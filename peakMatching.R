@@ -6,7 +6,10 @@
 standards <- read.csv("metaboliteRetentionTimes.csv", header=TRUE, sep=",", stringsAsFactors=FALSE, skip=1)[1:15, 1:2]
 unknowns <- read.csv("metaboliteRetentionTimes.csv", header=TRUE, sep=",", stringsAsFactors=FALSE, skip=1)[1:15, 5:6]
 
-for(i in 1:1000){
+nPerm <- 1000
+allData <- vector("list", length=nPerm)
+
+for(i in 1:nPerm){
   unknownRTs <- unknowns[sample(nrow(unknowns)), ] # shuffle row-wise
   standardRTs <- standards[, 2]
   matchingRTs <- vector(length=15)
@@ -18,5 +21,10 @@ for(i in 1:1000){
     matchingRTs[j] <- unknownRTs[metaboliteMatch, 2]
     matchingMix[j] <- unknownRTs[metaboliteMatch, 1]
   }
-  outputMatches <- data.frame(standards[, 1:2], matchingRTs, matchingMix)
+  outputMatches <- data.frame(metabolite=standards[, 1], standardRT=as.numeric(standards[, 2]), unknownRT=as.numeric(matchingRTs), unknownMix=matchingMix)
+  # method to analyze accuracy of matches - select order which minimizes RMSE
+  RMSE <- rmse(as.numeric(outputMatches$standardRT), as.numeric(outputMatches$unknownRT))
+  allData[[i]] <- c(RMSE=RMSE, outputMatches)
 }
+
+sortedData <- allData[order(RMSE)]
