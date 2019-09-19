@@ -1,6 +1,7 @@
-# Script to extract peak height and area data from HPLC excel files exported by Chromeleon software.
+# Function to extract peak height and area data from HPLC excel files exported by Chromeleon software.
 # Note - to avoid confusion regarding peak identity, only data from named peaks will be saved and analyzed.
 
+dataExtraction <- function(path, type="area"){
 # install any necessary packages if they aren't already installed
 packageList <- c("readxl", "ggplot2")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
@@ -13,7 +14,7 @@ library(readxl)
 library(ggplot2)
 
 # set folder containing all HPLC excel files as the working directory
-setwd("C:/Users/bca08_000/Documents/scutellaria/Test2 - Processing 2")
+setwd(path)
 
 # initialize empty list to store dataframes with all integration data
 allData <- list()
@@ -43,23 +44,28 @@ for(i in 1:length(dir())){
 # TODO: use subset function to identify and separate experiemental data from standard/wash data in allData
 # or have user separate files manually?
 
-# create new data frames to store peak height and area data for all samples
-areaData <- data.frame(matrix(ncol=length(intResults$`Peak Name`), nrow=length(allData)))
-heightData <- data.frame(matrix(ncol=length(intResults$`Peak Name`), nrow=length(allData)))
-
-# name columns of height and area dataframes to match peak names
-colnames(areaData) <- intResults$`Peak Name`
-colnames(heightData) <- intResults$`Peak Name`
-
-# loop through each dataframe in allData
-for(i in 1:length(allData)){
-  # save area and height data for each named peak
-  areaData[i, ] <- allData[[i]]$Area
-  heightData[i, ] <- allData[[i]]$Height 
-  # name row to match the name of the sample
-  rownames(areaData)[i] <- names(allData[i])
-  rownames(heightData)[i] <- names(allData[i])
+if(type == "area"){
+  # create new data frame to store peak areas
+  areaData <- data.frame(matrix(ncol=length(intResults$`Peak Name`), nrow=length(allData)))
+  # name columns to match peak names
+  colnames(areaData) <- intResults$`Peak Name`
+  # loop through each data frame in allData, and save peak areas into new row in areaData
+  for(i in 1:length(allData)){
+    areaData[i, ] <- allData[[i]]$Area
+    rownames(areaData)[i] <- names(allData[i])
+  }
+  return(areaData)
+}else if(type == "height"){
+  # create new data frame to store peak heights
+  heightData <- data.frame(matrix(ncol=length(intResults$`Peak Name`), nrow=length(allData)))
+  # name columns to match peak names
+  colnames(heightData) <- intResults$`Peak Name`
+  # loop through each data frame in allData, and save peak heights into new row in heightData
+  for(i in 1:length(allData)){
+    heightData[i, ] <- alldata[[i]]$Height
+    rownames(heightData)[i] <- names(allData[i])
+  }
+  return(heightData)
 }
 
-
-
+}
