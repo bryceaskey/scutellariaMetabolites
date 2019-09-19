@@ -62,7 +62,7 @@ if(type == "area"){
   colnames(heightData) <- intResults$`Peak Name`
   # loop through each data frame in allData, and save peak heights into new row in heightData
   for(i in 1:length(allData)){
-    heightData[i, ] <- alldata[[i]]$Height
+    heightData[i, ] <- allData[[i]]$Height
     rownames(heightData)[i] <- names(allData[i])
   }
   return(heightData)
