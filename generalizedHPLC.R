@@ -3,7 +3,7 @@
 
 dataExtraction <- function(path, type="area"){
 # install any necessary packages if they aren't already installed
-packageList <- c("readxl", "ggplot2")
+packageList <- c("readxl")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 if(length(newPackages) > 0){
   install.packages(newPackages)
