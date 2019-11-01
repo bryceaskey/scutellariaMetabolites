@@ -1,7 +1,7 @@
 library(ggplot2)
 library(plyr)
 
-heightData <- read.csv(file="E:/Scutellaria/Col and A2 -1 combined.csv")
+heightData <- read.csv(file="C:/Users/bca08_000/Documents/scutellaria/data/Col and A2 -1 combined.csv")
 colnames(heightData)  <- c("genotype", "group", "height")
 heightData[, 2] <- as.factor(heightData[, 2])
 
