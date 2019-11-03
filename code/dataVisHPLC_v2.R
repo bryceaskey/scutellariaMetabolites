@@ -78,32 +78,27 @@ allData <- data.frame(
 # Calculate mean and standard error -------------------------------------------------------------
 # Make one data frame for each metabolite, and combine into list.
 # Columns: variety / organ / mean / stError / upperSD / lowerSD
-sdData <- list()
+listData <- list()
 for(metName in colnames(allData)[4:ncol(allData)]){
   df <- ddply(allData, c("variety", "organ"), summarise, mean=mean(get(metName)), stError=sd(get(metName))/sqrt(length(get(metName))))
   df <- transform(df, lowerSD=mean-stError, upperSD=mean+stError)
   assign(metName, df)
 }
-sdData <- list(apigenin, apigeninG, scutellarein, scutellarin, hispidulin, hispiduloG, chrysin, chrysinG, wogonin, wogonoside, baicalein, baicalin, oroxylinA, oroxyloside, acetoside)
-names(sdData) <- colnames(allData)[4:ncol(allData)]
+listData <- list(apigenin, apigeninG, scutellarein, scutellarin, hispidulin, hispiduloG, chrysin, chrysinG, wogonin, wogonoside, baicalein, baicalin, oroxylinA, oroxyloside, acetoside)
+names(listData) <- colnames(allData)[4:ncol(allData)]
+rm(df, list=names(listData))
 
 # Better data structure to make scaled point figure with ------------------------------------------
-meanData <- ddply(allData, c("variety", "organ"), summarise,
-  apigeninMean=mean(apigenin),
-  apigeninGMean=mean(apigeninG),
-  scutellareinMean=mean(scutellarein),
-  scutellarinMean=mean(scutellarin),
-  hispidulinMean=mean(hispidulin),
-  hispiduloGMean=mean(hispiduloG),
-  chrysinMean=mean(chrysin),
-  chrysingGMean=mean(chrysinG),
-  wognoninMean=mean(wogonin),
-  wogonosideMean=mean(wogonoside),
-  baicaleinMean=mean(baicalein),
-  baicalinMean=mean(baicalin),
-  oroxylinAMean=mean(oroxylinA),
-  oroxylosideMean=mean(oroxyloside),
-  acetosideMean=mean(acetoside)
+allData <- do.call(rbind, listData)
+allData$metabolite <- factor(names(listData)[rep(1:length(listData), each=sapply(listData, nrow)[1])])
+rownames(allData) <- seq(1, nrow(allData))
+sumData <- ddply(allData, c("variety", "metabolite"), summarise, total=sum(mean))
+
+# Create scaled point plot ------------------------------------------------------------------------
+print(
+  ggplot(data=sumData, mapping=aes(x=variety, y=metabolite, fill=total)) +
+    geom_raster() +
+    coord_fixed()
 )
 
-# Calculate upper and lower limits for standard deviation -----------------------------------------
+# TODO: scale each metabolite as a % of maximum value?
