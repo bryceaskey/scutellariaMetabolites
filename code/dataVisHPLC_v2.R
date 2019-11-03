@@ -72,8 +72,38 @@ allData <- data.frame(
   acetoside=sapply(rawData$acetoside[23:112], ppmConversion, metaboliteName="acetoside", rawData=rawData)
 )
 
-# Calculate means and standard deviations for each metabolite in each variety ---------------------
-meanData <- ddply(allData, c("Variety", "Organ"), summarise,
-  acetosideMean=mean(...),
-  acetosideStError=sd(...)/sqrt(length(...))
+# TODO: Reconsider data structure. Make one data frame for each metabolite, and combine into list?
+# Columns: mean / stError / upperSD / lowerSD
+
+# Calculate mean and standard error -------------------------------------------------------------
+# Make one data frame for each metabolite, and combine into list.
+# Columns: variety / organ / mean / stError / upperSD / lowerSD
+sdData <- list()
+for(metName in colnames(allData)[4:ncol(allData)]){
+  df <- ddply(allData, c("variety", "organ"), summarise, mean=mean(get(metName)), stError=sd(get(metName))/sqrt(length(get(metName))))
+  df <- transform(df, lowerSD=mean-stError, upperSD=mean+stError)
+  assign(metName, df)
+}
+sdData <- list(apigenin, apigeninG, scutellarein, scutellarin, hispidulin, hispiduloG, chrysin, chrysinG, wogonin, wogonoside, baicalein, baicalin, oroxylinA, oroxyloside, acetoside)
+names(sdData) <- colnames(allData)[4:ncol(allData)]
+
+# Better data structure to make scaled point figure with ------------------------------------------
+meanData <- ddply(allData, c("variety", "organ"), summarise,
+  apigeninMean=mean(apigenin),
+  apigeninGMean=mean(apigeninG),
+  scutellareinMean=mean(scutellarein),
+  scutellarinMean=mean(scutellarin),
+  hispidulinMean=mean(hispidulin),
+  hispiduloGMean=mean(hispiduloG),
+  chrysinMean=mean(chrysin),
+  chrysingGMean=mean(chrysinG),
+  wognoninMean=mean(wogonin),
+  wogonosideMean=mean(wogonoside),
+  baicaleinMean=mean(baicalein),
+  baicalinMean=mean(baicalin),
+  oroxylinAMean=mean(oroxylinA),
+  oroxylosideMean=mean(oroxyloside),
+  acetosideMean=mean(acetoside)
 )
+
+# Calculate upper and lower limits for standard deviation -----------------------------------------
