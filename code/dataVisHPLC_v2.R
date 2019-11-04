@@ -92,13 +92,57 @@ rm(df, list=names(listData))
 allData <- do.call(rbind, listData)
 allData$metabolite <- factor(names(listData)[rep(1:length(listData), each=sapply(listData, nrow)[1])])
 rownames(allData) <- seq(1, nrow(allData))
-sumData <- ddply(allData, c("variety", "metabolite"), summarise, total=sum(mean))
 
-# Create scaled point plot ------------------------------------------------------------------------
-print(
-  ggplot(data=sumData, mapping=aes(x=variety, y=metabolite, fill=total)) +
-    geom_raster() +
-    coord_fixed()
+# Data structure for creating organ-specific raster plots -----------------------------------------
+organData <- list(
+  Leaves=subset(allData, organ=="Leaves", select=c("variety", "mean", "metabolite")),
+  Shoots=subset(allData, organ=="Shoots", select=c("variety", "mean", "metabolite")),
+  Roots=subset(allData, organ=="Roots", select=c("variety", "mean", "metabolite"))
 )
 
-# TODO: scale each metabolite as a % of maximum value?
+# Scale mean values for each metabolite as a % of max value ---------------------------------------
+# Define function to work on dataframe for a single organ
+normalizeValues <- function(df){
+  normData <- data.frame()
+  for(met in levels(df$metabolite)){
+    metData <- subset(df, metabolite==met)
+    maxConc <- max(metData$mean)
+    metData <- transform(metData, normMean=mean/maxConc)
+    normData <- rbind(normData, metData)
+    
+  }
+  return(normData)
+}
+
+# Apply function to each organ
+organData <- list(
+  Leaves=normalizeValues(organData$Leaves),
+  Shoots=normalizeValues(organData$Shoots),
+  Roots=normalizeValues(organData$Roots)
+)
+
+# Create raster plot (i.e. heatmap) for each organ ------------------------------------------------------------------------
+rootHeatmap <- ggplot(data=organData$Leaves, mapping=aes(x=variety, y=metabolite, fill=normMean)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=c("#FFFFFFFF","#FF3333")) +
+  coord_fixed() +
+  labs(title="Root normalized metabolite concentrations", x="Variety", y="Metabolite", fill="Normalized concentration") +
+  theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
+
+shootHeatmap <- ggplot(data=organData$Shoots, mapping=aes(x=variety, y=metabolite, fill=normMean)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=c("#FFFFFFFF","#009900")) +
+  coord_fixed() + 
+  labs(title="Shoot normalized metabolite concentrations", x="Variety", y="Metabolite", fill="Normalized concentration") +
+  theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
+
+leafHeatmap <- ggplot(data=organData$Leaves, mapping=aes(x=variety, y=metabolite, fill=normMean)) +
+  geom_raster() +
+  scale_fill_gradientn(colours=c("#FFFFFFFF","#0066CC")) +
+  coord_fixed() +
+  labs(title="Leaf normalized metabolite concentrations", x="Variety", y="Metabolite", fill="Normalized concentration") +
+  theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
+
+print(rootHeatmap)
+print(shootHeatmap)
+print(leafHeatmap)
