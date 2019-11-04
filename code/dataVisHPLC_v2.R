@@ -5,6 +5,7 @@
 library(ggplot2)
 library(plyr)
 library(tibble)
+library(cowplot)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
 rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellaria/data/metaboliteData.csv", header=TRUE)
@@ -115,34 +116,39 @@ normalizeValues <- function(df){
 }
 
 # Apply function to each organ
-organData <- list(
-  Leaves=normalizeValues(organData$Leaves),
-  Shoots=normalizeValues(organData$Shoots),
-  Roots=normalizeValues(organData$Roots)
-)
+#organData <- list(
+#  Leaves=normalizeValues(organData$Leaves),
+#  Shoots=normalizeValues(organData$Shoots),
+#  Roots=normalizeValues(organData$Roots)
+#)
 
 # Create raster plot (i.e. heatmap) for each organ ------------------------------------------------------------------------
-rootHeatmap <- ggplot(data=organData$Leaves, mapping=aes(x=variety, y=metabolite, fill=normMean)) +
+rootHeatmap <- ggplot(data=organData$Roots, mapping=aes(x=variety, y=metabolite, fill=mean)) +
   geom_raster() +
   scale_fill_gradientn(colours=c("#FFFFFFFF","#FF3333")) +
   coord_fixed() +
-  labs(title="Root normalized metabolite concentrations", x="Variety", y="Metabolite", fill="Normalized concentration") +
+  labs(title="Root metabolite concentrations", x="Variety", y="Metabolite", fill="Concentration (ppm)") +
   theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
 
-shootHeatmap <- ggplot(data=organData$Shoots, mapping=aes(x=variety, y=metabolite, fill=normMean)) +
+shootHeatmap <- ggplot(data=organData$Shoots, mapping=aes(x=variety, y=metabolite, fill=mean)) +
   geom_raster() +
   scale_fill_gradientn(colours=c("#FFFFFFFF","#009900")) +
   coord_fixed() + 
-  labs(title="Shoot normalized metabolite concentrations", x="Variety", y="Metabolite", fill="Normalized concentration") +
+  labs(title="Shoot metabolite concentrations", x="Variety", y="Metabolite", fill="Concentration (ppm)") +
   theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
 
-leafHeatmap <- ggplot(data=organData$Leaves, mapping=aes(x=variety, y=metabolite, fill=normMean)) +
+leafHeatmap <- ggplot(data=organData$Leaves, mapping=aes(x=variety, y=metabolite, fill=mean)) +
   geom_raster() +
   scale_fill_gradientn(colours=c("#FFFFFFFF","#0066CC")) +
   coord_fixed() +
-  labs(title="Leaf normalized metabolite concentrations", x="Variety", y="Metabolite", fill="Normalized concentration") +
+  labs(title="Leaf metabolite concentrations", x="Variety", y="Metabolite", fill="Concentration (ppm)") +
   theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
 
 print(rootHeatmap)
 print(shootHeatmap)
 print(leafHeatmap)
+
+# Method to create scaled pie charts --------------------------------------------------------------
+# Start by making pie chart for a single species and single organ, then combine using cowplot
+#sizes <- matrix(c(x$scale[1], x$scale[3], x$scale[5], x$scale[7], x$scale[9], x$scale[11], x$scale[13], x$scale[15], x$scale[17]), ncol = 3)
+#plot_grid(p1,p2,p3,p4,p5,p6,p7,p8,p9, align = "h", ncol = 3, nrow = 3, rel_widths = sizes, rel_heights = sizes)
