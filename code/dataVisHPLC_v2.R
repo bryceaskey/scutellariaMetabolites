@@ -150,5 +150,34 @@ print(leafHeatmap)
 
 # Method to create scaled pie charts --------------------------------------------------------------
 # Start by making pie chart for a single species and single organ, then combine using cowplot
-#sizes <- matrix(c(x$scale[1], x$scale[3], x$scale[5], x$scale[7], x$scale[9], x$scale[11], x$scale[13], x$scale[15], x$scale[17]), ncol = 3)
-#plot_grid(p1,p2,p3,p4,p5,p6,p7,p8,p9, align = "h", ncol = 3, nrow = 3, rel_widths = sizes, rel_heights = sizes)
+altissima <- ggplot(transform(subset(allData, variety=="Altissima"), organ=factor(organ, levels=c("Roots", "Shoots", "Leaves")))) +
+  geom_bar(mapping=aes(x="", y=mean, fill=metabolite), width=1, stat="identity", position="fill", color="white") +
+  coord_polar("y", start=0) +
+  facet_grid(~organ) +
+  theme(legend.position="bottom", legend.direction="horizontal")
+  #theme(axis.title.x = element_blank()) +
+  #geom_text(aes(y=lab.ypos, label=mean), color="white") +
+  #scale_fill_manual(values=)
+
+altissimaRoot <- ggplot(subset(subset(allData, variety=="Altissima"), organ=="Roots")) +
+  geom_bar(mapping=aes(x="", y=mean, fill=metabolite), width=1, stat="identity", position="fill", color="white", show.legend=FALSE) +
+  coord_polar("y", start=0) +
+  theme_void()
+
+altissimaShoot <- ggplot(subset(subset(allData, variety=="Altissima"), organ=="Shoots")) +
+  geom_bar(mapping=aes(x="", y=mean, fill=metabolite), width=1, stat="identity", position="fill", color="white", show.legend=FALSE) +
+  coord_polar("y", start=0) +
+  theme_void()
+
+altissimaLeaf <- ggplot(subset(subset(allData, variety=="Altissima"), organ=="Leaves")) +
+  geom_bar(mapping=aes(x="", y=mean, fill=metabolite), width=1, stat="identity", position="fill", color="white", show.legend=FALSE) +
+  coord_polar("y", start=0) +
+  theme_void()
+
+legend <- cowplot::get_legend(altissima)
+
+print(plot_grid(altissimaRoot, altissimaShoot, altissimaLeaf, 
+  nrow=1, ncol=3,
+  labels=c("Root", "Shoot", "Leaf"), label_x=0, label_y=1, label_size=14,
+  rel_widths=c(1, 3, 1)
+))
