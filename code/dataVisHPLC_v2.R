@@ -61,7 +61,7 @@ allData <- data.frame(
   scutellarein=sapply(rawData$scutellarein[23:112], ppmConversion, metaboliteName="scutellarein", rawData=rawData),
   scutellarin=sapply(rawData$scutellarin[23:112], ppmConversion, metaboliteName="scutellarin", rawData=rawData),
   hispidulin=sapply(rawData$hispidulin[23:112], ppmConversion, metaboliteName="hispidulin", rawData=rawData),
-  hispiduloG=sapply(rawData$hispiduloG[23:112], ppmConversion, metaboliteName="hispiduloG", rawData=rawData),
+  hispidulinG=sapply(rawData$hispidulinG[23:112], ppmConversion, metaboliteName="hispidulinG", rawData=rawData),
   chrysin=sapply(rawData$chrysin[23:112], ppmConversion, metaboliteName="chrysin", rawData=rawData),
   chrysinG=sapply(rawData$chrysinG[23:112], ppmConversion, metaboliteName="chrysinG", rawData=rawData),
   wogonin=sapply(rawData$wogonin[23:112], ppmConversion, metaboliteName="wogonin", rawData=rawData),
@@ -85,7 +85,7 @@ for(metName in colnames(allData)[4:ncol(allData)]){
   df <- transform(df, lowerSD=mean-stError, upperSD=mean+stError)
   assign(metName, df)
 }
-listData <- list(apigenin, apigeninG, scutellarein, scutellarin, hispidulin, hispiduloG, chrysin, chrysinG, wogonin, wogonoside, baicalein, baicalin, oroxylinA, oroxyloside, acetoside)
+listData <- list(apigenin, apigeninG, scutellarein, scutellarin, hispidulin, hispidulinG, chrysin, chrysinG, wogonin, wogonoside, baicalein, baicalin, oroxylinA, oroxyloside, acetoside)
 names(listData) <- colnames(allData)[4:ncol(allData)]
 rm(df, list=names(listData))
 
@@ -116,37 +116,48 @@ normalizeValues <- function(df){
 }
 
 # Apply function to each organ
-#organData <- list(
-#  Leaves=normalizeValues(organData$Leaves),
-#  Shoots=normalizeValues(organData$Shoots),
-#  Roots=normalizeValues(organData$Roots)
-#)
+organData <- list(
+  Leaves=normalizeValues(organData$Leaves),
+  Shoots=normalizeValues(organData$Shoots),
+  Roots=normalizeValues(organData$Roots)
+)
 
 # Create raster plot (i.e. heatmap) for each organ ------------------------------------------------------------------------
+# Remove Havenesis, move Tourmetii next to Lateriflora, and adjust metabolite order to match pathway
+varietyOrder <- c("Altissima", "Arenicola", "Baicalensis", "Barbata", "Hastafolia", "Lateriflora", "Tourmetii", "Racemosa 071119", "Racemosa MS", "Racemosa SC", "RNA Seq")
+metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein", "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
+organData$Leaves <- subset(organData$Leaves, variety!="Havenesis")
+organData$Leaves$variety <- factor(organData$Leaves$variety, levels=varietyOrder)
+organData$Leaves$metabolite <- factor(organData$Leaves$metabolite, levels=metaboliteOrder)
+organData$Shoots <- subset(organData$Shoots, variety!="Havenesis")
+organData$Shoots$variety <- factor(organData$Shoots$variety, levels=varietyOrder)
+organData$Shoots$metabolite <- factor(organData$Shoots$metabolite, levels=metaboliteOrder)
+organData$Roots <- subset(organData$Roots, variety!="Havenesis")
+organData$Roots$variety <- factor(organData$Roots$variety, levels=varietyOrder)
+organData$Roots$metabolite <- factor(organData$Roots$metabolite, levels=metaboliteOrder)
+
 rootHeatmap <- ggplot(data=organData$Roots, mapping=aes(x=variety, y=metabolite, fill=mean)) +
   geom_raster() +
   scale_fill_gradientn(colours=c("#FFFFFFFF","#FF3333")) +
   coord_fixed() +
-  labs(title="Root metabolite concentrations", x="Variety", y="Metabolite", fill="Concentration (ppm)") +
+  labs(title="Root metabolites", x="Variety", y="Metabolite", fill="Conc (ppm)") +
   theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
 
 shootHeatmap <- ggplot(data=organData$Shoots, mapping=aes(x=variety, y=metabolite, fill=mean)) +
   geom_raster() +
   scale_fill_gradientn(colours=c("#FFFFFFFF","#009900")) +
   coord_fixed() + 
-  labs(title="Shoot metabolite concentrations", x="Variety", y="Metabolite", fill="Concentration (ppm)") +
+  labs(title="Shoot metabolites", x="Variety", y="Metabolite", fill="Conc (ppm)") +
   theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
 
 leafHeatmap <- ggplot(data=organData$Leaves, mapping=aes(x=variety, y=metabolite, fill=mean)) +
   geom_raster() +
   scale_fill_gradientn(colours=c("#FFFFFFFF","#0066CC")) +
   coord_fixed() +
-  labs(title="Leaf metabolite concentrations", x="Variety", y="Metabolite", fill="Concentration (ppm)") +
+  labs(title="Leaf metabolites", x="Variety", y="Metabolite", fill="Conc (ppm)") +
   theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
 
-print(rootHeatmap)
-print(shootHeatmap)
-print(leafHeatmap)
+plot_grid(rootHeatmap, shootHeatmap, leafHeatmap, nrow=1, ncol=3)
 
 # Method to create scaled pie charts --------------------------------------------------------------
 # Start by making pie chart for a single species and single organ, then combine using cowplot
