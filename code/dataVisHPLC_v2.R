@@ -4,6 +4,7 @@
 
 library(ggplot2)
 library(plyr)
+library(dplyr)
 library(tibble)
 library(cowplot)
 
@@ -74,15 +75,15 @@ allData <- data.frame(
 )
 
 # TODO: Reconsider data structure. Make one data frame for each metabolite, and combine into list?
-# Columns: mean / stError / upperSD / lowerSD
+# Columns: meanConc / stError / upperSD / lowerSD
 
 # Calculate mean and standard error -------------------------------------------------------------
 # Make one data frame for each metabolite, and combine into list.
-# Columns: variety / organ / mean / stError / upperSD / lowerSD
+# Columns: variety / organ / meanConc / stError / upperSD / lowerSD
 listData <- list()
 for(metName in colnames(allData)[4:ncol(allData)]){
-  df <- ddply(allData, c("variety", "organ"), summarise, mean=mean(get(metName)), stError=sd(get(metName))/sqrt(length(get(metName))))
-  df <- transform(df, lowerSD=mean-stError, upperSD=mean+stError)
+  df <- ddply(allData, c("variety", "organ"), summarise, meanConc=mean(get(metName)), stError=sd(get(metName))/sqrt(length(get(metName))))
+  df <- transform(df, lowerSD=meanConc-stError, upperSD=meanConc+stError)
   assign(metName, df)
 }
 listData <- list(apigenin, apigeninG, scutellarein, scutellarin, hispidulin, hispidulinG, chrysin, chrysinG, wogonin, wogonoside, baicalein, baicalin, oroxylinA, oroxyloside, acetoside)
@@ -96,9 +97,9 @@ rownames(allData) <- seq(1, nrow(allData))
 
 # Data structure for creating organ-specific raster plots -----------------------------------------
 organData <- list(
-  Leaves=subset(allData, organ=="Leaves", select=c("variety", "mean", "metabolite")),
-  Shoots=subset(allData, organ=="Shoots", select=c("variety", "mean", "metabolite")),
-  Roots=subset(allData, organ=="Roots", select=c("variety", "mean", "metabolite"))
+  Leaves=subset(allData, organ=="Leaves", select=c("variety", "meanConc", "metabolite")),
+  Shoots=subset(allData, organ=="Shoots", select=c("variety", "meanConc", "metabolite")),
+  Roots=subset(allData, organ=="Roots", select=c("variety", "meanConc", "metabolite"))
 )
 
 # Scale mean values for each metabolite as a % of max value ---------------------------------------
@@ -107,8 +108,8 @@ normalizeValues <- function(df){
   normData <- data.frame()
   for(met in levels(df$metabolite)){
     metData <- subset(df, metabolite==met)
-    maxConc <- max(metData$mean)
-    metData <- transform(metData, normMean=mean/maxConc)
+    maxConc <- max(metData$meanConc)
+    metData <- transform(metData, normMean=meanConc/maxConc)
     normData <- rbind(normData, metData)
     
   }
@@ -136,21 +137,21 @@ organData$Roots <- subset(organData$Roots, variety!="Havenesis")
 organData$Roots$variety <- factor(organData$Roots$variety, levels=varietyOrder)
 organData$Roots$metabolite <- factor(organData$Roots$metabolite, levels=metaboliteOrder)
 
-rootHeatmap <- ggplot(data=organData$Roots, mapping=aes(x=variety, y=metabolite, fill=mean)) +
+rootHeatmap <- ggplot(data=organData$Roots, mapping=aes(x=variety, y=metabolite, fill=meanConc)) +
   geom_raster() +
   scale_fill_gradientn(colours=c("#FFFFFFFF","#FF3333")) +
   coord_fixed() +
   labs(title="Root metabolites", x="Variety", y="Metabolite", fill="Conc (ppm)") +
   theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
 
-shootHeatmap <- ggplot(data=organData$Shoots, mapping=aes(x=variety, y=metabolite, fill=mean)) +
+shootHeatmap <- ggplot(data=organData$Shoots, mapping=aes(x=variety, y=metabolite, fill=meanConc)) +
   geom_raster() +
   scale_fill_gradientn(colours=c("#FFFFFFFF","#009900")) +
   coord_fixed() + 
   labs(title="Shoot metabolites", x="Variety", y="Metabolite", fill="Conc (ppm)") +
   theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
 
-leafHeatmap <- ggplot(data=organData$Leaves, mapping=aes(x=variety, y=metabolite, fill=mean)) +
+leafHeatmap <- ggplot(data=organData$Leaves, mapping=aes(x=variety, y=metabolite, fill=meanConc)) +
   geom_raster() +
   scale_fill_gradientn(colours=c("#FFFFFFFF","#0066CC")) +
   coord_fixed() +
@@ -160,35 +161,73 @@ leafHeatmap <- ggplot(data=organData$Leaves, mapping=aes(x=variety, y=metabolite
 plot_grid(rootHeatmap, shootHeatmap, leafHeatmap, nrow=1, ncol=3)
 
 # Method to create scaled pie charts --------------------------------------------------------------
-# Start by making pie chart for a single species and single organ, then combine using cowplot
 altissima <- ggplot(transform(subset(allData, variety=="Altissima"), organ=factor(organ, levels=c("Roots", "Shoots", "Leaves")))) +
-  geom_bar(mapping=aes(x="", y=mean, fill=metabolite), width=1, stat="identity", position="fill", color="white") +
+  geom_bar(mapping=aes(x="", y=meanConc, fill=metabolite), width=1, stat="identity", position="fill", color="white") +
   coord_polar("y", start=0) +
   facet_grid(~organ) +
   theme(legend.position="bottom", legend.direction="horizontal")
-  #theme(axis.title.x = element_blank()) +
-  #geom_text(aes(y=lab.ypos, label=mean), color="white") +
-  #scale_fill_manual(values=)
 
-altissimaRoot <- ggplot(subset(subset(allData, variety=="Altissima"), organ=="Roots")) +
-  geom_bar(mapping=aes(x="", y=mean, fill=metabolite), width=1, stat="identity", position="fill", color="white", show.legend=FALSE) +
-  coord_polar("y", start=0) +
-  theme_void()
+altissimaRootData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Roots"), meanConc>0)
+altissimaShootData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Shoots"), meanConc>0)
+altissimaLeafData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Leaves"), meanConc>0)
 
-altissimaShoot <- ggplot(subset(subset(allData, variety=="Altissima"), organ=="Shoots")) +
-  geom_bar(mapping=aes(x="", y=mean, fill=metabolite), width=1, stat="identity", position="fill", color="white", show.legend=FALSE) +
-  coord_polar("y", start=0) +
-  theme_void()
+# Calculate position of labels in pie charts ------------------------------------------------------
+altissimaRootData <- altissimaRootData %>%
+  mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
+   start=lag(end, default=0),
+   middle=0.5*(start+end),
+   hjust=ifelse(middle>pi, 1, 0),
+   vjust=ifelse(middle<pi/2 | middle>3*pi/2, 0, 1))
 
-altissimaLeaf <- ggplot(subset(subset(allData, variety=="Altissima"), organ=="Leaves")) +
-  geom_bar(mapping=aes(x="", y=mean, fill=metabolite), width=1, stat="identity", position="fill", color="white", show.legend=FALSE) +
-  coord_polar("y", start=0) +
-  theme_void()
+altissimaRoot <- ggplot(altissimaRootData) +
+  geom_arc_bar(mapping=aes(x0=0, y0=0, r0=0, r=1, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
+  geom_text(mapping=aes(x=1.05*sin(middle), y=1.05*cos(middle), label=metabolite, hjust=hjust, vjust=vjust)) +
+  coord_fixed() +
+  scale_x_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
+  scale_y_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
+  theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
+
+altissimaShootData <- altissimaShootData %>%
+  mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
+   start=lag(end, default=0),
+   middle=0.5*(start+end),
+   hjust=ifelse(middle>pi, 1, 0),
+   vjust=ifelse(middle<pi/2 | middle>3*pi/2, 0, 1))
+
+altissimaShoot <- ggplot(altissimaShootData) +
+  geom_arc_bar(mapping=aes(x0=0, y0=0, r0=0, r=1, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
+  geom_text(mapping=aes(x=1.05*sin(middle), y=1.05*cos(middle), label=metabolite, hjust=hjust, vjust=vjust)) +
+  coord_fixed() +
+  scale_x_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
+  scale_y_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
+  theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
+
+altissimaLeafData <- altissimaLeafData %>%
+  mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
+   start=lag(end, default=0),
+   middle=0.5*(start+end),
+   hjust=ifelse(middle>pi, 1, 0),
+   vjust=ifelse(middle<pi/2 | middle>3*pi/2, 0, 1))
+
+altissimaLeaf <- ggplot(altissimaLeafData) +
+  geom_arc_bar(mapping=aes(x0=0, y0=0, r0=0, r=1, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
+  geom_text(mapping=aes(x=1.05*sin(middle), y=1.05*cos(middle), label=metabolite, hjust=hjust, vjust=vjust)) +
+  coord_fixed() +
+  scale_x_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
+  scale_y_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
+  theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
+
+# TODO: Make position calculation and pie chart generation into functions to simplify large-scale implementation.
+# TODO: Replace metabolite names with numbers in pie chart, and add corresponding number to label in legend.
 
 legend <- cowplot::get_legend(altissima)
+
+pieSizes <- ddply(allData, c("variety", "organ"), summarise, area=sum(meanConc))
+pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
 
 print(plot_grid(altissimaRoot, altissimaShoot, altissimaLeaf, 
   nrow=1, ncol=3,
   labels=c("Root", "Shoot", "Leaf"), label_x=0, label_y=1, label_size=14,
-  rel_widths=c(1, 3, 1)
+  rel_widths=c(pieSizes$radius[2], pieSizes$radius[3], pieSizes$radius[1]),
+  rel_heights=c(pieSizes$radius[2], pieSizes$radius[3], pieSizes$radius[1])
 ))
