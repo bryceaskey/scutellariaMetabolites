@@ -7,9 +7,10 @@ library(plyr)
 library(dplyr)
 library(tibble)
 library(cowplot)
+library(ggforce)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellaria/data/metaboliteData.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
 # Define functions for interpreting injection names -----------------------------------------------
@@ -166,6 +167,8 @@ altissima <- ggplot(transform(subset(allData, variety=="Altissima"), organ=facto
   coord_polar("y", start=0) +
   facet_grid(~organ) +
   theme(legend.position="bottom", legend.direction="horizontal")
+# Remove rows with meanConc = 0, but maintain consistent color scheme across all plots
+# Colors must be first be manually assigned to metabolites
 
 altissimaRootData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Roots"), meanConc>0)
 altissimaShootData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Shoots"), meanConc>0)
