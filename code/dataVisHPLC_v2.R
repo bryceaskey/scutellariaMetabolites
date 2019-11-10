@@ -10,7 +10,7 @@ library(cowplot)
 library(ggforce)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellaria/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
 # Define functions for interpreting injection names -----------------------------------------------
@@ -93,45 +93,37 @@ allData <- do.call(rbind, listData)
 allData$metabolite <- factor(names(listData)[rep(1:length(listData), each=sapply(listData, nrow)[1])])
 rownames(allData) <- seq(1, nrow(allData))
 
-# Create raster plot (i.e. heatmap) for each organ ------------------------------------------------
-# Remove Havenesis, move Tourmetii next to Lateriflora, and adjust metabolite order to match pathway
-# Add column with numerical labels to match metabolite order
+# Adjust allData structure for easier plotting ----------------------------------------------------
 varietyOrder <- c("Altissima", "Arenicola", "Baicalensis", "Barbata", "Hastafolia", "Lateriflora", "Tourmetii", "Racemosa 071119", "Racemosa MS", "Racemosa SC", "RNA Seq")
 metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein", "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
 organOrder <- c("Roots", "Shoots", "Leaves")
-allData <- filter(allData, variety!="Havenesis")
+allData <- filter(allData, variety!="Havenesis") #remove Havenesis
 allData$variety <- factor(allData$variety, levels=varietyOrder)
 allData$metabolite <- factor(allData$metabolite, levels=metaboliteOrder)
 allData$organ <- factor(allData$organ, levels=organOrder)
-allData$metNum <- as.numeric(allData$metabolite)
+allData$metNum <- as.numeric(allData$metabolite) #create new column w/ factor nums - for pie chart sector labeling
 
-createHeatmap <- function(allData, organ){
-  
+# Define function to create raster plot (i.e. heatmap) for each organ -----------------------------
+createHeatmap <- function(allData, plantOrgan){
+  if(plantOrgan=="Roots"){
+    colorScale <- c("#FFFFFFFF", "#FF3333")
+    plotTitle <- "Root metabolites"
+  }else if(plantOrgan=="Shoots"){
+    colorScale <- c("#FFFFFFFF", "#009900")
+    plotTitle <- "Shoot metabolites"
+  }else{
+    colorScale <- c("#FFFFFFFF", "#0066CC")
+    plotTitle <- "Leaf metabolites"
+  }
+  organData <- filter(allData, organ==plantOrgan)
+  heatmap <- ggplot(data=organData) +
+    geom_raster(mapping=aes(x=variety, y=metabolite, fill=meanConc)) +
+    scale_fill_gradientn(colours=colorScale) +
+    coord_fixed() +
+    labs(title=plotTitle, x="Variety", y="Metabolite", fill="Conc (ppm)") +
+    theme(axis.text.x=element_text(angle=90, vjust=0.5, hjust=1))
   return(heatmap)
 }
-
-rootHeatmap <- ggplot(data=filter(allData, organ=="Roots"), mapping=aes(x=variety, y=metabolite, fill=meanConc)) +
-  geom_raster() +
-  scale_fill_gradientn(colours=c("#FFFFFFFF","#FF3333")) +
-  coord_fixed() +
-  labs(title="Root metabolites", x="Variety", y="Metabolite", fill="Conc (ppm)") +
-  theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
-
-shootHeatmap <- ggplot(data=filter(allData, organ=="Shoots"), mapping=aes(x=variety, y=metabolite, fill=meanConc)) +
-  geom_raster() +
-  scale_fill_gradientn(colours=c("#FFFFFFFF","#009900")) +
-  coord_fixed() + 
-  labs(title="Shoot metabolites", x="Variety", y="Metabolite", fill="Conc (ppm)") +
-  theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
-
-leafHeatmap <- ggplot(data=filter(allData, organ=="Leaves"), mapping=aes(x=variety, y=metabolite, fill=meanConc)) +
-  geom_raster() +
-  scale_fill_gradientn(colours=c("#FFFFFFFF","#0066CC")) +
-  coord_fixed() +
-  labs(title="Leaf metabolites", x="Variety", y="Metabolite", fill="Conc (ppm)") +
-  theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1))
-
-plot_grid(rootHeatmap, shootHeatmap, leafHeatmap, nrow=1, ncol=3)
 
 # Method to create scaled pie charts --------------------------------------------------------------
 altissima <- ggplot(transform(subset(allData, variety=="Altissima"), organ=factor(organ, levels=c("Roots", "Shoots", "Leaves")))) +
@@ -144,11 +136,12 @@ altissima <- ggplot(transform(subset(allData, variety=="Altissima"), organ=facto
 metaboliteColors <- c("#8B0000", "#DC143C", "#FF7F50", "#FFD700", "#B8860B", "#BDB76B", "#808000", "#9ACD32", "#2E8B57", "#66CDAA", "#2F4F4F", "#008080", "#4682B4", "#8A2BE2", "#8B008B")
 names(metaboliteColors) <- metaboliteOrder
 
-altissimaRootData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Roots"), meanConc>0)
-altissimaShootData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Shoots"), meanConc>0)
-altissimaLeafData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Leaves"), meanConc>0)
+altissimaRootData <- filter(allData, variety=="Altissima" & organ=="Roots" & meanConc>0)
+altissimaShootData <- filter(allData, variety=="Altissima" & organ=="Shoots" & meanConc>0)
+altissimaLeafData <- filter(allData, variety=="Altissima" & organ=="Leaves" & meanConc>0)
 
 # Calculate position of labels in pie charts ------------------------------------------------------
+altissimaRootData <- altissimaRootData[order(altissimaRootData$metNum), ]
 altissimaRootData <- altissimaRootData %>%
   mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
   start=lag(end, default=0),
@@ -165,6 +158,7 @@ altissimaRoot <- ggplot(altissimaRootData) +
   scale_fill_manual(values=metaboliteColors) +
   theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
 
+altissimaShootData <- altissimaShootData[order(altissimaShootData$metNum), ]
 altissimaShootData <- altissimaShootData %>%
   mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
   start=lag(end, default=0),
@@ -181,6 +175,7 @@ altissimaShoot <- ggplot(altissimaShootData) +
   scale_fill_manual(values=metaboliteColors) +
   theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
 
+altissimaLeafData <- altissimaLeafData[order(altissimaLeafData$metNum), ]
 altissimaLeafData <- altissimaLeafData %>%
   mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
   start=lag(end, default=0),
@@ -198,8 +193,7 @@ altissimaLeaf <- ggplot(altissimaLeafData) +
   theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
 
 # TODO: Make position calculation and pie chart generation into functions to simplify large-scale implementation.
-# TODO: Replace metabolite names with numbers in pie chart, and add corresponding number to label in legend.
-
+# TODO: Increase distance of labels from sectors, and add tick marks to middle.
 legend <- cowplot::get_legend(altissima)
 
 pieSizes <- ddply(allData, c("variety", "organ"), summarise, area=sum(meanConc))
