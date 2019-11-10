@@ -169,6 +169,8 @@ altissima <- ggplot(transform(subset(allData, variety=="Altissima"), organ=facto
   theme(legend.position="bottom", legend.direction="horizontal")
 # Remove rows with meanConc = 0, but maintain consistent color scheme across all plots
 # Colors must be first be manually assigned to metabolites
+metaboliteColors <- c("#8B0000", "#DC143C", "#FF7F50", "#FFD700", "#B8860B", "#BDB76B", "#808000", "#9ACD32", "#2E8B57", "#66CDAA", "#2F4F4F", "#008080", "#4682B4", "#8A2BE2", "#8B008B")
+names(metaboliteColors) <- metaboliteOrder
 
 altissimaRootData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Roots"), meanConc>0)
 altissimaShootData <- subset(subset(subset(allData, variety=="Altissima"), organ=="Shoots"), meanConc>0)
@@ -188,6 +190,7 @@ altissimaRoot <- ggplot(altissimaRootData) +
   coord_fixed() +
   scale_x_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
   scale_y_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
+  scale_fill_manual(values=metaboliteColors) +
   theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
 
 altissimaShootData <- altissimaShootData %>%
@@ -203,6 +206,7 @@ altissimaShoot <- ggplot(altissimaShootData) +
   coord_fixed() +
   scale_x_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
   scale_y_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
+  scale_fill_manual(values=metaboliteColors) +
   theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
 
 altissimaLeafData <- altissimaLeafData %>%
@@ -218,6 +222,7 @@ altissimaLeaf <- ggplot(altissimaLeafData) +
   coord_fixed() +
   scale_x_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
   scale_y_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
+  scale_fill_manual(values=metaboliteColors) +
   theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
 
 # TODO: Make position calculation and pie chart generation into functions to simplify large-scale implementation.
