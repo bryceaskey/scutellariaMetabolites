@@ -10,7 +10,7 @@ library(cowplot)
 library(ggforce)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellaria/data/metaboliteData.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
 # Define functions for interpreting injection names -----------------------------------------------
@@ -125,16 +125,20 @@ createHeatmap <- function(allData, plantOrgan){
   return(heatmap)
 }
 
-# Method to create scaled pie charts --------------------------------------------------------------
-altissima <- ggplot(transform(subset(allData, variety=="Altissima"), organ=factor(organ, levels=c("Roots", "Shoots", "Leaves")))) +
-  geom_bar(mapping=aes(x="", y=meanConc, fill=metabolite), width=1, stat="identity", position="fill", color="white") +
-  coord_polar("y", start=0) +
-  facet_grid(~organ) +
-  theme(legend.position="bottom", legend.direction="horizontal")
-# Remove rows with meanConc = 0, but maintain consistent color scheme across all plots
-# Colors must be first be manually assigned to metabolites
+
+# Set colors to be used for metabolites across all plots ------------------------------------------
 metaboliteColors <- c("#8B0000", "#DC143C", "#FF7F50", "#FFD700", "#B8860B", "#BDB76B", "#808000", "#9ACD32", "#2E8B57", "#66CDAA", "#2F4F4F", "#008080", "#4682B4", "#8A2BE2", "#8B008B")
 names(metaboliteColors) <- metaboliteOrder
+
+# Define function to create color legend for scaled pie charts ------------------------------------
+createLegend <- function(allData, metaboliteColors, legendOrientation="horizontal"){
+  x <- ggplot(filter(allData, variety==levels(allData$variety)[1])) +
+    geom_bar(mapping=aes(x="", y=meanConc, fill=metabolite), stat="identity") +
+    theme(legend.position="bottom", legend.direction=legendOrientation) +
+    scale_fill_manual(values=metaboliteColors, labels=paste(seq(1, 15), ". ", names(metaboliteColors), sep=""))
+  legend <- get_legend(x)
+  return(legend)
+}
 
 altissimaRootData <- filter(allData, variety=="Altissima" & organ=="Roots" & meanConc>0)
 altissimaShootData <- filter(allData, variety=="Altissima" & organ=="Shoots" & meanConc>0)
@@ -199,9 +203,19 @@ legend <- cowplot::get_legend(altissima)
 pieSizes <- ddply(allData, c("variety", "organ"), summarise, area=sum(meanConc))
 pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
 
-print(plot_grid(altissimaRoot, altissimaShoot, altissimaLeaf,
+pies <- plot_grid(altissimaRoot, altissimaShoot, altissimaLeaf,
   nrow=1, ncol=3,
   labels=c("Root", "Shoot", "Leaf"), label_x=0, label_y=1, label_size=14,
   rel_widths=c(pieSizes$radius[1], pieSizes$radius[2], pieSizes$radius[3]),
   rel_heights=c(pieSizes$radius[1], pieSizes$radius[2], pieSizes$radius[3])
+)
+
+legend <- plot_grid(createLegend(allData, metaboliteColors, "horizontal"),
+  nrow=1, ncol=1
+)
+
+print(plot_grid(pies, legend,
+  nrow=2, ncol=1
 ))
+
+
