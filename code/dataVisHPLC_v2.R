@@ -198,7 +198,6 @@ altissimaLeaf <- ggplot(altissimaLeafData) +
 
 # TODO: Make position calculation and pie chart generation into functions to simplify large-scale implementation.
 # TODO: Increase distance of labels from sectors, and add tick marks to middle.
-legend <- cowplot::get_legend(altissima)
 
 pieSizes <- ddply(allData, c("variety", "organ"), summarise, area=sum(meanConc))
 pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
