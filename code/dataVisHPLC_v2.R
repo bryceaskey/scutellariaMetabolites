@@ -140,6 +140,9 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
   return(legend)
 }
 
+# Define function to create pie chart -------------------------------------------------------------
+createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan){}
+
 altissimaRootData <- filter(allData, variety=="Altissima" & organ=="Roots" & meanConc>0)
 altissimaShootData <- filter(allData, variety=="Altissima" & organ=="Shoots" & meanConc>0)
 altissimaLeafData <- filter(allData, variety=="Altissima" & organ=="Leaves" & meanConc>0)
