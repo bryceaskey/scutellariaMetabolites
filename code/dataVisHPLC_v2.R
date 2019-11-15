@@ -10,7 +10,7 @@ library(cowplot)
 library(ggforce)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
 # Define functions for interpreting injection names -----------------------------------------------
@@ -140,84 +140,51 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
   return(legend)
 }
 
-# Define function to create pie chart -------------------------------------------------------------
-createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan){}
+# Define function to create pie charts ------------------------------------------------------------
+createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan){
+  subData <- filter(allData, variety==plantVariety & organ==plantOrgan & meanConc>0)
+  subData <- subData[order(subData$metNum), ]
+  subData <- subData %>% mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
+    start=lag(end, default=0),
+    middle=0.5*(start+end),
+    hjust=ifelse(middle>pi, 1, 0),
+    vjust=ifelse(middle<pi | middle>3*pi/2, 0, 1))
+  pieChart <- ggplot(data=subData) +
+    geom_arc_bar(mapping=aes(x0=0, y0=0.035, r0=0, r=0.95, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
+    geom_text(mapping=aes(x=1.1*sin(middle), y=1.1*cos(middle), label=metNum, hjust=hjust, vjust=vjust)) +
+    coord_fixed() +
+    scale_x_continuous(limits=c(-1.2, 1.2), name="", breaks=NULL, labels=NULL) +
+    scale_y_continuous(limits=c(-1.2, 1.2), name="", breaks=NULL, labels=NULL) +
+    scale_fill_manual(values=metaboliteColors) +
+    theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
+  return(pieChart)
+}
 
-altissimaRootData <- filter(allData, variety=="Altissima" & organ=="Roots" & meanConc>0)
-altissimaShootData <- filter(allData, variety=="Altissima" & organ=="Shoots" & meanConc>0)
-altissimaLeafData <- filter(allData, variety=="Altissima" & organ=="Leaves" & meanConc>0)
-
-# Calculate position of labels in pie charts ------------------------------------------------------
-altissimaRootData <- altissimaRootData[order(altissimaRootData$metNum), ]
-altissimaRootData <- altissimaRootData %>%
-  mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
-  start=lag(end, default=0),
-  middle=0.5*(start+end),
-  hjust=ifelse(middle>pi, 1, 0),
-  vjust=ifelse(middle<pi/2 | middle>3*pi/2, 0, 1))
-
-altissimaRoot <- ggplot(altissimaRootData) +
-  geom_arc_bar(mapping=aes(x0=0, y0=0, r0=0, r=1, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
-  geom_text(mapping=aes(x=1.05*sin(middle), y=1.05*cos(middle), label=metNum, hjust=hjust, vjust=vjust)) +
-  coord_fixed() +
-  scale_x_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
-  scale_y_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
-  scale_fill_manual(values=metaboliteColors) +
-  theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
-
-altissimaShootData <- altissimaShootData[order(altissimaShootData$metNum), ]
-altissimaShootData <- altissimaShootData %>%
-  mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
-  start=lag(end, default=0),
-  middle=0.5*(start+end),
-  hjust=ifelse(middle>pi, 1, 0),
-  vjust=ifelse(middle<pi/2 | middle>3*pi/2, 0, 1))
-
-altissimaShoot <- ggplot(altissimaShootData) +
-  geom_arc_bar(mapping=aes(x0=0, y0=0, r0=0, r=1, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
-  geom_text(mapping=aes(x=1.05*sin(middle), y=1.05*cos(middle), label=metNum, hjust=hjust, vjust=vjust)) +
-  coord_fixed() +
-  scale_x_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
-  scale_y_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
-  scale_fill_manual(values=metaboliteColors) +
-  theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
-
-altissimaLeafData <- altissimaLeafData[order(altissimaLeafData$metNum), ]
-altissimaLeafData <- altissimaLeafData %>%
-  mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
-  start=lag(end, default=0),
-  middle=0.5*(start+end),
-  hjust=ifelse(middle>pi, 1, 0),
-  vjust=ifelse(middle<pi/2 | middle>3*pi/2, 0, 1))
-
-altissimaLeaf <- ggplot(altissimaLeafData) +
-  geom_arc_bar(mapping=aes(x0=0, y0=0, r0=0, r=1, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
-  geom_text(mapping=aes(x=1.05*sin(middle), y=1.05*cos(middle), label=metNum, hjust=hjust, vjust=vjust)) +
-  coord_fixed() +
-  scale_x_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
-  scale_y_continuous(limits=c(-1.5, 1.5), name="", breaks=NULL, labels=NULL) +
-  scale_fill_manual(values=metaboliteColors) +
-  theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
-
-# TODO: Make position calculation and pie chart generation into functions to simplify large-scale implementation.
 # TODO: Increase distance of labels from sectors, and add tick marks to middle.
 
+# For loop to create list of pie charts for plotting ----------------------------------------------
+allPies <- vector("list", length=length(levels(allData$variety))*3)
+i = 0
+for(variety in levels(allData$variety)){
+  for(organ in levels(allData$organ)){
+    i = i + 1
+    allPies[[i]] <- local({
+      i <- i
+      pieChart <- createPieChart(allData, metaboliteColors, variety, organ)
+    })
+    names(allPies)[i] <- paste(variety, organ)
+  }
+}
+
+# Calculate size of pies based on total amount of metabolites -------------------------------------
 pieSizes <- ddply(allData, c("variety", "organ"), summarise, area=sum(meanConc))
 pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
 
-pies <- plot_grid(altissimaRoot, altissimaShoot, altissimaLeaf,
-  nrow=1, ncol=3,
-  labels=c("Root", "Shoot", "Leaf"), label_x=0, label_y=1, label_size=14,
-  rel_widths=c(pieSizes$radius[1], pieSizes$radius[2], pieSizes$radius[3]),
-  rel_heights=c(pieSizes$radius[1], pieSizes$radius[2], pieSizes$radius[3])
+allPies <- allPies[1:24]
+pieSizes <- pieSizes[1:24, ]
+
+print(plot_grid(plotlist=allPies, 
+  ncol=3,
+  rel_heights=pieSizes$radius,
+  rel_widths=pieSizes$radius)
 )
-
-legend <- plot_grid(createLegend(allData, metaboliteColors, "horizontal"),
-  nrow=1, ncol=1
-)
-
-print(plot_grid(pies, legend,
-  nrow=2, ncol=1
-))
-
-
