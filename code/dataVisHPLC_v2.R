@@ -141,7 +141,7 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
 }
 
 # Define function to create pie charts ------------------------------------------------------------
-createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan){
+createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, size){
   subData <- filter(allData, variety==plantVariety & organ==plantOrgan & meanConc>0)
   subData <- subData[order(subData$metNum), ]
   subData <- subData %>% mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
@@ -150,7 +150,7 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan){
     hjust=ifelse(middle>pi, 1, 0),
     vjust=ifelse(middle<pi | middle>3*pi/2, 0, 1))
   pieChart <- ggplot(data=subData) +
-    geom_arc_bar(mapping=aes(x0=0, y0=0.035, r0=0, r=0.95, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
+    geom_arc_bar(mapping=aes(x0=0, y0=0.035, r0=0, r=size, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
     geom_text(mapping=aes(x=1.1*sin(middle), y=1.1*cos(middle), label=metNum, hjust=hjust, vjust=vjust)) +
     coord_fixed() +
     scale_x_continuous(limits=c(-1.2, 1.2), name="", breaks=NULL, labels=NULL) +
@@ -162,29 +162,33 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan){
 
 # TODO: Increase distance of labels from sectors, and add tick marks to middle.
 
+varietiesToPlot <- c("Altissima", "Barbata", "...")
+# TODO: Method to subset allData based on varieties specified in varietiesToPlot
+# TODO: If using r value to scale, need to develop method to scale labels with pie charts
+
+# Calculate size of pies based on total amount of metabolites -------------------------------------
+pieSizes <- ddply(allData, c("variety", "organ"), summarise, area=sum(meanConc))
+pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
+
+pieSizes <- transform(pieSizes, scaledRadius=pieSizes$radius/max(radius))
+
 # For loop to create list of pie charts for plotting ----------------------------------------------
 allPies <- vector("list", length=length(levels(allData$variety))*3)
+
 i = 0
 for(variety in levels(allData$variety)){
   for(organ in levels(allData$organ)){
     i = i + 1
     allPies[[i]] <- local({
       i <- i
-      pieChart <- createPieChart(allData, metaboliteColors, variety, organ)
+      pieRadius <- pieSizes[which(pieSizes$variety == variety & pieSizes$organ == organ), 5]
+      pieChart <- createPieChart(allData, metaboliteColors, variety, organ, size=pieRadius)
     })
     names(allPies)[i] <- paste(variety, organ)
   }
 }
 
-# Calculate size of pies based on total amount of metabolites -------------------------------------
-pieSizes <- ddply(allData, c("variety", "organ"), summarise, area=sum(meanConc))
-pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
-
-allPies <- allPies[1:24]
-pieSizes <- pieSizes[1:24, ]
+allPies <- allPies[1:9]
 
 print(plot_grid(plotlist=allPies, 
-  ncol=3,
-  rel_heights=pieSizes$radius,
-  rel_widths=pieSizes$radius)
-)
+  ncol=3))
