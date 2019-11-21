@@ -166,29 +166,30 @@ varietiesToPlot <- c("Altissima", "Barbata", "...")
 # TODO: Method to subset allData based on varieties specified in varietiesToPlot
 # TODO: If using r value to scale, need to develop method to scale labels with pie charts
 
-# Calculate size of pies based on total amount of metabolites -------------------------------------
-pieSizes <- ddply(allData, c("variety", "organ"), summarise, area=sum(meanConc))
-pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
+# Subset allData to select varieties for plotting with scaled pie charts  -------------------------
+plottingData <- filter(allData, variety=="Baicalensis" | variety=="Barbata" | variety=="Racemosa MS")
+plottingData$variety <- factor(plottingData$variety)
 
+# Calculate size of pies based on total amount of metabolites -------------------------------------
+pieSizes <- ddply(plottingData, c("variety", "organ"), summarise, area=sum(meanConc))
+pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
 pieSizes <- transform(pieSizes, scaledRadius=pieSizes$radius/max(radius))
 
 # For loop to create list of pie charts for plotting ----------------------------------------------
-allPies <- vector("list", length=length(levels(allData$variety))*3)
+allPies <- vector("list", length=length(levels(plottingData$variety))*3)
 
 i = 0
-for(variety in levels(allData$variety)){
-  for(organ in levels(allData$organ)){
+for(variety in levels(plottingData$variety)){
+  for(organ in levels(plottingData$organ)){
     i = i + 1
     allPies[[i]] <- local({
       i <- i
       pieRadius <- pieSizes[which(pieSizes$variety == variety & pieSizes$organ == organ), 5]
-      pieChart <- createPieChart(allData, metaboliteColors, variety, organ, size=pieRadius)
+      pieChart <- createPieChart(plottingData, metaboliteColors, variety, organ, size=pieRadius)
     })
     names(allPies)[i] <- paste(variety, organ)
   }
 }
-
-allPies <- allPies[1:9]
 
 print(plot_grid(plotlist=allPies, 
   ncol=3))
