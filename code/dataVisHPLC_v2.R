@@ -150,24 +150,23 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, 
     hjust=ifelse(middle>pi, 1, 0),
     vjust=ifelse(middle<pi | middle>3*pi/2, 0, 1))
   pieChart <- ggplot(data=subData) +
-    geom_arc_bar(mapping=aes(x0=0, y0=0.035, r0=0, r=size, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
-    geom_text(mapping=aes(x=1.1*sin(middle), y=1.1*cos(middle), label=metNum, hjust=hjust, vjust=vjust)) +
+    geom_arc_bar(mapping=aes(x0=0, y0=0, r0=0, r=size, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
+    geom_text(mapping=aes(x=(size+0.5)*sin(middle), y=(size+0.5)*cos(middle), label=metNum), size=4) +
+    geom_segment(mapping=aes(x=(size+0.05)*sin(middle), y=(size+0.05)*cos(middle), xend=(size+0.25)*sin(middle), yend=(size+0.25)*cos(middle)), color="black", size=0.75) +
     coord_fixed() +
-    scale_x_continuous(limits=c(-1.2, 1.2), name="", breaks=NULL, labels=NULL) +
-    scale_y_continuous(limits=c(-1.2, 1.2), name="", breaks=NULL, labels=NULL) +
+    scale_x_continuous(limits=c(-1.22, 1.22), name="", breaks=NULL, labels=NULL) +
+    scale_y_continuous(limits=c(-1.22, 1.22), name="", breaks=NULL, labels=NULL) +
     scale_fill_manual(values=metaboliteColors) +
-    theme(panel.background=element_blank(), plot.background=element_blank(), axis.line=element_blank())
+    theme(panel.background=element_blank(), plot.background=element_blank(), plot.margin=unit(c(0, 0, 0, 0), "cm"), axis.line=element_blank())
   return(pieChart)
 }
 
 # TODO: Increase distance of labels from sectors, and add tick marks to middle.
 
-varietiesToPlot <- c("Altissima", "Barbata", "...")
-# TODO: Method to subset allData based on varieties specified in varietiesToPlot
 # TODO: If using r value to scale, need to develop method to scale labels with pie charts
 
 # Subset allData to select varieties for plotting with scaled pie charts  -------------------------
-plottingData <- filter(allData, variety=="Baicalensis" | variety=="Barbata" | variety=="Racemosa MS")
+plottingData <- filter(allData, variety=="Arenicola" | variety=="Barbata" | variety=="Altissima")
 plottingData$variety <- factor(plottingData$variety)
 
 # Calculate size of pies based on total amount of metabolites -------------------------------------
