@@ -8,6 +8,8 @@ library(dplyr)
 library(tibble)
 library(cowplot)
 library(ggforce)
+library(grid)
+library(gridExtra)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
 rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
@@ -134,7 +136,7 @@ names(metaboliteColors) <- metaboliteOrder
 createLegend <- function(allData, metaboliteColors, legendOrientation="horizontal"){
   x <- ggplot(filter(allData, variety==levels(allData$variety)[1])) +
     geom_bar(mapping=aes(x="", y=meanConc, fill=metabolite), stat="identity") +
-    theme(legend.position="bottom", legend.direction=legendOrientation) +
+    theme(legend.position="bottom", legend.direction=legendOrientation, legend.text=element_text(size=10)) +
     scale_fill_manual(values=metaboliteColors, labels=paste(seq(1, 15), ". ", names(metaboliteColors), sep=""))
   legend <- get_legend(x)
   return(legend)
@@ -151,15 +153,18 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, 
     vjust=ifelse(middle<pi | middle>3*pi/2, 0, 1))
   pieChart <- ggplot(data=subData) +
     geom_arc_bar(mapping=aes(x0=0, y0=0, r0=0, r=size, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
-    geom_text(mapping=aes(x=(size+0.5)*sin(middle), y=(size+0.5)*cos(middle), label=metNum), size=4) +
-    geom_segment(mapping=aes(x=(size+0.05)*sin(middle), y=(size+0.05)*cos(middle), xend=(size+0.25)*sin(middle), yend=(size+0.25)*cos(middle)), color="black", size=0.75) +
+    #TODO: Add condition to detect slivers of pie that are directly next to each other - test with geom_text_repel
+    geom_text(mapping=aes(x=(size+0.3)*sin(middle), y=(size+0.3)*cos(middle), label=metNum), size=3) +
+    geom_segment(mapping=aes(x=(size+0.05)*sin(middle), y=(size+0.05)*cos(middle), xend=(size+0.15)*sin(middle), yend=(size+0.15)*cos(middle)), color="black", size=0.5) +
     coord_fixed() +
-    scale_x_continuous(limits=c(-1.22, 1.22), name="", breaks=NULL, labels=NULL) +
-    scale_y_continuous(limits=c(-1.22, 1.22), name="", breaks=NULL, labels=NULL) +
+    scale_x_continuous(limits=c(-1.325, 1.325), name="", breaks=NULL, labels=NULL) +
+    scale_y_continuous(limits=c(-1.325, 1.325), name="", breaks=NULL, labels=NULL) +
     scale_fill_manual(values=metaboliteColors) +
     theme(panel.background=element_blank(), plot.background=element_blank(), plot.margin=unit(c(0, 0, 0, 0), "cm"), axis.line=element_blank())
   return(pieChart)
 }
+
+# Define function to create labels for complete figure --------------------------------------------
 
 # TODO: Increase distance of labels from sectors, and add tick marks to middle.
 
@@ -190,5 +195,19 @@ for(variety in levels(plottingData$variety)){
   }
 }
 
-print(plot_grid(plotlist=allPies, 
-  ncol=3))
+legend <- createLegend(allData, metaboliteColors)
+justPies <- plot_grid(plotlist=allPies, 
+  ncol=3)
+
+y.grob <- textGrob("Barbata Arenicola Altissima", 
+  gp=gpar(fontface="bold", col="black", fontsize=14), rot=90)
+x.grob <- textGrob("Roots Shoots Leaves", 
+  gp=gpar(fontface="bold", col="black", fontsize=14))
+
+justPies <- grid.arrange(arrangeGrob(justPies, left=y.grob, top=x.grob))
+
+finalFigure <- plot_grid(justPies, legend,
+  nrow=2, ncol=1, 
+  rel_heights=c(1, 0.15))
+
+print(finalFigure)
