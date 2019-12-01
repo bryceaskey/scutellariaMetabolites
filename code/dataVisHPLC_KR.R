@@ -10,10 +10,10 @@ library(cowplot)
 library(ggforce)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
-rawDataKR <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteDataKR.csv", header=TRUE)
+rawDataKR <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteDataKR.csv", header=TRUE)
 rawDataKR [, 1] <- as.character(rawDataKR[, 1])
 colnames(rawDataKR)[1] <- "injectionName"
 
@@ -133,11 +133,8 @@ allData <- do.call(rbind, listData)
 allData$metabolite <- factor(names(listData)[rep(1:length(listData), each=sapply(listData, nrow)[1])])
 rownames(allData) <- seq(1, nrow(allData))
 
-print("test1")
 allDataKR <- do.call(rbind, listDataKR)
-print("test2")
 allDataKR$metabolite <- factor(names(listDataKR)[rep(1:length(listDataKR), each=sapply(listDataKR, nrow)[1])])
-print("test3")
 rownames(allDataKR) <- seq(1, nrow(allDataKR))
 
 allData <- rbind(allData, allDataKR)
