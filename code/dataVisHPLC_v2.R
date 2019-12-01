@@ -12,7 +12,7 @@ library(grid)
 library(gridExtra)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
 # Define functions for interpreting injection names -----------------------------------------------
@@ -171,7 +171,8 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, 
 # TODO: If using r value to scale, need to develop method to scale labels with pie charts
 
 # Subset allData to select varieties for plotting with scaled pie charts  -------------------------
-plottingData <- filter(allData, variety=="Arenicola" | variety=="Barbata" | variety=="Altissima")
+#plottingData <- filter(allData, variety=="Arenicola" | variety=="Barbata" | variety=="Altissima")
+plottingData <- allData
 plottingData$variety <- factor(plottingData$variety)
 
 # Calculate size of pies based on total amount of metabolites -------------------------------------
@@ -199,7 +200,7 @@ legend <- createLegend(allData, metaboliteColors)
 justPies <- plot_grid(plotlist=allPies, 
   ncol=3)
 
-y.grob <- textGrob("Barbata Arenicola Altissima", 
+y.grob <- textGrob("KR Strigillosa KR Pekinesis KR Insignis KR Dependens KR Barbata KR Indica RNA Seq Racemosa SC Racemosa MS Racemosa 071119 Tournefortii Lateriflora Hastafolia Barbata Baicalensis Arenicola Altissima", 
   gp=gpar(fontface="bold", col="black", fontsize=14), rot=90)
 x.grob <- textGrob("Roots Shoots Leaves", 
   gp=gpar(fontface="bold", col="black", fontsize=14))
@@ -208,6 +209,6 @@ justPies <- grid.arrange(arrangeGrob(justPies, left=y.grob, top=x.grob))
 
 finalFigure <- plot_grid(justPies, legend,
   nrow=2, ncol=1, 
-  rel_heights=c(1, 0.15))
+  rel_heights=c(1, 0.05))
 
 print(finalFigure)
