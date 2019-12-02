@@ -12,7 +12,7 @@ library(grid)
 library(gridExtra)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
 # Define functions for interpreting injection names -----------------------------------------------
@@ -99,7 +99,6 @@ rownames(allData) <- seq(1, nrow(allData))
 varietyOrder <- c("Altissima", "Arenicola", "Baicalensis", "Barbata", "Hastafolia", "Lateriflora", "Tourmetii", "Racemosa 071119", "Racemosa MS", "Racemosa SC", "RNA Seq")
 metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein", "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
 organOrder <- c("Roots", "Shoots", "Leaves")
-allData <- filter(allData, variety!="Havenesis") #remove Havenesis
 allData$variety <- factor(allData$variety, levels=varietyOrder)
 allData$metabolite <- factor(allData$metabolite, levels=metaboliteOrder)
 allData$organ <- factor(allData$organ, levels=organOrder)
@@ -171,8 +170,7 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, 
 # TODO: If using r value to scale, need to develop method to scale labels with pie charts
 
 # Subset allData to select varieties for plotting with scaled pie charts  -------------------------
-#plottingData <- filter(allData, variety=="Arenicola" | variety=="Barbata" | variety=="Altissima")
-plottingData <- allData
+plottingData <- filter(allData, variety=="Arenicola" | variety=="Barbata" | variety=="Altissima")
 plottingData$variety <- factor(plottingData$variety)
 
 # Calculate size of pies based on total amount of metabolites -------------------------------------
@@ -200,7 +198,7 @@ legend <- createLegend(allData, metaboliteColors)
 justPies <- plot_grid(plotlist=allPies, 
   ncol=3)
 
-y.grob <- textGrob("KR Strigillosa KR Pekinesis KR Insignis KR Dependens KR Barbata KR Indica RNA Seq Racemosa SC Racemosa MS Racemosa 071119 Tournefortii Lateriflora Hastafolia Barbata Baicalensis Arenicola Altissima", 
+y.grob <- textGrob("RNA Seq Racemosa SC Racemosa MS Racemosa 071119 Tournefortii Lateriflora Hastafolia Barbata Baicalensis Arenicola Altissima", 
   gp=gpar(fontface="bold", col="black", fontsize=14), rot=90)
 x.grob <- textGrob("Roots Shoots Leaves", 
   gp=gpar(fontface="bold", col="black", fontsize=14))
