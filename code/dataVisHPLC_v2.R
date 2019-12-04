@@ -10,6 +10,7 @@ library(cowplot)
 library(ggforce)
 library(grid)
 library(gridExtra)
+library(ggrepel)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
 rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
@@ -152,8 +153,7 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, 
     vjust=ifelse(middle<pi | middle>3*pi/2, 0, 1))
   pieChart <- ggplot(data=subData) +
     geom_arc_bar(mapping=aes(x0=0, y0=0, r0=0, r=size, start=start, end=end, fill=metabolite), show.legend=FALSE, color="white") +
-    #TODO: Add condition to detect slivers of pie that are directly next to each other - test with geom_text_repel
-    geom_text(mapping=aes(x=(size+0.3)*sin(middle), y=(size+0.3)*cos(middle), label=metNum), size=3) +
+    geom_text(mapping=aes(x=(size+0.275)*sin(middle), y=(size+0.275)*cos(middle), label=metNum), size=3) +
     geom_segment(mapping=aes(x=(size+0.05)*sin(middle), y=(size+0.05)*cos(middle), xend=(size+0.15)*sin(middle), yend=(size+0.15)*cos(middle)), color="black", size=0.5) +
     coord_fixed() +
     scale_x_continuous(limits=c(-1.325, 1.325), name="", breaks=NULL, labels=NULL) +
@@ -163,11 +163,8 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, 
   return(pieChart)
 }
 
-# Define function to create labels for complete figure --------------------------------------------
-
-# TODO: Increase distance of labels from sectors, and add tick marks to middle.
-
-# TODO: If using r value to scale, need to develop method to scale labels with pie charts
+#TODO: Add method to manually prevent label overlap
+# Detect overlapping labels, then vary distances of labels from outer edge of pie
 
 # Subset allData to select varieties for plotting with scaled pie charts  -------------------------
 plottingData <- filter(allData, variety=="Arenicola" | variety=="Barbata" | variety=="Altissima")
@@ -177,6 +174,7 @@ plottingData$variety <- factor(plottingData$variety)
 pieSizes <- ddply(plottingData, c("variety", "organ"), summarise, area=sum(meanConc))
 pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
 pieSizes <- transform(pieSizes, scaledRadius=pieSizes$radius/max(radius))
+
 
 # For loop to create list of pie charts for plotting ----------------------------------------------
 allPies <- vector("list", length=length(levels(plottingData$variety))*3)
