@@ -10,17 +10,17 @@ library(cowplot)
 library(ggforce)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
-rawDataKR <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteDataKR.csv", header=TRUE)
+rawDataKR <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteDataKR.csv", header=TRUE)
 rawDataKR [, 1] <- as.character(rawDataKR[, 1])
 colnames(rawDataKR)[1] <- "injectionName"
 
 # Define functions for interpreting injection names -----------------------------------------------
 abbrevNames <- data.frame(
   abbrev=c("HV", "AC", "AS", "BT", "TT", "HF", "BL", "LD", "RMSEQ", "R071119", "R_MS", "R_SC"),
-  fullName=c("Havenesis", "Arenicola", "Altissima", "Barbata", "Tournefortii", "Hastafolia", "Baicalensis", "Lateriflora", "RNA Seq", "Racemosa 071119", "Racemosa MS", "Racemosa SC")
+  fullName=c("Havenesis", "Arenicola", "Altissima", "Barbata", "Tournefortii", "Hastifolia", "Baicalensis", "Leonardii", "RNA Seq", "Racemosa 071119", "Racemosa MS", "Racemosa SC")
 )
 
 abbrevNamesKR <- data.frame(
@@ -137,17 +137,22 @@ allDataKR <- do.call(rbind, listDataKR)
 allDataKR$metabolite <- factor(names(listDataKR)[rep(1:length(listDataKR), each=sapply(listDataKR, nrow)[1])])
 rownames(allDataKR) <- seq(1, nrow(allDataKR))
 
-allData <- rbind(allData, allDataKR)
+# allData <- rbind(allData, allDataKR)
 
 # Adjust allData structure for easier plotting ----------------------------------------------------
-varietyOrder <- c("Altissima", "Arenicola", "Baicalensis", "Barbata", "Hastafolia", "Lateriflora", "Tournefortii", "Racemosa 071119", "Racemosa MS", "Racemosa SC", "RNA Seq", "KR_Indica", "KR_Barbata", "KR_Dependens", "KR_Insignis", "KR_Pekinesis", "KR_Strigillosa")
+varietyOrder <- c("Altissima", "Leonardii", "Hastifolia", "Havenesis", "Arenicola", "Tournefortii", "RNA Seq", "Baicalensis", "Barbata", "Racemosa 071119", "Racemosa MS", "Racemosa SC", "KR_Indica", "KR_Barbata", "KR_Dependens", "KR_Insignis", "KR_Pekinesis", "KR_Strigillosa")
 metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein", "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
 organOrder <- c("Roots", "Shoots", "Leaves", "Flowers")
-allData <- filter(allData, variety!="Havenesis") #remove Havenesis
 allData$variety <- factor(allData$variety, levels=varietyOrder)
 allData$metabolite <- factor(allData$metabolite, levels=metaboliteOrder)
 allData$organ <- factor(allData$organ, levels=organOrder)
 allData$metNum <- as.numeric(allData$metabolite) #create new column w/ factor nums - for pie chart sector labeling
+
+# Remove non-triplicate Racemosa samples, and keep RNA Seq data as true Racemosa data -------------
+allData <- filter(allData, variety != "Racemosa 071119" & variety != "Racemosa MS" & variety != "Racemosa SC" & variety != "KR_Indica" & variety != "KR_Barbata" & variety != "KR_Dependens" & variety != "KR_Insignis" & variety != "KR_Strigillosa")
+allData$variety <- factor(allData$variety, levels=c(levels(allData$variety), "Racemosa"))
+allData$variety[allData$variety=="RNA Seq"] <- "Racemosa"
+allData$variety <- factor(allData$variety)
 
 # Define function to create raster plot (i.e. heatmap) for each organ -----------------------------
 createHeatmap <- function(allData, plantOrgan){
@@ -178,6 +183,5 @@ print(plot_grid(
   createHeatmap(allData, "Leaves"),
   createHeatmap(allData, "Shoots"),
   createHeatmap(allData, "Roots"),
-  createHeatmap(allData, "Flowers"),
-  nrow=1, ncol=4,
-  rel_widths=c(1, 1, 1, 0.51), rel_heights=c(1, 1, 1, 0.4)))
+  nrow=1, ncol=3,
+  rel_widths=c(1, 1, 1), rel_heights=c(1, 1, 1)))

@@ -19,7 +19,7 @@ rawData[, 1] <- as.character(rawData[, 1])
 # Define functions for interpreting injection names -----------------------------------------------
 abbrevNames <- data.frame(
   abbrev=c("HV", "AC", "AS", "BT", "TT", "HF", "BL", "LD", "RMSEQ", "R071119", "R_MS", "R_SC"),
-  fullName=c("Havenesis", "Arenicola", "Altissima", "Barbata", "Tourmetii", "Hastafolia", "Baicalensis", "Lateriflora", "RNA Seq", "Racemosa 071119", "Racemosa MS", "Racemosa SC")
+  fullName=c("Havenesis", "Arenicola", "Altissima", "Barbata", "Tournefortii", "Hastafolia", "Baicalensis", "Leonardii", "RNA Seq", "Racemosa 071119", "Racemosa MS", "Racemosa SC")
 )
 
 getSampleName <- function(injectionName){
@@ -97,7 +97,7 @@ allData$metabolite <- factor(names(listData)[rep(1:length(listData), each=sapply
 rownames(allData) <- seq(1, nrow(allData))
 
 # Adjust allData structure for easier plotting ----------------------------------------------------
-varietyOrder <- c("Altissima", "Arenicola", "Baicalensis", "Barbata", "Hastafolia", "Lateriflora", "Tourmetii", "Racemosa 071119", "Racemosa MS", "Racemosa SC", "RNA Seq")
+varietyOrder <- c("Altissima", "Arenicola", "Baicalensis", "Barbata", "Hastafolia", "Havenesis", "Leonardii", "Tournefortii", "Racemosa 071119", "Racemosa MS", "Racemosa SC", "RNA Seq")
 metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein", "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
 organOrder <- c("Roots", "Shoots", "Leaves")
 allData$variety <- factor(allData$variety, levels=varietyOrder)
@@ -167,7 +167,7 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, 
 # Detect overlapping labels, then vary distances of labels from outer edge of pie
 
 # Subset allData to select varieties for plotting with scaled pie charts  -------------------------
-plottingData <- filter(allData, variety=="Arenicola" | variety=="Barbata" | variety=="Altissima")
+plottingData <- filter(allData, variety=="Baicalensis" | variety=="Barbata" | variety=="RNA Seq")
 plottingData$variety <- factor(plottingData$variety)
 
 # Calculate size of pies based on total amount of metabolites -------------------------------------
@@ -192,11 +192,11 @@ for(variety in levels(plottingData$variety)){
   }
 }
 
-legend <- createLegend(allData, metaboliteColors)
+legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 justPies <- plot_grid(plotlist=allPies, 
   ncol=3)
 
-y.grob <- textGrob("RNA Seq Racemosa SC Racemosa MS Racemosa 071119 Tournefortii Lateriflora Hastafolia Barbata Baicalensis Arenicola Altissima", 
+y.grob <- textGrob("Racemosa Barbata Baicalensis", 
   gp=gpar(fontface="bold", col="black", fontsize=14), rot=90)
 x.grob <- textGrob("Roots Shoots Leaves", 
   gp=gpar(fontface="bold", col="black", fontsize=14))
@@ -204,7 +204,7 @@ x.grob <- textGrob("Roots Shoots Leaves",
 justPies <- grid.arrange(arrangeGrob(justPies, left=y.grob, top=x.grob))
 
 finalFigure <- plot_grid(justPies, legend,
-  nrow=2, ncol=1, 
-  rel_heights=c(1, 0.05))
+  nrow=1, ncol=2, 
+  rel_widths=c(1, 0.20))
 
 print(finalFigure)
