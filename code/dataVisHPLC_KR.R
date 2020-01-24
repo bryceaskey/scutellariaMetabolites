@@ -13,7 +13,7 @@ library(ggforce)
 rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
-rawDataKR <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteDataKR.csv", header=TRUE)
+rawDataKR <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/2020-01-17_metaboliteDataKR.csv", header=TRUE)
 rawDataKR [, 1] <- as.character(rawDataKR[, 1])
 colnames(rawDataKR)[1] <- "injectionName"
 
@@ -84,25 +84,28 @@ allData <- data.frame(
   acetoside=sapply(rawData$acetoside[23:112], ppmConversion, metaboliteName="acetoside", mix1Rows=5:12, mix2Rows=14:21, rawData=rawData)
 )
 
+rawDataKR <- rawDataKR[!grepl("15mix", rawDataKR$injectionName), ]
+row.names(rawDataKR) <- 1:nrow(rawDataKR)
+
 allDataKR <- data.frame(
-  variety=sapply(rawDataKR$injectionName[20:79], getSampleName, abbrevs=abbrevNamesKR),
-  replicate=sapply(rawDataKR$injectionName[20:79], getSampleRep),
-  organ=sapply(rawDataKR$injectionName[20:79], getSampleOrgan, abbrevs=abbrevOrgans),
-  apigenin=sapply(rawDataKR$apigenin[20:79], ppmConversion, metaboliteName="apigenin", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  apigeninG=sapply(rawDataKR$apigeninG[20:79], ppmConversion, metaboliteName="apigeninG", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  scutellarein=sapply(rawDataKR$scutellarein[20:79], ppmConversion, metaboliteName="scutellarein", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  scutellarin=sapply(rawDataKR$scutellarin[20:79], ppmConversion, metaboliteName="scutellarin", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  hispidulin=sapply(rawDataKR$hispidulin[20:79], ppmConversion, metaboliteName="hispidulin", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  hispidulinG=sapply(rawDataKR$hispidulinG[20:79], ppmConversion, metaboliteName="hispidulinG", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  chrysin=sapply(rawDataKR$chrysin[20:79], ppmConversion, metaboliteName="chrysin", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  chrysinG=sapply(rawDataKR$chrysinG[20:79], ppmConversion, metaboliteName="chrysinG", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  wogonin=sapply(rawDataKR$wogonin[20:79], ppmConversion, metaboliteName="wogonin", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  wogonoside=sapply(rawDataKR$wogonoside[20:79], ppmConversion, metaboliteName="wogonoside", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  baicalein=sapply(rawDataKR$baicalein[20:79], ppmConversion, metaboliteName="baicalein", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  baicalin=sapply(rawDataKR$baicalin[20:79], ppmConversion, metaboliteName="baicalin", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  oroxylinA=sapply(rawDataKR$oroxylinA[20:79], ppmConversion, metaboliteName="oroxylinA", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  oroxyloside=sapply(rawDataKR$oroxyloside[20:79], ppmConversion, metaboliteName="oroxyloside", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR),
-  acetoside=sapply(rawDataKR$acetoside[20:79], ppmConversion, metaboliteName="acetoside", mix1Rows=2:9, mix2Rows=11:18, rawData=rawDataKR)
+  variety=sapply(rawDataKR$injectionName[29:88], getSampleName, abbrevs=abbrevNamesKR),
+  replicate=sapply(rawDataKR$injectionName[29:88], getSampleRep),
+  organ=sapply(rawDataKR$injectionName[29:88], getSampleOrgan, abbrevs=abbrevOrgans),
+  apigenin=rawDataKR$apigenin[29:88],
+  apigeninG=rawDataKR$apigeninG[29:88],
+  scutellarein=rawDataKR$scutellarein[29:88],
+  scutellarin=rawDataKR$scutellarin[29:88],
+  hispidulin=rawDataKR$hispidulin[29:88],
+  hispidulinG=rawDataKR$hispidulinG[29:88],
+  chrysin=rawDataKR$chrysin[29:88],
+  chrysinG=rawDataKR$chrysinG[29:88],
+  wogonin=rawDataKR$wogonin[29:88],
+  wogonoside=rawDataKR$wogonoside[29:88],
+  baicalein=rawDataKR$baicalein[29:88],
+  baicalin=rawDataKR$baicalin[29:88],
+  oroxylinA=rawDataKR$oroxylinA[29:88],
+  oroxyloside=rawDataKR$oroxyloside[29:88],
+  acetoside=rawDataKR$acetoside[29:88]
 )
 
 # Calculate mean and standard error -------------------------------------------------------------
@@ -137,25 +140,25 @@ allDataKR <- do.call(rbind, listDataKR)
 allDataKR$metabolite <- factor(names(listDataKR)[rep(1:length(listDataKR), each=sapply(listDataKR, nrow)[1])])
 rownames(allDataKR) <- seq(1, nrow(allDataKR))
 
-# allData <- rbind(allData, allDataKR)
+combinedData <- rbind(allData, allDataKR)
 
-# Adjust allData structure for easier plotting ----------------------------------------------------
+# Adjust combinedData structure for easier plotting ----------------------------------------------------
 varietyOrder <- c("Altissima", "Leonardii", "Hastifolia", "Havenesis", "Arenicola", "Tournefortii", "RNA Seq", "Baicalensis", "Barbata", "Racemosa 071119", "Racemosa MS", "Racemosa SC", "KR_Indica", "KR_Barbata", "KR_Dependens", "KR_Insignis", "KR_Pekinesis", "KR_Strigillosa")
 metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein", "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
 organOrder <- c("Roots", "Shoots", "Leaves", "Flowers")
-allData$variety <- factor(allData$variety, levels=varietyOrder)
-allData$metabolite <- factor(allData$metabolite, levels=metaboliteOrder)
-allData$organ <- factor(allData$organ, levels=organOrder)
-allData$metNum <- as.numeric(allData$metabolite) #create new column w/ factor nums - for pie chart sector labeling
+combinedData$variety <- factor(combinedData$variety, levels=varietyOrder)
+combinedData$metabolite <- factor(combinedData$metabolite, levels=metaboliteOrder)
+combinedData$organ <- factor(combinedData$organ, levels=organOrder)
+combinedData$metNum <- as.numeric(combinedData$metabolite) #create new column w/ factor nums - for pie chart sector labeling
 
 # Remove non-triplicate Racemosa samples, and keep RNA Seq data as true Racemosa data -------------
-allData <- filter(allData, variety != "Racemosa 071119" & variety != "Racemosa MS" & variety != "Racemosa SC" & variety != "KR_Indica" & variety != "KR_Barbata" & variety != "KR_Dependens" & variety != "KR_Insignis" & variety != "KR_Strigillosa")
-allData$variety <- factor(allData$variety, levels=c(levels(allData$variety), "Racemosa"))
-allData$variety[allData$variety=="RNA Seq"] <- "Racemosa"
-allData$variety <- factor(allData$variety)
+combinedData <- filter(combinedData, variety != "Racemosa 071119" & variety != "Racemosa MS" & variety != "Racemosa SC")
+combinedData$variety <- factor(combinedData$variety, levels=c(levels(combinedData$variety), "Racemosa"))
+combinedData$variety[combinedData$variety=="RNA Seq"] <- "Racemosa"
+combinedData$variety <- factor(combinedData$variety, levels=c("Altissima", "Leonardii", "Hastifolia", "Havenesis", "Arenicola", "Tournefortii", "Baicalensis", "Barbata", "Racemosa", "KR_Indica", "KR_Barbata", "KR_Dependens", "KR_Insignis", "KR_Pekinesis", "KR_Strigillosa"))
 
 # Define function to create raster plot (i.e. heatmap) for each organ -----------------------------
-createHeatmap <- function(allData, plantOrgan){
+createHeatmap <- function(combinedData, plantOrgan){
   if(plantOrgan=="Roots"){
     colorScale <- c("#FFFFFFFF", "#FF3333")
     plotTitle <- "Root metabolites"
@@ -169,7 +172,7 @@ createHeatmap <- function(allData, plantOrgan){
     colorScale <- c("#FFFFFFFF", "#FCBA03")
     plotTitle <- "Flower metabolites"
   }
-  organData <- filter(allData, organ==plantOrgan)
+  organData <- filter(combinedData, organ==plantOrgan)
   heatmap <- ggplot(data=organData) +
     geom_raster(mapping=aes(x=variety, y=metabolite, fill=meanConc)) +
     scale_fill_gradientn(colours=colorScale) +
@@ -180,8 +183,8 @@ createHeatmap <- function(allData, plantOrgan){
 }
 
 print(plot_grid(
-  createHeatmap(allData, "Leaves"),
-  createHeatmap(allData, "Shoots"),
-  createHeatmap(allData, "Roots"),
+  createHeatmap(combinedData, "Leaves"),
+  createHeatmap(combinedData, "Shoots"),
+  createHeatmap(combinedData, "Roots"),
   nrow=1, ncol=3,
   rel_widths=c(1, 1, 1), rel_heights=c(1, 1, 1)))
