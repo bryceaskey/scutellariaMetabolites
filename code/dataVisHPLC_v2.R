@@ -143,8 +143,8 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
 }
 
 # Define function to create pie charts ------------------------------------------------------------
-createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, size){
-  subData <- filter(allData, variety==plantVariety & organ==plantOrgan & meanConc>0)
+createPieChart <- function(metData, metaboliteColors, plantVariety, plantOrgan, size){
+  subData <- filter(metData, variety==plantVariety & organ==plantOrgan & meanConc>0)
   subData <- subData[order(subData$metNum), ]
   subData <- subData %>% mutate(end=2*pi*cumsum(meanConc)/sum(meanConc),
     start=lag(end, default=0),
@@ -166,22 +166,22 @@ createPieChart <- function(allData, metaboliteColors, plantVariety, plantOrgan, 
 #TODO: Add method to manually prevent label overlap
 # Detect overlapping labels, then vary distances of labels from outer edge of pie
 
-# Subset allData to select varieties for plotting with scaled pie charts  -------------------------
-plottingData <- filter(allData, variety=="Baicalensis" | variety=="Barbata" | variety=="RNA Seq")
-plottingData$variety <- factor(plottingData$variety)
-
 # Calculate size of pies based on total amount of metabolites -------------------------------------
-pieSizes <- ddply(plottingData, c("variety", "organ"), summarise, area=sum(meanConc))
+pieSizes <- ddply(allData, c("variety", "organ"), summarise, area=sum(meanConc))
 pieSizes <- transform(pieSizes, radius=sqrt(area/pi))
 pieSizes <- transform(pieSizes, scaledRadius=pieSizes$radius/max(radius))
 
+# Subset allData to select varieties for plotting with scaled pie charts  -------------------------
+plottingData <- filter(allData, variety=="Havenesis" | variety=="Arenicola" | variety=="Tournefortii" | variety=="RNA Seq")
+plottingData$variety <- factor(plottingData$variety, levels=(c("Havenesis", "Arenicola", "Tournefortii", "RNA Seq")))
+plottingData$organ <- factor(plottingData$organ, levels=c("Leaves", "Shoots", "Roots"))
 
 # For loop to create list of pie charts for plotting ----------------------------------------------
 allPies <- vector("list", length=length(levels(plottingData$variety))*3)
 
 i = 0
-for(variety in levels(plottingData$variety)){
-  for(organ in levels(plottingData$organ)){
+for(organ in levels(plottingData$organ)){
+  for(variety in levels(plottingData$variety)){
     i = i + 1
     allPies[[i]] <- local({
       i <- i
@@ -194,12 +194,12 @@ for(variety in levels(plottingData$variety)){
 
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 justPies <- plot_grid(plotlist=allPies, 
-  ncol=3)
+  nrow=3)
 
-y.grob <- textGrob("Racemosa Barbata Baicalensis", 
-  gp=gpar(fontface="bold", col="black", fontsize=14), rot=90)
-x.grob <- textGrob("Roots Shoots Leaves", 
+x.grob <- textGrob("Havenesis                                        Arenicola                                        Tournefortii                                        Racemosa", 
   gp=gpar(fontface="bold", col="black", fontsize=14))
+y.grob <- textGrob("Roots                                          Shoots                                          Leaves", 
+  gp=gpar(fontface="bold", col="black", fontsize=14), rot=90)
 
 justPies <- grid.arrange(arrangeGrob(justPies, left=y.grob, top=x.grob))
 
