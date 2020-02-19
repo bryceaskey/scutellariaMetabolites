@@ -18,7 +18,7 @@ rawData[, 1] <- as.character(rawData[, 1])
 # Define functions for interpreting injection names -----------------------------------------------
 abbrevNames <- data.frame(
   abbrev=c("HV", "AC", "AS", "BT", "TT", "HF", "BL", "LD", "RMSEQ", "R071119", "R_MS", "R_SC"),
-  fullName=c("Havenesis", "Arenicola", "Altissima", "Barbata", "Tournefortii", "Hastafolia", "Baicalensis", "Leonardii", "RNA Seq", "Racemosa 071119", "Racemosa MS", "Racemosa SC")
+  fullName=c("havenesis", "arenicola", "altissima", "barbata", "tournefortii", "hastafolia", "baicalensis", "leonardii", "RNA Seq", "racemosa 071119", "racemosa MS", "racemosa SC")
 )
 
 getSampleName <- function(injectionName){
@@ -96,7 +96,7 @@ allData$metabolite <- factor(names(listData)[rep(1:length(listData), each=sapply
 rownames(allData) <- seq(1, nrow(allData))
 
 # Adjust allData structure for easier plotting ----------------------------------------------------
-varietyOrder <- c("Altissima", "Arenicola", "Baicalensis", "Barbata", "Hastafolia", "Havenesis", "Leonardii", "Tournefortii", "Racemosa 071119", "Racemosa MS", "Racemosa SC", "RNA Seq")
+varietyOrder <- c("altissima", "arenicola", "baicalensis", "barbata", "hastafolia", "havenesis", "leonardii", "tournefortii", "racemosa 071119", "racemosa MS", "racemosa SC", "RNA Seq")
 metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein", "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
 organOrder <- c("Roots", "Shoots", "Leaves")
 allData$variety <- factor(allData$variety, levels=varietyOrder)
@@ -163,8 +163,8 @@ createPieChart <- function(metData, metaboliteColors, plantVariety, plantOrgan, 
 }
 
 # Subset allData to select varieties for plotting with scaled pie charts  -------------------------
-plottingData <- filter(allData, variety=="Baicalensis" | variety=="Arenicola")
-plottingData$variety <- factor(plottingData$variety, levels=(c("Baicalensis", "Arenicola")))
+plottingData <- filter(allData, variety=="baicalensis" | variety=="arenicola")
+plottingData$variety <- factor(plottingData$variety, levels=(c("baicalensis", "arenicola")))
 plottingData$organ <- factor(plottingData$organ, levels=c("Leaves", "Shoots", "Roots"))
 
 # Calculate size of pies based on total amount of metabolites -------------------------------------
