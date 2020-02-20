@@ -81,13 +81,23 @@ allDataTotal <- allDataTotal %>%
 allDataTotal$variety <- factor(allDataTotal$variety)
 levels(allDataTotal$variety)[29] <- "racemosa"
 
+#Fix errors in naming
+levels(allDataTotal$variety)[levels(allDataTotal$variety)=="hastafolia"] <- "hastifolia"
+# Define function to capitalize first letter of a string
+capStr <- function(y) {
+  c <- strsplit(y, " ")[[1]]
+  paste(toupper(substring(c, 1,1)), substring(c, 2),
+        sep="", collapse=" ")
+}
+allDataTotal$metabolite <- factor(sapply(as.character(allDataTotal$metabolite), capStr))
+
+
 # Create heatmap ----------------------------------------------------------------------------------
 heatmap <- ggplot(data=allDataTotal) +
   geom_raster(mapping=aes(x=variety, y=metabolite, fill=concentration)) +
   scale_fill_gradientn(colours=c("#FFFFFFFF", "#0066CC")) +
   coord_fixed() +
-  labs(title="Total flavonoid concentrations", x="Variety", y="Metabolite", fill="Concentration (ppm)") +
-  theme(axis.text.x=element_text(angle=90, vjust=0.5, hjust=1), text=element_text(size=16), legend.position="bottom")
-
+  labs(x="Species", y="Metabolite", fill="Concentration (ppm)") +
+  theme(axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, color="#000000"), text=element_text(size=16, color="#000000"), legend.position="bottom")
 print(heatmap)
 
