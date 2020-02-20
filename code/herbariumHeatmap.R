@@ -9,11 +9,11 @@ library(stats)
 library(tidyr)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteDataHerbarium1-30.csv", na.strings=c("", "NA"), header=TRUE)
+rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteDataHerbarium1-30.csv", na.strings=c("", "NA"), header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
 # Define functions for interpreting injection names -----------------------------------------------
-herbariumList <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/herbariumList.csv")
+herbariumList <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/herbariumList.csv")
 
 getSampleName <- function(injectionName, nameList){
   sampleName <- nameList[injectionName==nameList$Label, 3]
@@ -97,7 +97,8 @@ heatmap <- ggplot(data=allDataTotal) +
   geom_raster(mapping=aes(x=variety, y=metabolite, fill=concentration)) +
   scale_fill_gradientn(colours=c("#FFFFFFFF", "#0066CC")) +
   coord_fixed() +
-  labs(x="Species", y="Metabolite", fill="Concentration (ppm)") +
-  theme(axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, color="#000000"), text=element_text(size=16, color="#000000"), legend.position="bottom")
+  labs(x="Species", y="Metabolite", fill="Concentration \n(ppm)") +
+  theme(axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, color="#000000"), text=element_text(size=16, color="#000000"), 
+        legend.position="right", legend.direction = "vertical")
 print(heatmap)
 
