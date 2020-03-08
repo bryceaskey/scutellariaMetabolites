@@ -1,22 +1,13 @@
-# Injection names should be standardized to match the following format:
-# Variety Abbreviation - Replicate Number - Plant Organ
-# e.g. BL-1-R = baicalensis - 1st replicate - Root
-
-library(ggplot2)
+# Method to prepare and format metabolite data from raw .csv file
 library(plyr)
 library(dplyr)
 library(tibble)
-library(cowplot)
-library(ggforce)
-library(grid)
-library(gridExtra)
-library(ggrepel)
 
-# Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
+# Read metabolite data from .csv file ----
+rawData <- read.csv(file="...", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
-# Define functions for interpreting injection names -----------------------------------------------
+# Define functions for interpreting injection names ----
 abbrevNames <- data.frame(
   abbrev=c("HV", "AC", "AS", "BT", "TT", "HF", "BL", "LD", "RMSEQ", "R071119", "R_MS", "R_SC"),
   fullName=c("havenesis", "arenicola", "altissima", "barbata", "tournefortii", "hastafolia", "baicalensis", "leonardii", "RNA Seq", "racemosa 071119", "racemosa MS", "racemosa SC")
@@ -44,7 +35,7 @@ getSampleOrgan <- function(injectionName){
   return(sampleOrgan)
 }
 
-# Define function to convert peak area data into ppm using calibration samples --------------------
+# Define function to convert peak area data into ppm using calibration samples ----
 ppmConversion <- function(peakArea, metaboliteName, rawData=rawData){
   if(sum(grepl(metaboliteName, colnames(rawData)[2:9]))==1){
     calibrations <- data.frame(ppm=c(0.1, 0.5, 1, 5, 10, 25, 50, 100), area=rawData[[metaboliteName]][5:12])
@@ -56,7 +47,7 @@ ppmConversion <- function(peakArea, metaboliteName, rawData=rawData){
   return(ppm)
 }
 
-# Create data frame with processed data -----------------------------------------------------------
+# Create data frame with processed data ----
 allData <- data.frame(
   variety=sapply(rawData$injectionName[23:112], getSampleName),
   replicate=sapply(rawData$injectionName[23:112], getSampleRep),
@@ -78,7 +69,7 @@ allData <- data.frame(
   acetoside=sapply(rawData$acetoside[23:112], ppmConversion, metaboliteName="acetoside", rawData=rawData)
 )
 
-# Calculate mean and standard error ---------------------------------------------------------------
+# Calculate mean and standard error ----
 # Make one data frame for each metabolite, and combine into list.
 # Columns: variety / organ / meanConc / stError / upperSD / lowerSD
 listData <- list()
@@ -91,23 +82,20 @@ listData <- list(apigenin, apigeninG, scutellarein, scutellarin, hispidulin, his
 names(listData) <- colnames(allData)[4:ncol(allData)]
 rm(df, list=names(listData))
 
-# Data structure for creating figures with in ggplot ----------------------------------------------
+# Data structure for creating figures with in ggplot ----
 allData <- do.call(rbind, listData)
 allData$metabolite <- factor(names(listData)[rep(1:length(listData), each=sapply(listData, nrow)[1])])
 rownames(allData) <- seq(1, nrow(allData))
 
-# Remove racemosa and barbata data ----------------------------------------------------------------
-allData <- allData[ , -c(4:6)]
+# Remove racemosa and barbata data ----
 allData <- allData %>%
   filter(!grepl("racemosa MS", variety)) %>%
   filter(!grepl("racemosa SC", variety)) %>%
   filter(!grepl("racemosa 071119", variety)) %>%
-  filter(!grepl("RNA Seq", variety)) %>%
-  filter(!grepl("barbata", variety)) %>%
-  filter(!grepl("havenesis", variety))
+  filter(!grepl("RNA Seq", variety))
 allData$variety <- factor(allData$variety)
 
-# Adjust allData structure for easier plotting ----------------------------------------------------
+# Adjust allData structure for easier plotting ----
 varietyOrder <- c("altissima", "arenicola", "baicalensis", "barbata", "hastafolia", "havenesis", "leonardii", "tournefortii", "racemosa 071119", "racemosa MS", "racemosa SC", "RNA Seq")
 metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein", "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
 organOrder <- c("Roots", "Shoots", "Leaves")
@@ -116,81 +104,10 @@ colnames(allData)[1] <- "species"
 allData$metabolite <- factor(allData$metabolite, levels=metaboliteOrder)
 allData$organ <- factor(allData$organ, levels=organOrder)
 allData$metNum <- as.numeric(allData$metabolite) #create new column w/ factor nums - for bar plot section labeling
+allData$species <- factor(allData$species)
 
-# Set colors to be used for metabolites across all plots ------------------------------------------
-metaboliteColors <- c("#8B0000", "#DC143C", "#FF7F50", "#FFD700", "#B8860B", "#BDB76B", "#808000", "#9ACD32", "#2E8B57", "#66CDAA", "#2F4F4F", "#008080", "#4682B4", "#8A2BE2", "#8B008B")
-names(metaboliteColors) <- metaboliteOrder
-
-# Define function to capitalize first letter of a string ------------------------------------------
-capStr <- function(y) {
-  c <- strsplit(y, " ")[[1]]
-  paste(toupper(substring(c, 1,1)), substring(c, 2),
-        sep="", collapse=" ")
-}
-
-# Define function to create color legend for scaled pie charts ------------------------------------
-createLegend <- function(allData, metaboliteColors, legendOrientation="horizontal"){
-  x <- ggplot(filter(allData, species==levels(allData$species)[1])) +
-    geom_bar(mapping=aes(x="", y=meanConc, fill=metabolite), stat="identity") +
-    theme(legend.position="bottom", legend.direction=legendOrientation, legend.text=element_text(size=12), legend.title=element_text(size=16)) +
-    labs(fill="Flavonoid") +
-    scale_fill_manual(values=metaboliteColors, labels=paste(seq(1, 15), ". ", sapply(names(metaboliteColors), capStr), sep=""))
-  legend <- get_legend(x)
-  return(legend)
-}
-
-# Fix errors in naming
+# Fix error in naming ----
 levels(allData$species)[levels(allData$species)=="hastafolia"] <- "hastifolia"
 
-
-# Define function to create stacked bar charts ----------------------------------------------------
-createStackedBars <- function(allData, metaboliteColors, plantOrgan){
-  organData <- allData
-  organData <- organData[order(organData$metNum), ]
-  organData <- organData %>%
-    filter(grepl(plantOrgan, organ)) %>%
-    filter(meanConc > 0) %>%
-    group_by(species) %>%
-    mutate(text_y = sum(meanConc) - (cumsum(meanConc) - meanConc/2))
-  organData$species <- factor(organData$species)
-  organData <- organData %>%
-    group_by(species) %>%
-    mutate(text_x = as.numeric(species) - 0.25)
-  chart <- ggplot(data=organData, mapping=aes(x=species, y=meanConc, fill=metabolite)) +
-    geom_bar(position="stack", stat="identity", width=0.5) +
-    # ylim(0, 100) +
-    labs(x="Species", y="Concentration (ppm)") +
-    scale_fill_manual(values=metaboliteColors) +
-    geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), hjust=1, direction="y", nudge_x=-0.2) +
-    if(plantOrgan=="Roots"){
-      theme(legend.position="none",
-            panel.background = element_rect(fill="#ffe0cf"),
-            panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
-            text=element_text(size=20))
-    }else if(plantOrgan=="Shoots"){
-      theme(legend.position="none", 
-            axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-            panel.background = element_rect(fill="#d5ffcc"),
-            panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
-            text=element_text(size=20))
-    }else{
-      theme(legend.position="none",
-            axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-            panel.background = element_rect(fill="#cce8ff"),
-            panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
-            text=element_text(size=20))
-    }
-}
-
-rootPlot <- createStackedBars(allData, metaboliteColors, "Roots")
-shootPlot <- createStackedBars(allData, metaboliteColors, "Shoots")
-leafPlot <- createStackedBars(allData, metaboliteColors, "Leaves")
-
-justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))
-legend <- createLegend(allData, metaboliteColors, legendOrientation="horizontal")
-
-finalFigure <- plot_grid(justData, legend,
-  nrow=2, ncol=1, 
-  rel_heights=c(1, 0.20))
-
-print(finalFigure)
+# Order according to metabolite number ----
+allData <- allData[order(allData$metNum), ]
