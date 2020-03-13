@@ -1,6 +1,12 @@
 # Interactive visualization of flavonoid data collected for various species of Scutellaria
 
 # Load necessary libraries, functions, and data ----
+packageList <- c("shiny", "plyr", "dplyr", "tibble", "ggplot2", "ggrepel", "cowplot")
+newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
+if(length(newPackages) > 0){
+  install.packages(newPackages)
+}
+
 library(shiny)
 library(plyr)
 library(dplyr)
