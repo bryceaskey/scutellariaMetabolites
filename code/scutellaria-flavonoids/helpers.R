@@ -21,28 +21,32 @@ names(metaboliteColors) <- metaboliteOrder
 
 # Function to create color legend for metabolite identification
 createLegend <- function(allData, metaboliteColors){
-  # Create color legend for metabolite identification
   x <- ggplot(filter(allData, species==levels(allData$species)[1])) +
     geom_bar(mapping=aes(x="", y=meanConc, fill=metabolite), stat="identity") +
-    theme(legend.position="bottom", legend.direction="horizontal",
+    theme(legend.position="bottom", legend.direction="vertical",
           legend.text=element_text(size=16), legend.title=element_text(size=20)) +
     labs(fill="Flavonoid") +
     scale_fill_manual(values=metaboliteColors, 
-                      labels=paste(seq(1, 15), ". ", sapply(names(metaboliteColors), capStr), sep=""))
-  return(get_legend(x))
+                      labels=paste(seq(1, 15), ". ", names(metaboliteColors), sep=""))
+  legend <- plot_grid(get_legend(x), nrow=1, ncol=1)
+  return(legend)
+}
+
+# Function to filter data based on ui inputs, and calculate data and label positions ----
+filterData <- function(allData, selectedOrgan, selectedMetabolites){
+  filteredData <- allData %>%
+    filter(grepl(selectedOrgan, organ)) %>%
+    filter(grepl(paste(paste("^", selectedMetabolites, "$", sep=""), collapse="|"), metabolite)) %>%
+    group_by(species) %>%
+      arrange(metNum, .by_group=TRUE) %>%
+      mutate(text_y = sum(meanConc) - (cumsum(meanConc) - meanConc/2)) %>%
+      mutate(text_x = as.numeric(species) - 0.25)
+  filteredData$metNum[filteredData$meanConc == 0] <- ""
+  return(filteredData)
 }
 
 # Function to create stacked bar plot from metabolite data ----
-createPlot <- function(filteredData, legend){
-  # Calculate x and y locations for metabolite labels
-  filteredData <- filteredData %>%
-    group_by(species) %>%
-    arrange(metNum, .by_group=TRUE) %>%
-    mutate(text_y = sum(meanConc) - (cumsum(meanConc) - meanConc/2)) %>%
-    mutate(text_x = as.numeric(species) - 0.25)
-  filteredData$metNum[filteredData$meanConc == 0] = ""
-  
-  # Create stacked bar plot
+createPlot <- function(filteredData, metaboliteColors){
   chart <- ggplot(data=filteredData, mapping=aes(x=species, y=meanConc, fill=metabolite)) +
     geom_bar(position="stack", stat="identity", width=0.5) +
     labs(x="Species", y="Concentration (ppm)") +
@@ -64,7 +68,33 @@ createPlot <- function(filteredData, legend){
             panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
             text=element_text(size=20))
     }
-  finalFigure <- plot_grid(chart, legend, nrow=2, ncol=1,rel_heights=c(1, 0.20))
-  return(finalFigure)
-  #TODO: add in legend
+  return(chart)
+}
+
+# Function to create an empty plot to display before user has selected any flavonoids ----
+createEmptyPlot <- function(allData){
+  chart <- ggplot(data=allData, mapping=aes(x=species, y=0)) +
+    labs(x="Species", y="Concentration (ppm)") + 
+    ylim(0, 1) +
+    theme(legend.position="none",
+          panel.background = element_rect(fill="#d9d9d9"),
+          panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
+          text=element_text(size=20))
+  return(chart)
+}
+
+# Function to refine data for display
+refineData <- function(allData, selectedOrgan, selectedMetabolites, selectedSpecies){
+  filteredData <- allData %>%
+    filter(grepl(selectedOrgan, organ)) %>%
+    filter(grepl(paste(paste("^", selectedMetabolites, "$", sep=""), collapse="|"), metabolite)) %>%
+    group_by(species) %>%
+      arrange(metNum, .by_group=TRUE) %>%
+      mutate(text_y = sum(meanConc) - (cumsum(meanConc) - meanConc/2)) %>%
+      mutate(text_x = as.numeric(species) - 0.25) %>%
+    filter(grepl(selectedSpecies, species))
+  refinedData <- filteredData[, c(8, 7, 3, 4)]
+  refinedData$metNum <- as.character(refinedData$metNum)
+  colnames(refinedData) <- c("Flavonoid #", "Flavonoid name", "Mean concentration (ppm)", "Standard error")
+  return(refinedData)
 }
