@@ -2,13 +2,14 @@
 # Before running, working directory must be set to parent directory of app.R
 
 # Load necessary libraries, functions, and data ----
-packageList <- c("shiny", "plyr", "dplyr", "tibble", "ggplot2", "ggrepel", "cowplot")
+packageList <- c("shiny", "shinyjs", "plyr", "dplyr", "tibble", "ggplot2", "ggrepel", "cowplot")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 if(length(newPackages) > 0){
   install.packages(newPackages)
 }
 
 library(shiny)
+library(shinyjs)
 library(plyr)
 library(dplyr)
 library(tibble)
@@ -22,6 +23,7 @@ load("data/flavonoidConcs.rda") # name of variable is "allData"
 
 # Define UI ----
 ui <- fluidPage(
+  useShinyjs(),
   titlePanel("Scutellaria flavonoids"),
   fluidRow(
     column(3,
@@ -34,7 +36,8 @@ ui <- fluidPage(
                            choices=list("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin",
                                         "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside",
                                         "scutellarein", "scutellarin", "baicalin", "baicalein",
-                                        "wogonin", "wogonoside"))
+                                        "wogonin", "wogonoside")),
+        actionButton("resetButton", "Reset selections")
       )
     ),
     
@@ -59,21 +62,22 @@ server <- function(input, output){
       filteredData <- filterData(allData, input$organ, input$metabolites)
       return(createPlot(filteredData, metaboliteColors))
     }else{
-      # Should return an empty plot with a gray background - y-axis scale from 0 to 1?
-      return(createEmptyPlot(allData))
+      # Should return an empty plot with a gray background - y-axis scaled from 0 to 1
+      return(createEmptyPlot(allData, input$organ))
     }
   })
     
   # Return legend
   output$legend <- renderPlot({
-    if(length(input$metabolites) > 0){
-      return(createLegend(allData, metaboliteColors))
-    }else{
-      return("")
-    }
+    return(createLegend(allData, metaboliteColors))
   })
   
-  # Return data about click on plot
+  # Functionality for reset button - uncheck metabolite boxes
+  observeEvent(input$resetButton, {
+    reset("metabolites")
+  })
+  
+  # Return species selected by click on plot
   output$clickInfo <- renderText({
     if(is.null(input$plotClick$x)){
       paste0("Selected species: ")
@@ -85,7 +89,7 @@ server <- function(input, output){
     }
   })
   
-  # Return selected data in table
+  # Return data about selected species in table
   output$selectedData <- renderTable({expr=
     if(is.null(input$plotClick$x)){
       emptyDF <- data.frame(a = character(), b = character(), c = character(), d = character())
