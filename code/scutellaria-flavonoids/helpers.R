@@ -72,14 +72,26 @@ createPlot <- function(filteredData, metaboliteColors){
 }
 
 # Function to create an empty plot to display before user has selected any flavonoids ----
-createEmptyPlot <- function(allData){
+createEmptyPlot <- function(allData, selectedOrgan){
   chart <- ggplot(data=allData, mapping=aes(x=species, y=0)) +
     labs(x="Species", y="Concentration (ppm)") + 
     ylim(0, 1) +
-    theme(legend.position="none",
-          panel.background = element_rect(fill="#d9d9d9"),
-          panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
-          text=element_text(size=20))
+    if(selectedOrgan == "Roots"){
+      theme(legend.position="none",
+            panel.background = element_rect(fill="#ffe0cf"),
+            panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
+            text=element_text(size=20))
+    }else if(selectedOrgan == "Shoots"){
+      theme(legend.position="none",
+            panel.background = element_rect(fill="#d5ffcc"),
+            panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
+            text=element_text(size=20))
+    }else{
+      theme(legend.position="none",
+            panel.background = element_rect(fill="#cce8ff"),
+            panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
+            text=element_text(size=20))
+    }
   return(chart)
 }
 
