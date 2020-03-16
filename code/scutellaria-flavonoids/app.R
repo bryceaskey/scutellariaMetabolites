@@ -34,10 +34,11 @@ ui <- fluidPage(
                     choices=list("Leaves", "Shoots", "Roots"), selected=1),
         checkboxGroupInput("metabolites", "Select metabolites",
                            choices=list("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin",
-                                        "chrysin", "chrysinG", "apigenin", "apigeninG", "acetoside",
-                                        "scutellarein", "scutellarin", "baicalin", "baicalein",
-                                        "wogonin", "wogonoside")),
-        actionButton("resetButton", "Reset selections")
+                                        "chrysin", "chrysinG", "apigenin", "apigeninG", 
+                                        "acetoside", "scutellarein", "scutellarin", "baicalin",
+                                        "baicalein", "wogonin", "wogonoside")),
+        actionButton("selectAll", "Select all"),
+        actionButton("deselectAll", "Deselect all")
       )
     ),
     
@@ -55,7 +56,7 @@ ui <- fluidPage(
 
 
 # Define server logic ----
-server <- function(input, output){
+server <- function(input, output, session){
   # Return reactive plot
   output$plot <- renderPlot({
     if(length(input$metabolites) > 0){
@@ -72,8 +73,17 @@ server <- function(input, output){
     return(createLegend(allData, metaboliteColors))
   })
   
-  # Functionality for reset button - uncheck metabolite boxes
-  observeEvent(input$resetButton, {
+  # Functionality for "Select all" button - check all metabolites boxes
+  observeEvent(input$selectAll, {
+    variables <- list("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin", 
+                      "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein", 
+                      "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
+    updateCheckboxGroupInput(session, "metabolites", "Select metabolites", choices=variables,
+                             selected=unlist(variables))
+  })
+  
+  # Functionality for "Deselect all" button - uncheck all metabolite boxes
+  observeEvent(input$deselectAll, {
     reset("metabolites")
   })
   
