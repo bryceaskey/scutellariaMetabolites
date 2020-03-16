@@ -107,6 +107,6 @@ refineData <- function(allData, selectedOrgan, selectedMetabolites, selectedSpec
     filter(grepl(selectedSpecies, species))
   refinedData <- filteredData[, c(8, 7, 3, 4)]
   refinedData$metNum <- as.character(refinedData$metNum)
-  colnames(refinedData) <- c("Flavonoid #", "Flavonoid name", "Mean concentration (ppm)", "Standard error")
+  colnames(refinedData) <- c("Flavonoid #", "Flavonoid name", "Concentration (ppm)", "Standard error")
   return(refinedData)
 }
