@@ -1,0 +1,47 @@
+/ufrc/lee/braskey
+c4a-s1.ufhpc
+Tue Apr  7 00:05:31 EDT 2020
+Downloading scutellaria RNA seq data
+Read 25902883 spots for SRR3130396
+Written 25902883 spots for SRR3130396
+Read 22726868 spots for SRR3123399
+Written 22726868 spots for SRR3123399
+Read 66853467 spots for SRR7689119
+Written 66853467 spots for SRR7689119
+Read 67071809 spots for SRR7689120
+Written 67071809 spots for SRR7689120
+Read 66777139 spots for SRR7689121
+Written 66777139 spots for SRR7689121
+Read 66472470 spots for SRR7689122
+Written 66472470 spots for SRR7689122
+Read 65457113 spots for SRR7689123
+Written 65457113 spots for SRR7689123
+fastq-dump (PID 34032) was killed (signal 9)
+2020-04-07T06:37:28 fastq-dump.2.10.4 fatal: string unexpected while executing query within virtual file system module - multiple response SRR URLs for the same service 'ncbi'
+2020-04-07T06:37:28 fastq-dump.2.10.4 fatal: string unexpected while executing query within virtual file system module - multiple response SRR URLs for the same service 'ncbi'
+2020-04-07T06:37:28 fastq-dump.2.10.4 fatal: string unexpected while executing query within virtual file system module - multiple response SRR URLs for the same service 'ncbi'
+2020-04-07T06:49:35 fastq-dump.2.10.4 err: timeout exhausted while waiting condition within process system module - failed SRR1605127
+
+=============================================================
+An error occurred during processing.
+A report was generated into the file '/home/braskey/ncbi_error_report.txt'.
+If the problem persists, you may consider sending the file
+to 'sra-tools@ncbi.nlm.nih.gov' for assistance.
+=============================================================
+
+fastq-dump (PID 34570) quit with error code 3
+Read 22525547 spots for SRR3367955
+Written 22525547 spots for SRR3367955
+Read 22817910 spots for SRR3367956
+Written 22817910 spots for SRR3367956
+Read 22441855 spots for SRR3367957
+Written 22441855 spots for SRR3367957
+Read 27930422 spots for SRR6940088
+Written 27930422 spots for SRR6940088
+Read 36145215 spots for SRR5150730
+Written 36145215 spots for SRR5150730
+Read 29099899 spots for SRR3727161
+Written 29099899 spots for SRR3727161
+Read 29099899 spots for SRR3114960
+Written 29099899 spots for SRR3114960
+slurmstepd: error: Detected 1 oom-kill event(s) in step 49909914.batch cgroup. Some of your processes may have been killed by the cgroup out-of-memory handler.
