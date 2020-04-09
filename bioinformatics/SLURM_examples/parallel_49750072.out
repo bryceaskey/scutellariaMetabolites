@@ -1,0 +1,50 @@
+/ufrc/lee/braskey/SLURM_examples
+c2a-s17.ufhpc
+Fri Apr  3 18:49:09 EDT 2020
+Running prime number generator program on 4 CPU cores
+
+PRIME_OPENMP
+  C++/OpenMP version
+
+  Number of processors available = 4
+  Number of threads =              4
+
+TEST01
+  Call PRIME_NUMBER to count the primes from 1 to N.
+
+         N        Pi          Time
+
+         1         0      0.00520929
+         2         1      0.00247457
+         4         2        0.004941
+         8         4      0.00247513
+        16         6      0.00494522
+        32        11      0.00247309
+        64        18      0.00493095
+       128        31      0.00251511
+       256        54      0.00493454
+       512        97      0.00254323
+      1024       172      0.00509195
+      2048       309      0.00347146
+      4096       564       0.0081657
+      8192      1028       0.0157808
+     16384      1900       0.0466664
+     32768      3512        0.171483
+     65536      6542        0.717354
+    131072     12251         2.12518
+
+TEST01
+  Call PRIME_NUMBER to count the primes from 1 to N.
+
+         N        Pi          Time
+
+         5         3      0.00346004
+        50        15      0.00369152
+       500        95      0.00381895
+      5000       669      0.00950102
+     50000      5133        0.453256
+    500000     41538         25.3207
+
+PRIME_OPENMP
+  Normal end of execution.
+Fri Apr  3 18:49:41 EDT 2020

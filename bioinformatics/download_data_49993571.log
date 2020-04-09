@@ -1,0 +1,39 @@
+/ufrc/lee/braskey
+c21a-s36.ufhpc
+Wed Apr  8 13:21:32 EDT 2020
+Downloading scutellaria RNA seq data
+Read 41235603 spots for SRR8449931
+Written 41235603 spots for SRR8449931
+Read 48528038 spots for SRR8449932
+Written 48528038 spots for SRR8449932
+Read 25589730 spots for SRR8449933
+Written 25589730 spots for SRR8449933
+Read 22595120 spots for SRR8449934
+Written 22595120 spots for SRR8449934
+Read 21080785 spots for SRR8449935
+Written 21080785 spots for SRR8449935
+Read 20874954 spots for SRR8449936
+Written 20874954 spots for SRR8449936
+Read 18571158 spots for SRR8449937
+Written 18571158 spots for SRR8449937
+Read 20852584 spots for SRR8449938
+Written 20852584 spots for SRR8449938
+2020-04-08T18:59:05 fastq-dump.2.10.4 err: timeout exhausted while waiting condition within process system module - failed SRR8449939
+
+=============================================================
+An error occurred during processing.
+A report was generated into the file '/home/braskey/ncbi_error_report.txt'.
+If the problem persists, you may consider sending the file
+to 'sra-tools@ncbi.nlm.nih.gov' for assistance.
+=============================================================
+
+fastq-dump (PID 17135) quit with error code 3
+mv: cannot stat ‘SRR8449931’: No such file or directory
+mv: cannot stat ‘SRR8449932’: No such file or directory
+mv: cannot stat ‘SRR8449933’: No such file or directory
+mv: cannot stat ‘SRR8449934’: No such file or directory
+mv: cannot stat ‘SRR8449935’: No such file or directory
+mv: cannot stat ‘SRR8449936’: No such file or directory
+mv: cannot stat ‘SRR8449937’: No such file or directory
+mv: cannot stat ‘SRR8449938’: No such file or directory
+mv: cannot stat ‘SRR8449939’: No such file or directory
