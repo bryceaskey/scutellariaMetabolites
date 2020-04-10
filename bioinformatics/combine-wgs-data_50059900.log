@@ -1,0 +1,7 @@
+/ufrc/lee/braskey
+c6a-s17.ufhpc
+Thu Apr  9 21:09:08 EDT 2020
+  File "/ufrc/lee/braskey/combine-wgs-data.sh", line 11
+    module load python/3.8
+           ^
+SyntaxError: invalid syntax

@@ -15,4 +15,5 @@ module load bwa/0.7.17
 
 echo "Aligning altissima WGS data to reference genome"
 # bwa mem reference reads > output
+bwa index
 bwa mem /ufrc/lee/braskey/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/... /ufrc/lee/braskey/WGS/ATM_1.fq.gz > /ufrc/lee/braskey/WGS/ATM_1-aln.sam
