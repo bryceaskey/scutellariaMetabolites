@@ -9,11 +9,11 @@ library(stats)
 library(tidyr)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteDataHerbarium1-30.csv", na.strings=c("", "NA"), header=TRUE)
+rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteDataHerbarium1-30.csv", na.strings=c("", "NA"), header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
 # Define functions for interpreting injection names -----------------------------------------------
-herbariumList <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/herbariumList.csv")
+herbariumList <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/herbariumList.csv")
 
 getSampleName <- function(injectionName, nameList){
   sampleName <- nameList[injectionName==nameList$Label, 3]
