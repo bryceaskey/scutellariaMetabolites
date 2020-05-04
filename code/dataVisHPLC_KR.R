@@ -10,10 +10,10 @@ library(cowplot)
 library(ggforce)
 
 # Read metabolite data from .csv file -------------------------------------------------------------
-rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/metaboliteData.csv", header=TRUE)
 rawData[, 1] <- as.character(rawData[, 1])
 
-rawDataKR <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/2020-01-17_metaboliteDataKR.csv", header=TRUE)
+rawDataKR <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/2020-01-17_metaboliteDataKR.csv", header=TRUE)
 rawDataKR [, 1] <- as.character(rawDataKR[, 1])
 colnames(rawDataKR)[1] <- "injectionName"
 
