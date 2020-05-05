@@ -23,9 +23,11 @@ allData <- allData %>%
   filter(!grepl(excludeOrgans, organ)) #>%>
   # filter(!grepl(excludeMetabolites, metabolites))
 
-# Rename RNA Seq to racemosa
+# Fix naming error
 allData$species <- as.character(allData$species)
 allData$species[allData$species=="RNA Seq"] <- "racemosa"
+allData$species[allData$species=="havenesis"] <- "havanesis"
+allData$species[allData$species=="hastafolia"] <- "hastifolia"
 allData$species <- as.factor(allData$species)
 
 # Separate organ-specific data from non organ-specific data
@@ -102,13 +104,18 @@ heatmapData$stError_microM <- stError_microM
 metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin",
                      "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein",
                      "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
+levels(heatmapData$metabolite) <- metaboliteOrder
 
 heatmap <- ggplot(data=heatmapData) +
   geom_raster(mapping=aes(x=species, y=metabolite, fill=concentration_microM)) +
   scale_fill_viridis() +
   #scale_fill_gradientn(colours=c("#FFFFFFFF", "#0066CC")) +
   coord_fixed() +
-  labs(title="Non organ-specific metabolite concentrations for various species of Scutellaria", x="Species", y="Metabolite", fill=expression(paste("Conc (", mu, "M)", sep=""))) +
-  theme(axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, color="#000000"), text=element_text(size=18, color="#000000"), 
-        legend.position="right", legend.direction = "vertical", plot.margin=unit(c(0.5,1,0.25,1),"cm"))
+  labs(title=expression("Non organ-specific flavonoid concentrations for various species of Scutellaria"),
+       x="Species", y="Flavonoid", fill=expression(paste("Conc (", mu, "M)", sep=""))) +
+  theme(axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, color="#000000"),
+        axis.text.y=element_text(color="#000000"),
+        text=element_text(size=18, color="#000000"), 
+        legend.position="right", legend.direction = "vertical",
+        plot.margin=unit(c(0.5,1,0.25,1),"cm"))
 print(heatmap)
