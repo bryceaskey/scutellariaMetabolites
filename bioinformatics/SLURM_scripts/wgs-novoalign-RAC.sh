@@ -15,11 +15,11 @@ module load novoalign/3.00.02 samtools/1.10
 
 echo "Aligning racemosa WGS data to reference genome"
 
-ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/
+ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_RAC/
 wgs=/ufrc/lee/braskey/Data/WGS/
 
-gunzip -c ${wgs}RAC_1.fq.gz > ${wgs}RAC_1.fq
-gunzip -c ${wgs}RAC_2.fq.gz > ${wgs}RAC_2.fq
+#gunzip -c ${wgs}RAC_1.fq.gz > ${wgs}RAC_1.fq
+#gunzip -c ${wgs}RAC_2.fq.gz > ${wgs}RAC_2.fq
 
 novoindex ${ref}GCA005771605.nix ${ref}GCA005771605.fa
 novoalign -d ${ref}GCA005771605.nix -f  ${wgs}RAC_1.fq ${wgs}RAC_2.fq -o SAM > ${wgs}RAC_novoaln.sam

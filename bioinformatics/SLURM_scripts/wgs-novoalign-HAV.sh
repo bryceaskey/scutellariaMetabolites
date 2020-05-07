@@ -15,11 +15,11 @@ module load novoalign/3.00.02 samtools/1.10
 
 echo "Aligning havanesis WGS data to reference genome"
 
-ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/
+ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_HAV/
 wgs=/ufrc/lee/braskey/Data/WGS/
 
-gunzip -c ${wgs}HAV_1.fq.gz > ${wgs}HAV_1.fq
-gunzip -c ${wgs}HAV_2.fq.gz > ${wgs}HAV_2.fq
+#gunzip -c ${wgs}HAV_1.fq.gz > ${wgs}HAV_1.fq
+#gunzip -c ${wgs}HAV_2.fq.gz > ${wgs}HAV_2.fq
 
 novoindex ${ref}GCA005771605.nix ${ref}GCA005771605.fa
 novoalign -d ${ref}GCA005771605.nix -f  ${wgs}HAV_1.fq ${wgs}HAV_2.fq -o SAM > ${wgs}HAV_novoaln.sam
