@@ -15,11 +15,11 @@ module load novoalign/3.00.02 samtools/1.10
 
 echo "Aligning barbata WGS data to reference genome"
 
-ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/
+ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_BAR/
 wgs=/ufrc/lee/braskey/Data/WGS/
 
-gunzip -c ${wgs}BAR_1.fq.gz > ${wgs}BAR_1.fq
-gunzip -c ${wgs}BAR_2.fq.gz > ${wgs}BAR_2.fq
+#gunzip -c ${wgs}BAR_1.fq.gz > ${wgs}BAR_1.fq
+#gunzip -c ${wgs}BAR_2.fq.gz > ${wgs}BAR_2.fq
 
 novoindex ${ref}GCA005771605.nix ${ref}GCA005771605.fa
 novoalign -d ${ref}GCA005771605.nix -f  ${wgs}BAR_1.fq ${wgs}BAR_2.fq -o SAM > ${wgs}BAR_novoaln.sam
