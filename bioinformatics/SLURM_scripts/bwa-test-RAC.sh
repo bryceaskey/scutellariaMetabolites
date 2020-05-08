@@ -17,7 +17,7 @@ echo "Aligning racemosa WGS data to reference genome"
 
 ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_RAC_bwa/
 wgs=/ufrc/lee/braskey/Data/WGS/
-output_dir=/ufrc/lee/braskey/Data/WGS/bwa_test
+output_dir=/ufrc/lee/braskey/Data/WGS/bwa_test/
 
 bwa index ${ref}GCA005771605.fa
 bwa mem ${ref}GCA005771605.fa ${wgs}RMS_CSFP190050182-1a_HTCLTDSXX_L1_1.fq.gz ${wgs}RMS_CSFP190050182-1a_HTCLTDSXX_L1_2.fq.gz > ${output_dir}RAC_aln.sam
