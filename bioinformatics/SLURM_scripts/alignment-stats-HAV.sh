@@ -13,7 +13,7 @@ pwd; hostname; date
 
 module load samtools/1.10 bcftools/1.10.2
 
-wgs_data=/ufrc/lee/braskey/Data/WGS/
+wgs_data=/ufrc/lee/braskey/Data/WGS/bwa/
 
 samtools stats ${wgs_data}HAV_aln_sorted.bam
 bcftools stats ${wgs_data}HAV_aln_filtered.vcf
