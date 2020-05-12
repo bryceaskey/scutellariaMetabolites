@@ -6,7 +6,7 @@
 #SBATCH --mail-user=braskey@ufl.edu              # Where to send mail	
 #SBATCH --ntasks=1                               # Run on a single CPU
 #SBATCH --mem=4gb                                # Job memory request
-#SBATCH --time=120:00:00                         # Time limit hrs:min:sec
+#SBATCH --time=744:00:00                         # Time limit hrs:min:sec
 #SBATCH --output=wgs-novoalign-HAV_%j.log        # Standard output and error log
 
 pwd; hostname; date
@@ -25,3 +25,4 @@ novoindex ${ref}GCA005771605.nix ${ref}GCA005771605.fa
 novoalign -d ${ref}GCA005771605.nix -f  ${wgs}HAV_1.fq ${wgs}HAV_2.fq -o SAM > ${wgs}HAV_novoaln.sam
 samtools view -bS ${wgs}HAV_novoaln.sam > ${wgs}HAV_novoaln.bam
 samtools sort -O bam -o ${wgs}HAV_novoaln_sorted.bam ${wgs}HAV_novoaln.bam
+samtools index ${wgs}HAV_novoaln_sorted.bam
