@@ -23,3 +23,5 @@ bcftools mpileup -Ov -Q 20 -f ${ref} ${sorted_aln} | bcftools call -c -o ${outpu
 bcftools filter -Ov -i '%QUAL>20' ${output_dir}BAR_aln.vcf -o ${output_dir}BAR_aln_flt.vcf
 bcftools index ${output_dir}BAR_aln_flt.vcf
 bcftools stats ${output_dir}BAR_aln_flt.vcf
+bcftools view ${output_dir}BAR_aln_flt.vcf -Oz -o ${output_dir}BAR_aln_flt.vcf.gz
+bcftools index ${output_dir}BAR_aln_flt.vcf.gz
