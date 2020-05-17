@@ -26,7 +26,7 @@ allData <- allData %>%
 # Fix naming error
 allData$species <- as.character(allData$species)
 allData$species[allData$species=="RNA Seq"] <- "racemosa"
-allData$species[allData$species=="havenesis"] <- "havanesis"
+allData$species[allData$species=="havenesis"] <- "havanensis"
 allData$species[allData$species=="hastafolia"] <- "hastifolia"
 allData$species <- as.factor(allData$species)
 
