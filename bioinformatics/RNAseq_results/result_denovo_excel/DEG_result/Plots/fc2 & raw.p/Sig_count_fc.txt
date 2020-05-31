@@ -1,0 +1,2 @@
+	|FC|>=2	UP	DOWN
+Leaf/root	10783	5629	5154

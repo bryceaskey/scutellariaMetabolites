@@ -1,0 +1,331 @@
+<html>
+<head>
+<title> Analysis Result </title>
+<link rel=stylesheet href="http://download.macrogen.com/~seqdata/NGS/NGS_DEG_ver2/HTML.report/default.css" type=text/css>
+<meta http-equiv="content-type" content="text/html; charset=euc-kr" />
+</head>
+<body bgcolor= FFFFFF ><div id="wrapper">
+<div id="header">
+<div class="title-sec">
+<div class="title-inner-sec">
+<a href="#"><img src="http://download.macrogen.com/~seqdata/NGS/NGS_DEG_ver2/HTML.report/images/logo.png" alt="MACROGEN" /></a><h1>NGS Advanced Analysis Report</h1>
+</div>
+</div>
+<div class="info-sec">
+<div class="info-inner-sec">
+
+			<table class="tb2">
+			<caption class="hide">Customer</caption>
+			<colgroup>
+				<col width="120"/>
+				<col width="300"/>
+			</colgroup>
+			<tr>
+				<th>Order number</th>
+				<td>HN00107177</td>
+			</tr>
+			<tr>
+				<th>Name</th>
+				<td>Jeongim Kim</td>
+			</tr>
+			<tr>
+				<th>Application</th>
+				<td>Transcriptome Denovo Sequencing</td>
+			</tr>
+			<tr>
+				<th>Species</th>
+				<td>Other</td>
+			</tr>
+			</table></div>
+<div class="clear">
+</div>
+</div>
+</div>
+<div id="container", class="paddingB60">
+<h2 class="title">Report Summary</h2>
+<h3 class="title-mid">Study Object</h3>
+<ul class="con-sec">
+<p class="title-bull">Comparing expression profiles between clinically comparable samples using Transcriptome Denovo Sequencing data.</p>
+<li>6 Samples, 1 Comparison</li>
+</ul>
+<div class="paddingB30">
+</div>
+<h3 class="title-mid">Analysis Summary</h3>
+<ul class="con-sec">
+<h3 class="title-bull">Data Pre-processing & Quality Check</h3>
+<li>Filtering, Logarithm, Normalization</li>
+<li>Reproducibility, Box Plot, Density Plot, etc.</li>
+<h3 class="title-bull">Filtering differentially expressed contigs between comparison samples.</h3>
+<li>Fold change</li>
+<li>nbinomWaldTest using DESeq2</li>
+<h3 class="title-bull">Hierarchical Clustering (Euclidean Distance, Complete Linkage)</h3>
+</ul>
+<div class="paddingB30">
+</div>
+</div>
+<div id="container", class="con-hr">
+</div>
+<div id="container", class="paddingB60">
+<h2 class="title">I. Sample Description</h2>
+<h3 class="title-mid">I-1. Sample Information</h3>
+<ul class="con-sec">
+<p class="title-bull">Total 6 Samples</p>
+<div class="t-cs">
+<table class="tb">
+<tr>
+<th class="firstcol"></th>
+<th>Sample.ID</th>
+<th class="lastcol">Sample.Group</th>
+</tr>
+<tr>
+<td class="firstcol">1</td>
+<td>Leaf1</td>
+<td class="lastcol">Leaf</td>
+</tr>
+<tr>
+<td class="firstcol">2</td>
+<td>Leaf2</td>
+<td class="lastcol">Leaf</td>
+</tr>
+<tr>
+<td class="firstcol">3</td>
+<td>Leaf3</td>
+<td class="lastcol">Leaf</td>
+</tr>
+<tr>
+<td class="firstcol">4</td>
+<td>root1</td>
+<td class="lastcol">root</td>
+</tr>
+<tr>
+<td class="firstcol">5</td>
+<td>root2</td>
+<td class="lastcol">root</td>
+</tr>
+<tr>
+<td class="firstcol">6</td>
+<td>root3</td>
+<td class="lastcol">root</td>
+</tr>
+</table>
+</div>
+</ul>
+<div class="paddingB30">
+</div>
+<h3 class="title-mid">I-2. Analysis Design</h3>
+<ul class="con-sec">
+<p class="title-bull">Total 1 Comparison</p>
+<div class="t-cs">
+<table class="tb">
+<tr>
+<th class="firstcol"></th>
+<th>Test vs. Control</th>
+<th class="lastcol">Statistical Method</th>
+</tr>
+<tr>
+<td class="firstcol">1</td>
+<td>Leaf vs. root</td>
+<td class="lastcol">Fold Change, nbinomWaldTest using DESeq2, Hierarchical Clustering</td>
+</tr>
+</table>
+</div>
+</ul>
+<div class="paddingB30">
+</div>
+</div>
+<div id="container", class="con-hr">
+</div>
+<div id="container", class="paddingB60">
+<h2 class="title">II. Data Quality Check</h2>
+<font color="brown">
+(Please Refer to <i><b>Data Quality Check</i></b> folder.)</font>
+<ul class="con-sec">
+<h3 class="title-bull">QC for each contig (histogram)</h3>
+<li>For 6 samples, if more than one Count value was 0, it was not included in the analysis. Therefore, from total of 217,473 contigs, 188,943 were excluded and only 28,530 contigs were used for statistic analysis.</li>
+<a href="./Data Quality Check/Low Count by contig.png" target="blank"> <img src="./Data Quality Check/Low Count by contig.png" border="1" width="590"> </a>
+<h3 class="title-bull">Box plot</h3>
+<li>Below boxplots show the corresponding sample's expression distribution based on percentile (median, 50 percentile, 75 percentile, maximum and minimum) based on raw signal(Count), Log2 transformation and RLE Normalization.</li>
+<li>Randomly selected 10 samples in each group.</li>
+<a href="./Data Quality Check/Box.Plot.png" target="blank"> <img src="./Data Quality Check/Box.Plot.png" border="1" width="590"> </a>
+<h3 class="title-bull">Density plot</h3>
+<li>Below density plots show the corresponding sample's expression distribution before and after of raw signal(Count+1), Log2 transformation and RLE Normalization.</li>
+<li>Randomly selected 10 samples in each group.</li>
+<a href="./Data Quality Check/Density.Plot.png" target="blank"> <img src="./Data Quality Check/Density.Plot.png" border="1" width="590"> </a>
+<h3 class="title-bull">Reproducibility between Samples</h3>
+<li>The similarity between samples is obtained through Pearson's coefficient of sample's normalized value. For range : -1≤ r ≤ 1, the closer the value is to 1, the more similar the samples are.</li>
+<li>Total Samples</li>
+<a href="./Data Quality Check/Total.Scatter.Plot.png" target="blank"> <img src="./Data Quality Check/Total.Scatter.Plot.png" border="1" width="590"> </a>
+<a href="./Data Quality Check/Total.Level.Plot.png" target="blank"> <img src="./Data Quality Check/Total.Level.Plot.png" border="1" width="590"> </a>
+<h3 class="title-bull">Hierarchical clustering</h3>
+<li>Using each sample's normalized value, the high expression similarities were grouped together.<br>(Distance metric = Euclidean Distance, Linkage method = Complete Linkage)</li>
+<a href="./Data Quality Check/Hierarchical.Clustering.png" target="blank"> <img src="./Data Quality Check/Hierarchical.Clustering.png" border="1" width="590"> </a>
+<h3 class="title-bull">MDS (Multidimensional Scaling) plot</h3>
+<li>Using each sample's normalized value, the similarity between samples is graphically shown in a 2D plot to show the variability of the total data. This allows identification any outlier samples, or similar expression patterns between sample groups.</li>
+<a href="./Data Quality Check/MDS.Plot_dpi600.png" target="blank"> <img src="./Data Quality Check/MDS.Plot_dpi600.png" border="1" width="590"> </a>
+<h3 class="title-bull">Estimated dispersion plot</h3>
+<li>Estimate the genewise dispersion estimates over all genes, allowing for a possible abundance trend. <br>
+			Biological CV (BCV) is the coefficient of variation with which the (unknown) true abundance of the gene varies between replicate RNA samples. It represents the CV that would remain between biological replicates if sequencing depth could be increased indefinitely. <br>
+			The technical CV decreases as the size of the counts increases. BCV on the other hand does not. BCV is therefore likely to be the dominant source of uncertainty for high-count genes, so reliable estimation of BCV is crucial for realistic assessment of differential expression in RNA-Seq experiments.</li>
+<a href="./Data Quality Check/Dispersion.QC.Plot.png" target="blank"> <img src="./Data Quality Check/Dispersion.QC.Plot.png" border="1" width="590"> </a>
+</ul>
+<div class="paddingB30">
+</div>
+</div>
+<div id="container", class="con-hr">
+</div>
+<div id="container", class="paddingB60">
+<h2 class="title">III. Data Analysis</h2>
+<h3 class="title-mid">III-1. Data Analysis Flow</h3>
+<ul class="con-sec">
+<p class="title-bull"><b>1. Original Raw Data</b></p>
+<li>Raw data : 217,473 contigs, 6 samples</li>
+<p class="title-bull"><b>2. Data Pre-processing & Quality Check</b> : Filtering &#8594 Signal+1 &#8594 Logarithm &#8594 RLE Normalization</p>
+<li>Processed data ( <a href="./data2.xlsx">./data2.xlsx</a> ) : 28,530 contigs, 6 samples</li>
+<p class="title-bull"><b>3. Statistical Test</b> : Fold Change, nbinomWaldTest using DESeq2</p>
+<font color="brown">
+<li>Criteria for Significant Result : |fc|≥2 & raw.p<0.05</li>
+</font>
+<li>data3_fc2 & raw.p.xlsx contains significant contigs with satisfies |fc|≥2 & raw.p<0.05 conditions in at least one of total comparison pairs.</li>
+<div class="t-cs-li">
+<table class="tb">
+<tr>
+<th class="firstcol">Result File</th>
+<th class="lastcol"># of Significant contigs</th>
+</tr>
+<tr>
+<td class="firstcol"><a href="data3_fc2 & raw.p.xlsx">data3_fc2 & raw.p.xlsx</a></td>
+<td class="lastcol">8,436</td>
+</tr>
+</table>
+</div>
+<p class="title-bull"><b>4. Clustering Analysis</b></p>
+<li>Hierarchical Clustering (Euclidean Distance, Complete Linkage)</li>
+</ul>
+<div class="paddingB30">
+</div>
+<h3 class="title-mid">III-2. Data Pre-processing</h3>
+<ul class="con-sec">
+<p class="title-bull"><b>Object</b></p>
+<li>The goal of the Pre-processing is to reduce systematic bias to avoid statistically erroneous conclusions through filtering, transformation, and normalization of data.</li>
+<p class="title-bull"><b>1. Filtering Criteria</b></p>
+<li>contig : To exclude contig with at least one zero Counts.</li>
+<li>sample : No sample filtering.</li>
+<p class="title-bull"><b>2. Normalization</b> : RLE Normalization</p>
+<li>In order to reduce systematic bias, estimates the size factors from the count data and RLE normalize. <br>(estimateSizeFactors method in the DESeq2 R library)</li>
+<p class="title-bull"><b>3. Signal+1 & Logarithm for Visualization</b></p>
+<li>In case of DESeq2, Signal+1 & Logarithm before normalization and regularized log (rlog) transformation after normalization.<br>
+			    rlog transformation is minimizes differences between samples for rows with small counts, and which normalizes with respect to library size. rlog is more robust in the case when the size factors vary widely.<br>
+			    DESeq2 uses normalization count for statistical test.</li>
+<li>This data transformation is only for to visualization.<br> rlog transformed value was used to plot the heatmap of heirarchical clustering.</li>
+</ul>
+<div class="paddingB30">
+</div>
+<h3 class="title-mid">III-3. Result Plot Description</h3>
+<p class="cmt_mid">These are DEG result of Leaf_vs_root meeting fc2 & raw.p by example.</p>
+<font color="brown">
+<p class="con-sec">(Please Refer to <i><b>Plots >> fc2 & raw.p</i></b> folder.)</p>
+</font>
+<ul class="con-sec">
+<h3 class="title-bull">Significant UP, DOWN count by Fold change</h3>
+<li>Shows number of up and down regulated contigs based on fold change of comparison pair.</li>
+<a href="./Plots/fc2 & raw.p/Sig_count_fc.png" target="blank"> <img src="./Plots/fc2 & raw.p/Sig_count_fc.png" border="1" width="550"> </a>
+<h3 class="title-bull">Significant count by Fold change & p-value</h3>
+<li>Shows number of up and down regulated contigs based on fold change and p-value of comparison pair.</li>
+<a href="./Plots/fc2 & raw.p/Sig_count_fc_raw.p.png" target="blank"> <img src="./Plots/fc2 & raw.p/Sig_count_fc_raw.p.png" border="1" width="550"> </a>
+<h3 class="title-bull">Distribution of Expression level</h3>
+<li>Shows distribution of normalized value per group for comparison pair.</li>
+<a href="./Plots/fc2 & raw.p/Dist_of_exp_level_Leaf_vs_root.png" target="blank"> <img src="./Plots/fc2 & raw.p/Dist_of_exp_level_Leaf_vs_root.png" border="1" width="550"> </a>
+<h3 class="title-bull">Scatter plot of Expression level</h3>
+<li>Shows expression levels between comparison pair as a scatter plot.<br>(X-axis as control and Y-axis as test is average normalized value of the group.)</li>
+<a href="./Plots/fc2 & raw.p/Scatter_plot_Leaf_vs_root_dpi600.png" target="blank"> <img src="./Plots/fc2 & raw.p/Scatter_plot_Leaf_vs_root_dpi600.png" border="1" width="550"> </a>
+<h3 class="title-bull">Volcano plot</h3>
+<li>The log2 fold change and p-value obtained from the comparison of the average for each group plotted as the volcano plot.<br>(X-axis: log2 Fold Change, Y-axis: -log10 p-value)</li>
+<a href="./Plots/fc2 & raw.p/Volcano_plot_Leaf_vs_root_dpi600.png" target="blank"> <img src="./Plots/fc2 & raw.p/Volcano_plot_Leaf_vs_root_dpi600.png" border="1" width="550"> </a>
+<h3 class="title-bull">MA plot</h3>
+<li>Shows overall average expression level between log2 Fold Change as a MA plot.<br>(X-axis as mean of normalized counts and Y-axis as log2 Fold Change.)</li>
+<a href="./Plots/fc2 & raw.p/MA_plot_Leaf_vs_root_dpi600.png" target="blank"> <img src="./Plots/fc2 & raw.p/MA_plot_Leaf_vs_root_dpi600.png" border="1" width="550"> </a>
+<h3 class="title-bull">Cluster Analysis : Heat map for Hierarchical Clustering</h3>
+<font color="brown">
+<p class="con-sec">(Please Refer to <i><b>Cluster image</i></b> folder.)</p>
+</font>
+<li>Heatmap shows results of hierarchical clustering analysis (Euclidean Distance, Complete Linkage) which clusters the similarity of contigs and samples by expression level (normalized value) from the significant list.</li>
+<a href="./Cluster image/fc2 & raw.p/data3_fc2 & raw.p_hc_heatmap.png" target="blank"> <img src="./Cluster image/fc2 & raw.p/data3_fc2 & raw.p_hc_heatmap.png" border="1" width="590"> </a>
+</ul>
+<div class="paddingB30">
+</div>
+<h3 class="title-mid">III-5. Column Information</h3>
+<ul class="con-sec">
+<p class="title-bull"><b>1. Result Excel File</b></p>
+<div class="t-cs">
+<table class="tb">
+<tr>
+<th class="firstcol">Column Name</th>
+<th class="lastcol">Description</th>
+</tr>
+<tr>
+<td class="firstcol">Test/Control.fc</td>
+<td class="lastcol">Fold Change between two samples.<br>For example, Test/Control.fc has “2” means that probe is 2 fold <font color='red'>up</font>-regulated in test sample.<br>If Test/Control.fc has “-2”, probe is 2 fold <font color='blue'>down</font>-regulated in test sample.</td>
+</tr>
+<tr>
+<td class="firstcol">Test/Control.baseMean</td>
+<td class="lastcol">mean normalized counts, averaged over all samples from both conditions</td>
+</tr>
+<tr>
+<td class="firstcol">Test/Control.lfcSE</td>
+<td class="lastcol">logfoldchangeStandard Error</td>
+</tr>
+<tr>
+<td class="firstcol">Test/Control.raw.pval,<br>Test/Control.bh.pval</td>
+<td class="lastcol">p-value of nbinomTest, nbinomWaldTest, nbinomLRT. raw.pval & FDR correction p-value (adj.pval)</td>
+</tr>
+<tr>
+<td class="firstcol">*.mean</td>
+<td class="lastcol">mean of normalized counts for each samples or group</td>
+</tr>
+<tr>
+<td class="firstcol">N_[sample name]</td>
+<td class="lastcol">For sample’s raw signal, rlog transformed values</td>
+</tr>
+<tr>
+<td class="firstcol">[sample name]_ReadCount</td>
+<td class="lastcol">raw siganl of each sample</td>
+</tr>
+</table>
+</div>
+</ul>
+<div class="paddingB30">
+</div>
+</div>
+<div id="footer">
+<div class="info-sec">
+<div class="info-inner-sec">
+
+			<table class="tb2">
+			<caption class="hide">Info2</caption>
+			<colgroup>
+				<col width="500"/>
+				<col width="250"/>
+				<col width="250"/>
+			</colgroup>
+			<tr>
+				<th rowspan=2>If you have any question, <br>please send an email (<a href="mailto:ngs@macrogen.com">ngs@macrogen.com</a>) or contact representative.</th>
+				<th>Macrogen Korea</th>
+				<th>Contact</th>
+			</tr>
+			<tr>
+				<td>10F, 254 Beotkkot-ro, Geumcheon-gu, Seoul Rep. of Korea</td>
+				<td>Web : <a href="http://www.macrogen.com">http://www.macrogen.com</a><br>Lims : <a href="http://dna.macrogen.com">http://dna.macrogen.com</a></td>
+			</tr>
+			</table></div>
+<div class="clear">
+</div>
+</div>
+<div class="title-sec">
+<div class="title-inner-sec">
+
+						<a href="#"><img src="http://download.macrogen.com/~seqdata/NGS/NGS_DEG_ver2/HTML.report/images/logo.png" alt="MACROGEN" /></a>
+<h1></h1></div>
+</div>
+</div>
+</div>
+</body></html>

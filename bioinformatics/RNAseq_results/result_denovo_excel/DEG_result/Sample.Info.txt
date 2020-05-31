@@ -1,0 +1,7 @@
+Original	Sample.ID	Sample.Group
+Leaf1_Read_Count	Leaf1	Leaf
+Leaf2_Read_Count	Leaf2	Leaf
+Leaf3_Read_Count	Leaf3	Leaf
+root1_Read_Count	root1	root
+root2_Read_Count	root2	root
+root3_Read_Count	root3	root

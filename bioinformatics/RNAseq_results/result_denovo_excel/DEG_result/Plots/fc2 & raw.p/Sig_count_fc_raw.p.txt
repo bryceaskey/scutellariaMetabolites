@@ -1,0 +1,2 @@
+	|FC|>=2 & raw.p<0.05	UP	DOWN
+Leaf/root	8436	4509	3927
