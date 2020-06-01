@@ -22,8 +22,8 @@ wgs=/ufrc/lee/braskey/Data/WGS/bwa/
 gunzip -c ${wgs}${sp}_1.fq.gz > ${wgs}${sp}_1.fq
 gunzip -c ${wgs}${sp}_2.fq.gz > ${wgs}${sp}_2.fq
 
-fastq_quality_filter -Q 33 -q 20 -i ${wgs}${sp}_1.fq > ${wgs}${sp}_1_flt.fq
-fastq_quality_filter -Q 33 -q 20 -i ${wgs}${sp}_2.fq > ${wgs}${sp}_2_flt.fq
+fastq_quality_filter -Q 33 -q 36 -i ${wgs}${sp}_1.fq > ${wgs}${sp}_1_flt.fq
+fastq_quality_filter -Q 33 -q 36 -i ${wgs}${sp}_2.fq > ${wgs}${sp}_2_flt.fq
 
 bwa index ${ref}
 bwa mem ${ref} ${wgs}${sp}_1_flt.fq ${wgs}${sp}_2_flt.fq > ${wgs}${sp}_aln.sam
