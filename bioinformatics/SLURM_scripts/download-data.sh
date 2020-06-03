@@ -15,15 +15,15 @@ echo "Downloading scutellaria RNA seq data"
 dest=/ufrc/lee/braskey/Data/
 
 # SRP179837
-fastq-dump SRR8449931 -O ${dest}SRP179837/
-fastq-dump SRR8449932 -O ${dest}SRP179837/
-fastq-dump SRR8449933 -O ${dest}SRP179837/
-fastq-dump SRR8449934 -O ${dest}SRP179837/
-fastq-dump SRR8449935 -O ${dest}SRP179837/
-fastq-dump SRR8449936 -O ${dest}SRP179837/
-fastq-dump SRR8449937 -O ${dest}SRP179837/
-fastq-dump SRR8449938 -O ${dest}SRP179837/
-fastq-dump SRR8449939 -O ${dest}SRP179837/
+fastq-dump --split-files SRR8449931 -O ${dest}SRP179837/
+fastq-dump --split-files SRR8449932 -O ${dest}SRP179837/
+fastq-dump --split-files SRR8449933 -O ${dest}SRP179837/
+fastq-dump --split-files SRR8449934 -O ${dest}SRP179837/
+fastq-dump --split-files SRR8449935 -O ${dest}SRP179837/
+fastq-dump --split-files SRR8449936 -O ${dest}SRP179837/
+fastq-dump --split-files SRR8449937 -O ${dest}SRP179837/
+fastq-dump --split-files SRR8449938 -O ${dest}SRP179837/
+fastq-dump --split-files SRR8449939 -O ${dest}SRP179837/
 
 # SRP068883
 fastq-dump SRR3130396 -O ${dest}SRP068883/
