@@ -2,6 +2,7 @@ library(tidyverse)
 library(ggplot2)
 library(ggdendro)
 library(cowplot)
+library(viridis)
 
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
@@ -162,18 +163,18 @@ heatmap <- ggplot(data=heatmapData) +
         axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         text=element_text(size=14, color="#000000"), 
-        legend.position="none",
+        legend.position="right",
         panel.background=element_blank(),
         plot.margin=unit(c(0.031,0,0.025,-0.2),"npc"))
 
 # Create column of colored circles to represent phylogenetic clade
 cladeLabels <- ggplot(data=denCladeData) +
-  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=1, size=4.5) +
-  scale_fill_manual(values=c("#09c736", "#0dbecb", "#1127cf", "#9a16d3", "#d71a73", "#db601e", "#ffffff"), drop=FALSE) +
+  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=1, size=5) +
+  scale_fill_manual(values=c("#cae3e4", "#c4c5de", "#edc4f8", "#f8c4c4", "#f6e0b8", "#bcf5a5", "#ffffff"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=unit(c(0.001,0,0.087,-0.2),"npc"))
+        plot.margin=unit(c(0.001,0,0.087,-7),"npc"))
 
 # Comconte dendrogram and heatmap into 1 figure
-finalFigure <- plot_grid(contDenPlot, heatmap, cladeLabels, nrow=1, rel_widths=c(0.575, 0.4, 0.025))
+finalFigure <- plot_grid(contDenPlot, cladeLabels, heatmap, nrow=1, rel_widths=c(0.575, 0.025, 0.4))
 print(finalFigure)
