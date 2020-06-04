@@ -28,6 +28,7 @@ allData$species <- as.character(allData$species)
 allData$species[allData$species=="RNA Seq"] <- "racemosa"
 allData$species[allData$species=="havenesis"] <- "havanesis"
 allData$species[allData$species=="hastafolia"] <- "hastifolia"
+allData$species[allData$species=="havanesis"] <- "havanensis"
 allData$species <- as.factor(allData$species)
 
 # Average together any duplicate data points
@@ -114,7 +115,12 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
 
 # Function to create stacked bar charts
 createStackedBars <- function(allData, metaboliteColors, plantOrgan){
+  allData$species <- as.character(allData$species)
+  allData$species <- factor(allData$species, levels=c("baicalensis", "havanensis", "arenicola", "hastifolia", 
+  "dependens", "strigillosa", "barbata", "indica", "insignis", "racemosa", "tournefortii", "altissima", "leonardii", "pekinesis"))
   speciesList <- levels(allData$species)
+  
+  print(levels(allData$species))
   
   organData <- allData[order(allData$metNum), ]
   organData <- organData %>%
@@ -136,9 +142,11 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
     }
   }
   
+  
   organData <- organData %>%
     group_by(species) %>%
     mutate(text_x = as.numeric(species) - 0.25)
+  print(organData)
   
   chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
     geom_bar(position="stack", stat="identity", width=0.5) +
@@ -150,24 +158,27 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
     geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), hjust=1, direction="y", nudge_x=-0.2) +
     if(plantOrgan=="roots"){
       theme(legend.position="none",
-            axis.text.x=element_text(color="#000000", angle=45, hjust=1),
+            axis.text.x=element_text(color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
+            axis.title.x=element_blank(),
             panel.background=element_rect(fill="#ffe0cf"),
             panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
             text=element_text(size=18))
     }else if(plantOrgan=="shoots"){
       theme(legend.position="none", 
             #axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-            axis.text.x=element_text(color="#000000", angle=45, hjust=1),
+            axis.text.x=element_text(color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
+            axis.title.x=element_blank(),
             panel.background=element_rect(fill="#d5ffcc"),
             panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
             text=element_text(size=18))
     }else{
       theme(legend.position="none",
             #axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-            axis.text.x=element_text(color="#000000", angle=45, hjust=1),
+            axis.text.x=element_text(color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
+            axis.title.x=element_blank(),
             panel.background = element_rect(fill="#cce8ff"),
             panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
             text=element_text(size=18))
