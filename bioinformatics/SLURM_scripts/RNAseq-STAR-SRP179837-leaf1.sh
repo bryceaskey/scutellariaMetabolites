@@ -19,7 +19,6 @@ sp=SRP179837
 rep=leaf1
 ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_STAR/index/
 reads=/ufrc/lee/braskey/Data/SRP179837/
-<<<<<<< HEAD
 aln=/ufrc/lee/braskey/Data/SRP179837/alignments/STAR_v2/
 
 STAR --runThreadN 1 \
@@ -30,8 +29,3 @@ STAR --runThreadN 1 \
  --outFilterMatchNminOverLread 0 \
  --outFilterMatchNmin 0 \
  --outFilterMismatchNmax 2 
-=======
-aln=/ufrc/lee/braskey/Data/SRP179837/alignments/
-
-STAR --runThreadN 1 --outFilterMismatchNmax 2 --outFileNamePrefix ${aln}${sp}_${rep}_ --genomeDir ${ref} --readFilesIn ${reads}${sp}_${rep}_1.fastq ${reads}${sp}_${rep}_2.fastq
->>>>>>> 930cae41ac7568ae6c76714ceedade63579b75b8
