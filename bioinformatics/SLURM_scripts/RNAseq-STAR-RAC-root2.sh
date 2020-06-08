@@ -19,6 +19,7 @@ sp=RAC
 rep=root2
 ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_STAR/index/
 reads=/ufrc/lee/braskey/Data/RNAseq/
+<<<<<<< HEAD
 aln=/ufrc/lee/braskey/Data/RNAseq/alignments/STAR_v2/
 
 #gunzip -c ${reads}${sp}_${rep}_1.fastq.gz > ${reads}${sp}_${rep}_1.fastq
@@ -32,3 +33,11 @@ STAR --runThreadN 1 \
  --outFilterMatchNminOverLread 0 \
  --outFilterMatchNmin 0 \
  --outFilterMismatchNmax 2 
+=======
+aln=/ufrc/lee/braskey/Data/RNAseq/alignments/
+
+gunzip -c ${reads}${sp}_${rep}_1.fastq.gz > ${reads}${sp}_${rep}_1.fastq
+gunzip -c ${reads}${sp}_${rep}_2.fastq.gz > ${reads}${sp}_${rep}_2.fastq
+
+STAR --runThreadN 1 --outFilterMismatchNmax 2 --outFileNamePrefix ${aln}${sp}_${rep}_ --genomeDir ${ref} --readFilesIn ${reads}${sp}_${rep}_1.fastq ${reads}${sp}_${rep}_2.fastq
+>>>>>>> 930cae41ac7568ae6c76714ceedade63579b75b8
