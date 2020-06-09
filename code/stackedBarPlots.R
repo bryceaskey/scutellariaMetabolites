@@ -154,7 +154,7 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
   
   chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
     geom_bar(position="stack", stat="identity", width=0.5) +
-    # ylim(0, 100) +
+    ylim(0, 400) +
     labs(title=paste("Flavonoid concentrations in Scutellaria", plantOrgan),
          x="Species", 
          y=expression(paste("Concentration (", mu, "M)", sep=""))) +
@@ -162,30 +162,25 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
     geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), hjust=1, direction="y", nudge_x=-0.2) +
     if(plantOrgan=="roots"){
       theme(legend.position="none",
-            axis.text.x=element_text(color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
-            axis.text.y=element_text(color="#000000"),
             axis.title.x=element_blank(),
+            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
+            axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#ffe0cf"),
-            panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
-            text=element_text(size=18))
+            text=element_text(size=20))
     }else if(plantOrgan=="shoots"){
       theme(legend.position="none", 
-            #axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-            axis.text.x=element_text(color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
-            axis.text.y=element_text(color="#000000"),
             axis.title.x=element_blank(),
+            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
+            axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#d5ffcc"),
-            panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
-            text=element_text(size=18))
+            text=element_text(size=20))
     }else{
       theme(legend.position="none",
-            #axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-            axis.text.x=element_text(color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
-            axis.text.y=element_text(color="#000000"),
             axis.title.x=element_blank(),
+            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
+            axis.text.y=element_text(color="#000000"),
             panel.background = element_rect(fill="#cce8ff"),
-            panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(),
-            text=element_text(size=18))
+            text=element_text(size=20))
     }
 }
 
@@ -198,15 +193,17 @@ legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 
 finalRootFigure <- plot_grid(rootPlot, legend,
   nrow=1, ncol=2, 
-  rel_widths=c(1, 0.20))
+  rel_widths=c(1, 0.15))
 print(finalRootFigure)
 
 finalShootFigure <- plot_grid(shootPlot, legend,
   nrow=1, ncol=2, 
-  rel_widths=c(1, 0.20))
+  rel_widths=c(1, 0.15))
 print(finalShootFigure)
 
 finalLeafFigure <- plot_grid(leafPlot, legend,
   nrow=1, ncol=2,
-  rel_widths=c(1, 0.20))
+  rel_widths=c(1, 0.15))
 print(finalLeafFigure)
+
+# Export at size 1800x1000

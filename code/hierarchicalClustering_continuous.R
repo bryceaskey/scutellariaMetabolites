@@ -3,11 +3,24 @@ library(ggplot2)
 library(ggdendro)
 library(cowplot)
 library(viridis)
+library(dplyr)
 
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
 frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
 herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+
+# Adjust herbarium ppm to correct for dilution
+herbarium1_30 <- herbarium1_30 %>%
+  transmute(
+    species=species,
+    organ=organ,
+    metabolite=metabolite,
+    concentration_ppm=concentration_ppm/2,
+    stError_ppm=stError_ppm/2
+  )
+
+
 
 # Combine all data into a single data frame and change classifiers (species, organs, metabolites)
 # into factors
@@ -147,7 +160,7 @@ contDenPlot <- ggplot() +
   coord_flip() +
   scale_y_reverse(expand=c(0.3, 0)) +
   theme_dendro() +
-  theme(plot.margin=unit(c(0.00075,0,0.067,0.1),"npc"))
+  theme(plot.margin=unit(c(0.075,0,0.07,0.1),"npc"))
 
 # Adjust species order in heatmap data to match order in dendrogram
 speciesOrder <- label(contDenData)$label
@@ -163,18 +176,20 @@ heatmap <- ggplot(data=heatmapData) +
         axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         text=element_text(size=14, color="#000000"), 
-        legend.position="right",
+        legend.position="top", legend.direction="horizontal",
         panel.background=element_blank(),
         plot.margin=unit(c(0.031,0,0.025,-0.2),"npc"))
 
 # Create column of colored circles to represent phylogenetic clade
 cladeLabels <- ggplot(data=denCladeData) +
   geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=1, size=5) +
-  scale_fill_manual(values=c("#cae3e4", "#c4c5de", "#edc4f8", "#f8c4c4", "#f6e0b8", "#bcf5a5", "#ffffff"), drop=FALSE) +
+  scale_fill_manual(values=c("#97E2DE", "#96B8E3", "#A295E5", "#E894E2", "#E6969C", "#F0C8AA", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=unit(c(0.001,0,0.087,-7),"npc"))
+        plot.margin=unit(c(0.081,0,0.093,-7.2),"npc"))
 
 # Comconte dendrogram and heatmap into 1 figure
 finalFigure <- plot_grid(contDenPlot, cladeLabels, heatmap, nrow=1, rel_widths=c(0.575, 0.025, 0.4))
 print(finalFigure)
+
+# Export at size 1000x1000
