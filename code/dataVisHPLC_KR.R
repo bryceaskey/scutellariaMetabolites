@@ -87,11 +87,12 @@ allData <- data.frame(
 rawDataKR <- rawDataKR[!grepl("15mix", rawDataKR$injectionName), ]
 row.names(rawDataKR) <- 1:nrow(rawDataKR)
 
+# Peak area to ppm conversion was already completed in chromeleon for KR samples
 allDataKR <- data.frame(
   variety=sapply(rawDataKR$injectionName[29:88], getSampleName, abbrevs=abbrevNamesKR),
   replicate=sapply(rawDataKR$injectionName[29:88], getSampleRep),
   organ=sapply(rawDataKR$injectionName[29:88], getSampleOrgan, abbrevs=abbrevOrgans),
-  apigenin=rawDataKR$apigenin[29:88],
+  apigenin=sapply(rawDataKR$apigenin[29:88],
   apigeninG=rawDataKR$apigeninG[29:88],
   scutellarein=rawDataKR$scutellarein[29:88],
   scutellarin=rawDataKR$scutellarin[29:88],

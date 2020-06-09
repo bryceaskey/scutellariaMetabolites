@@ -1,7 +1,10 @@
-library(dplyr)
+# TODO: if a species doesn't produce any of the 15 metabolites in an organ, the bars will be
+# shifted left but labels won't be. Add placeholder data point and then photoshop out later?
+
 library(ggplot2)
 library(ggrepel)
 library(cowplot)
+library(dplyr)
 
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
@@ -89,18 +92,21 @@ for(i in 1:nrow(allData)){
 allData$concentration_microM <- concentration_microM
 allData$stError_microM <- stError_microM
 
-# Set order of species and metabolites to appear in heatmaps
-metaboliteOrder <- c("oroxyloside", "oroxylinA", "hispidulinG", "hispidulin", "chrysin",
-                     "chrysinG", "apigenin", "apigeninG", "acetoside", "scutellarein",
-                     "scutellarin", "baicalin", "baicalein", "wogonin", "wogonoside")
-levels(allData$metabolite) <- metaboliteOrder
+# Set order of metabolites to appear in heatmaps
+allData$metabolite <- factor(allData$metabolite, levels=c(
+  "chrysin", "chrysinG", "oroxylinA", "oroxyloside", "baicalein", "baicalin", "wogonin",
+  "wogonoside", "acetoside", "apigenin", "apigeninG", "scutellarein", "scutellarin",
+  "hispidulin", "hispidulinG")
+)
 
 # Create new column w/ factor nums - for bar plot section labeling
 allData$metNum <- as.numeric(allData$metabolite) 
 
 # Set colors to be used for metabolites across all plots
-metaboliteColors <- c("#8B0000", "#DC143C", "#FF7F50", "#FFD700", "#B8860B", "#BDB76B", "#808000", "#9ACD32", "#2E8B57", "#66CDAA", "#2F4F4F", "#008080", "#4682B4", "#8A2BE2", "#8B008B")
-names(metaboliteColors) <- metaboliteOrder
+metaboliteColors <- c(
+  "#8B0000", "#DC143C", "#FF7F50", "#FFD700", "#B8860B", "#BDB76B", "#808000", "#9ACD32", 
+  "#2E8B57", "#66CDAA", "#2F4F4F", "#008080", "#4682B4", "#8A2BE2", "#8B008B")
+names(metaboliteColors) <- levels(allData$metabolite)
 
 # Function to create color legend for scaled pie charts
 createLegend <- function(allData, metaboliteColors, legendOrientation="horizontal"){
@@ -115,12 +121,7 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
 
 # Function to create stacked bar charts
 createStackedBars <- function(allData, metaboliteColors, plantOrgan){
-  allData$species <- as.character(allData$species)
-  allData$species <- factor(allData$species, levels=c("baicalensis", "havanensis", "arenicola", "hastifolia", 
-  "dependens", "strigillosa", "barbata", "indica", "insignis", "racemosa", "tournefortii", "altissima", "leonardii", "pekinesis"))
   speciesList <- levels(allData$species)
-  
-  print(levels(allData$species))
   
   organData <- allData[order(allData$metNum), ]
   organData <- organData %>%
@@ -128,7 +129,10 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
     filter(concentration_microM > 0) %>%
     group_by(species) %>%
     mutate(text_y = sum(concentration_microM) - (cumsum(concentration_microM) - concentration_microM/2))
-  organData$species <- factor(organData$species)
+  organData$species <- factor(organData$species, levels=c(
+    "baicalensis", "havanensis", "arenicola", "hastifolia", "dependens", "strigillosa", "barbata",
+    "indica", "insignis", "racemosa", "tournefortii", "altissima", "leonardii", "pekinesis")
+  )
   
   if(length(speciesList) != length(levels(organData$species))){
     for(speciesName in speciesList){
