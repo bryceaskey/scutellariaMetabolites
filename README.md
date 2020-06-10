@@ -15,20 +15,29 @@ The purpose of this repository is to serve as a bookkeeping tool for all of code
 The documentation in this section details the bioinformatics approaches and methods applied in this project. Ideally, the documentation here should allow someone with little to no bioinformatics experience to understand and recreate the analysis method that was used. 
 
 Topics covered:
-1. Setting up a hipergator account
-2. Submitting jobs in hipergator \
-   2.1 SLURM scripts \
-   2.2 Bash basics \
-   2.3 Output files
+1. [Setting up a hipergator account](#setting-up-hipergator)
+2. [Submitting jobs in hipergator](#submitting-jobs) \
+   2.1 [SLURM scripts](#slurm-scripts) \
+   2.2 [Bash basics](#bash-basics) \
+   2.3 [Output files](#output-files)
+3. [Downloading datasets](#downloading-datasets)
 
 Note that *Scutellaria* plants are "non-model" organisms, which means that there are a couple of extra processing and error checking steps necessary as compared to an analysis workflow that would be applied to data from a "model" organism, such as *Arabidopsis thaliana*.
 
-## 1. Setting up a hipergator account
+## 1. Setting up a hipergator account 
+<a name="setting-up-hipergator"></a>
 
 ## 2. Submitting jobs in hipergator
+<a name="submitting-jobs"></a>
 
 ### 2.1 SLURM scipts
+<a name="slurm-scripts"></a>
 
 ### 2.2 Bash basics
+<a name="bash-basics"></a>
 
 ### 2.3 Output files
+<a name="output-files"></a>
+
+## 3. Downloading datasets
+<a name="downloading-datasets"></a>
