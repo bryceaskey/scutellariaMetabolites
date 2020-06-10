@@ -1,0 +1,111 @@
+/ufrc/lee/braskey/SLURM_scripts
+c27a-s1.ufhpc
+Fri May 22 21:28:31 EDT 2020
+Aligning altissima WGS data to reference genome
+# novoindex (3.0) - Universal k-mer index constructor.
+# (C) 2008 - 2011 NovoCraft Technologies Sdn Bhd
+# novoindex /ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_ALT/GCA005771605.nix /ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_ALT/GCA005771605.fa 
+# Creating 32 indexing threads.
+# Building with 13-mer and step of 1 bp.
+# novoindex construction dT = 198.6s
+# Index memory size   1.829Gbyte.
+# Done.
+# novoalign (V3.00.02 - Build Apr  1 2013 @ 09:45:36 - A short read aligner with qualities.
+# (C) 2008,2009,2010,2011 NovoCraft Technologies Sdn Bhd.
+# License file not found.
+# Licensed for evaluation, educational, and not-for-profit use only.
+#  novoalign -d /ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_ALT/GCA005771605.nix -f /ufrc/lee/braskey/Data/WGS/ALT_1.fq /ufrc/lee/braskey/Data/WGS/ALT_2.fq -o SAM 
+# Starting at Fri May 22 21:34:20 2020
+# Interpreting input files as Illumina FASTQ, Casava Pipeline 1.8 & later.
+# Index Build Version: 3.0
+# Hash length: 13
+# Step size: 1
+#       Paired Reads: 72020561
+#      Pairs Aligned: 14357487
+#     Read Sequences: 144041122
+#            Aligned: 39279101
+#   Unique Alignment: 33463105
+#   Gapped Alignment: 16912587
+#     Quality Filter:        0
+# Homopolymer Filter:    35367
+#       Elapsed Time: 1442865.250 (secs.)
+#           CPU Time: 20016.62 (min.)
+# Fragment Length Distribution
+#	From	To	Count
+#	45	59	1
+#	60	74	91
+#	75	89	462
+#	90	104	3088
+#	105	119	10603
+#	120	134	29786
+#	135	149	49255
+#	150	164	78494
+#	165	179	122237
+#	180	194	163363
+#	195	209	225577
+#	210	224	305238
+#	225	239	382575
+#	240	254	507054
+#	255	269	612713
+#	270	284	701966
+#	285	299	806372
+#	300	314	852536
+#	315	329	851058
+#	330	344	807134
+#	345	359	744946
+#	360	374	648153
+#	375	389	536431
+#	390	404	435067
+#	405	419	340884
+#	420	434	256097
+#	435	449	189578
+#	450	464	135535
+#	465	479	96866
+#	480	494	66742
+#	495	509	46557
+#	510	524	31956
+#	525	539	21701
+#	540	554	15593
+#	555	569	11121
+#	570	584	8191
+#	585	599	6004
+#	600	614	4766
+#	615	629	3832
+#	630	644	3042
+#	645	659	2608
+#	660	674	2318
+#	675	689	1989
+#	690	704	1857
+#	705	719	1690
+#	720	734	1608
+#	735	749	1674
+#	750	764	1728
+#	765	779	1966
+#	780	794	1207
+#	795	809	1
+#	810	824	2
+#	825	839	0
+#	840	854	0
+#	855	869	4
+#	870	884	0
+#	885	899	0
+#	900	914	0
+#	915	929	0
+#	930	944	0
+#	945	959	0
+#	960	974	0
+#	975	989	0
+#	990	1004	0
+#	1005	1019	0
+#	1020	1034	0
+#	1035	1049	0
+#	1050	1064	0
+#	1065	1079	0
+#	1080	1094	2
+#	1095	1109	0
+#	1110	1124	0
+#	1125	1139	1
+# Mean   320, Std Dev  76.7
+# Done at Mon Jun  8 14:22:06 2020
+[bam_sort_core] merging from 67 files and 1 in-memory blocks...
+slurmstepd: error: unlink(/tmp/slurmd/job52318580/slurm_script): No such file or directory
