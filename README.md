@@ -24,8 +24,11 @@ Topics covered:
 
 Note that *Scutellaria* plants are "non-model" organisms, which means that there are a couple of extra processing and error checking steps necessary as compared to an analysis workflow that would be applied to data from a "model" organism, such as *Arabidopsis thaliana*.
 
-## 1. Setting up a hipergator account 
+## 1. Setting up hipergator 
 <a name="setting-up-hipergator"></a>
+The ufrc wiki provides a [pretty good guide](https://help.rc.ufl.edu/doc/Getting_Started) on how to set up a hipergator account. The first step is to request an account from your supervisor. Assuming that your supervisor has already set up a group with allocated resources in hipergator, just submit a [request account form](https://www.rc.ufl.edu/access/request-account/). Once your supervisor approves the account request, you should receive an email from ufrc stating that your account has been created. 
+
+   
 
 ## 2. Submitting jobs in hipergator
 <a name="submitting-jobs"></a>

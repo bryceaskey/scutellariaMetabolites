@@ -44,7 +44,7 @@ fastq-dump SRR3367956 -O ${dest}SRP048707/
 fastq-dump SRR3367957 -O ${dest}SRP048707/
 
 # SRP096180
-fastq-dump SRR6940088 -O ${dest}SRP096180/ # WGS
+fastq-dump --split-files SRR6940088 -O ${dest}SRP096180/ # WGS
 fastq-dump SRR5150730 -O ${dest}SRP096180/ # RNA-seq
 
 # SRP068819
