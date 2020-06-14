@@ -16,7 +16,7 @@ module load novoalign/3.00.02 samtools/1.10 seqtk/1.3
 echo "Aligning a subset of baicalensis WGS data to reference genome"
 
 ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_ALT/
-wgs=/ufrc/lee/braskey/Data/WGS/SRP096180/
+wgs=/ufrc/lee/braskey/Data/SRP096180/
 
 seqtk sample -s100 ${wgs}SRR6940088_1.fastq 100000 > ${wgs}SRR6940088_sub1.fastq
 seqtk sample -s100 ${wgs}SRR6940088_2.fastq 100000 > ${wgs}SRR6940088_sub2.fastq
