@@ -11,7 +11,7 @@
 
 pwd; hostname; date
 
-module load star/2.7.3a
+module load star/2.7.3a trimmomatic/0.39
 
 echo "Mapping SRP179837 (baicalensis) root2 RNAseq data to baicalensis reference genome"
 
@@ -19,13 +19,15 @@ sp=SRP179837
 rep=root2
 ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_STAR/index/
 reads=/ufrc/lee/braskey/Data/SRP179837/
-aln=/ufrc/lee/braskey/Data/SRP179837/alignments/STAR_v2/
+aln=/ufrc/lee/braskey/Data/SRP179837/alignments/STAR_v3/
+
+trimmomatic PE -threads 1 \
+  ${reads}${sp}_${rep}_1.fastq ${reads}${sp}_${rep}_2.fastq \
+  ${reads}${sp}_${rep}_trimmed_1.fastq ${reads}${sp}_${rep}_unpaired_1.fastq \
+  ${reads}${sp}_${rep}_trimmed_2.fastq ${reads}${sp}_${rep}_unpaired_2.fastq \
+  ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:36
 
 STAR --runThreadN 1 \
- --outFileNamePrefix ${aln}${sp}_${rep}_ \
- --genomeDir ${ref} \
- --readFilesIn ${reads}${sp}_${rep}_1.fastq ${reads}${sp}_${rep}_2.fastq \
- --outFilterScoreMinOverLread 0 \
- --outFilterMatchNminOverLread 0 \
- --outFilterMatchNmin 0 \
- --outFilterMismatchNmax 2 
+  --outFileNamePrefix ${aln}${sp}_${rep}_ \
+  --genomeDir ${ref} \
+  --readFilesIn ${reads}${sp}_${rep}_trimmed_1.fastq ${reads}${sp}_${rep}_trimmed_2.fastq \
