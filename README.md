@@ -32,7 +32,7 @@ Once your account has been created, the next step is to connect to hipergator us
 
 **Windows users -** Since Windows doesn't come with an SSH preinstalled, you will need to download one. [MobaXTerm](https://mobaxterm.mobatek.net/) has a pretty friendly user interface, so I recommend it for newer users. [This video](https://mediasite.video.ufl.edu/Mediasite/Play/2bf4c860f19b48a593fb581018b813a11d) from ufrc provides a good tutorial for first time setup of MobaXTerm. In short, after opening MobaXTerm and clicking the "New session" button, select the "SSH" option at the top of the popup window. Then enter the name of the remote host (hpg.rc.ufl.edu), check the "Specify username" box, enter your gatorlink username, and click the "OK" button.
 
-![Image of MobaXTerm SSH setup](https://github.com/bryceaskey/scutellariaMetabolites/tree/master/figures/docImages/MobaXTerm.png)
+![Image of MobaXTerm SSH setup](https://github.com/bryceaskey/scutellariaMetabolites/tree/master/figures/docImages/MobaXTerm.PNG?raw=true)
 
 *An image of what MobaXTerm SSH setup would look like for my account (with Gatorlink username braskey).*
 
