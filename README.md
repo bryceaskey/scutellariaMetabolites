@@ -24,11 +24,19 @@ Topics covered:
 
 Note that *Scutellaria* plants are "non-model" organisms, which means that there are a couple of extra processing and error checking steps necessary as compared to an analysis workflow that would be applied to data from a "model" organism, such as *Arabidopsis thaliana*.
 
-## 1. Setting up hipergator 
+## 1. Setting up a hipergator account
 <a name="setting-up-hipergator"></a>
 The ufrc wiki provides a [pretty good guide](https://help.rc.ufl.edu/doc/Getting_Started) on how to set up a hipergator account. The first step is to request an account from your supervisor. Assuming that your supervisor has already set up a group with allocated resources in hipergator, just submit a [request account form](https://www.rc.ufl.edu/access/request-account/). Once your supervisor approves the account request, you should receive an email from ufrc stating that your account has been created. 
 
-   
+Once your account has been created, the next step is to connect to hipergator using a secure shell, or SSH. An SSH is what you will use to communicate with hipergator (e.g. submit jobs, check the status of jobs). This process will differ depending on whether your computer is running Windows, Linux, or MacOS. 
+
+**Windows users -** Since Windows doesn't come with an SSH preinstalled, you will need to download one. [MobaXTerm](https://mobaxterm.mobatek.net/) has a pretty friendly user interface, so I recommend it for newer users. [This video](https://mediasite.video.ufl.edu/Mediasite/Play/2bf4c860f19b48a593fb581018b813a11d) from ufrc provides a good tutorial for first time setup of MobaXTerm. In short, after opening MobaXTerm and clicking the "New session" button, select the "SSH" option at the top of the popup window. Then enter the name of the remote host (hpg.rc.ufl.edu), check the "Specify username" box, enter your gatorlink username, and click the "OK" button.
+
+![Image of MobaXTerm SSH setup](https://github.com/bryceaskey/scutellariaMetabolites/tree/master/figures/docImages/MobaXTerm.png)
+
+*An image of what MobaXTerm SSH setup would look like for my account (with Gatorlink username braskey).*
+
+**Linux and MacOS users -** Both Linux and MacOS systems come with an SSH by default, which can be accessed from 
 
 ## 2. Submitting jobs in hipergator
 <a name="submitting-jobs"></a>
