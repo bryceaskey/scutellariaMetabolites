@@ -87,7 +87,7 @@ SFTP stands for Secure File Transfer Protocol. An SFTP is needed to to transfer 
 
 If this is the first time you have connected to hipergator on the computer, you may need to click "OK" on a prompt that says something like "Host not recognized". Once you've successfully connected to hipergator with the SFTP, you should see something similar to the image below.
 
-![Image of MobaXTerm SFTP client](figures/docImages/MobaXTerm-Client.png)
+![Image of MobaXTerm SFTP client](figures/docImages/MobaXTerm-Client.PNG)
 *An image of what the MobaXTerm client should look like after setting up an SFTP.*
 
 **Linux and MacOS users -** The SFTP client recommended by ufrc is [FileZilla](https://filezilla-project.org/). Make sure you download the client version, and not the server version. [This video](https://mediasite.video.ufl.edu/Mediasite/Play/873a2b08bf1d4ccda49a51f5c84692491d) from ufrc provides a good tutorial on how to setup FileZilla on a MacOS system. The process should be nearly identical on a Linux system. In short, after downloading and opening FileZilla, 
