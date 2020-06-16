@@ -20,8 +20,6 @@ herbarium1_30 <- herbarium1_30 %>%
     stError_ppm=stError_ppm/2
   )
 
-
-
 # Combine all data into a single data frame and change classifiers (species, organs, metabolites)
 # into factors
 allData <- rbind(fresh, frozenKR, herbarium1_30)
@@ -30,7 +28,7 @@ allData$organ <- as.factor(allData$organ)
 allData$metabolite <- as.factor(allData$metabolite)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia"), collapse = '|')
+excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
 excludeOrgans <- paste(c("flowers"), collapse = '|')
 #excludeMetabolites <- paste(c("chrysinG", "oroxyloside", "baicalin", "wogonoside", "acetoside", "apigeninG", "scutellarin", "hispidulinG"), collapse = '|')
 allData <- allData %>%
@@ -115,32 +113,45 @@ heatmapData$concentration_microM <- concentration_microM
 heatmapData$stError_microM <- stError_microM
 
 # Assign metabolite order as determined by heirarchical clustering
-metaboliteOrder <- c("chrysin", "chrysinG", "oroxylinA", "oroxyloside", "baicalein",
-                     "baicalin", "wogonin", "wogonoside", "acetoside", "apigenin",
-                     "apigeninG", "scutellarein", "scutellarin", "hispidulin", "hispidulinG")
-heatmapData$metabolite <- factor(heatmapData$metabolite, levels=metaboliteOrder)
+#metaboliteOrder <- c("chrysin", "chrysinG", "oroxylinA", "oroxyloside", "baicalein",
+#                     "baicalin", "wogonin", "wogonoside", "acetoside", "apigenin",
+#                     "apigeninG", "scutellarein", "scutellarin", "hispidulin", "hispidulinG")
+#heatmapData$metabolite <- factor(heatmapData$metabolite, levels=metaboliteOrder)
 
 # Transform data into wide format to use for heirarchical clustering 
-contData <- subset(heatmapData, select=-c(concentration_ppm, stError_ppm, stError_microM))
-contData <- contData %>%
+speciesData <- subset(heatmapData, select=-c(concentration_ppm, stError_ppm, stError_microM))
+speciesData <- speciesData %>%
   pivot_wider(names_from=metabolite, values_from=concentration_microM) %>%
   remove_rownames %>%
   column_to_rownames(var="species")
-contData <- scale(contData)
+speciesData <- scale(speciesData)
 
-# Calculate distance matrix
-contDist <- dist(contData, method="euclidian")
+# Calculate distance matrix and perform heirarchical clustering of species
+speciesDist <- dist(speciesData, method="euclidian")
+speciesCluster <- hclust(d=speciesDist, method="average")
+print(paste("Correlation between cophenetic distances and actual distances:", cor(speciesDist, cophenetic(speciesCluster))))
+speciesDenData <- dendro_data(as.dendrogram(speciesCluster), type="rectangle")
 
-contCluster <- hclust(d=contDist, method="average")
-print(paste("Correlation between cophenetic distances and actual distances:", cor(contDist, cophenetic(contCluster))))
-contDenData <- dendro_data(as.dendrogram(contCluster), type="rectangle")
+# Transpose distance matrix and perform heirarchical clustering of flavonoids
+flavonoidData <- t(speciesData)
+flavonoidDist <- dist(flavonoidData, method="euclidian")
+flavonoidCluster <- hclust(d=flavonoidDist, method="average")
+flavonoidDenData <- dendro_data(as.dendrogram(flavonoidCluster), type="rectangle")
+
+# Adjust species order in heatmap data to match order in dendrogram
+speciesOrder <- label(speciesDenData)$label
+heatmapData$species <- factor(heatmapData$species, levels=speciesOrder)
+
+# Adjust flavonoid order in heatmap data to match order in dendrogram
+flavonoidOrder <- label(flavonoidDenData)$label
+heatmapData$metabolite <- factor(heatmapData$metabolite, levels=flavonoidOrder)
 
 # Load clade data from phylogenetic tree generated from chloroplast genome
 cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
-speciesList <- vector(mode="character", length=nrow(label(contDenData)))
-cladeList <- vector(mode="numeric", length=nrow(label(contDenData)))
-for (i in 1:nrow(label(contDenData))){
-  denSpecies <- label(contDenData)$label[i]
+speciesList <- vector(mode="character", length=nrow(label(speciesDenData)))
+cladeList <- vector(mode="numeric", length=nrow(label(speciesDenData)))
+for (i in 1:nrow(label(speciesDenData))){
+  denSpecies <- label(speciesDenData)$label[i]
   speciesList[i] <- denSpecies
   clade <- cladeData$clade[grep(denSpecies, cladeData$species)]
   if (length(clade)>0){
@@ -149,47 +160,63 @@ for (i in 1:nrow(label(contDenData))){
     cladeList[i] <- NA
   }
 } 
-
-denCladeData <- data.frame(x=1, y=1:nrow(label(contDenData)), speciesList, cladeList)
+denCladeData <- data.frame(x=1, y=1:nrow(label(speciesDenData)), speciesList, cladeList)
 denCladeData$cladeList <- factor(denCladeData$cladeList, levels=c(1, 2, 3, 4, 5, 6))
 
-# Create dendrogram
-contDenPlot <- ggplot() +
-  geom_segment(data=segment(contDenData), mapping=aes(x=x, y=y, xend=xend, yend=yend)) +
-  geom_text(data=label(contDenData), mapping=aes(x=x, y=y, label=label, hjust=1), nudge_y=7) +
+# Create column of colored circles to represent phylogenetic clade
+cladeLabels <- ggplot(data=denCladeData) +
+  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=0.6, size=5) +
+  scale_fill_manual(values=c("#9c8aea", "#e07fea", "#eb74a1", "#eb9569", "#e5ec5e", "#78ed54", "#FFFFFF"), drop=FALSE) +
+  theme_void() +
+  theme(legend.position="none",
+        plot.margin=margin(6, 70, 21, -500, "pt"))
+
+# Add "S." to beginning of each species' name - not working
+speciesDenData$labels$label <- paste("S.", speciesDenData$labels$label)
+
+# Create dendrogram for species
+speciesDenPlot <- ggplot() +
+  geom_segment(data=segment(speciesDenData), mapping=aes(x=x, y=y, xend=xend, yend=yend)) +
+  geom_text(data=label(speciesDenData), mapping=aes(x=x, y=y, label=label, hjust=1), nudge_y=6, size=4, fontface="italic") +
   coord_flip() +
   scale_y_reverse(expand=c(0.3, 0)) +
+  theme_dendro()
+
+# Create dendrogram for flavonoids
+flavonoidDenPlot <- ggplot() +
+  geom_segment(data=segment(flavonoidDenData), mapping=aes(x=x, y=y, xend=xend, yend=yend)) +
+  geom_text(data=label(flavonoidDenData), mapping=aes(x=x, y=y, label=label), hjust=1, nudge_y=6, angle=90, size=2.5) +
   theme_dendro() +
-  theme(plot.margin=unit(c(0.075,0,0.07,0.1),"npc"))
+  scale_y_reverse()
 
-# Adjust species order in heatmap data to match order in dendrogram
-speciesOrder <- label(contDenData)$label
-heatmapData$species <- factor(heatmapData$species, levels=speciesOrder)
-
-# Create heatmap without species labels
+# Create heatmap without species or flavonoid labels
 heatmap <- ggplot(data=heatmapData) +
   geom_raster(mapping=aes(x=species, y=metabolite, fill=concentration_microM)) +
   scale_fill_viridis() +
   labs(y="Flavonoid", fill=expression(paste("Conc (", mu, "M)", sep=""))) +
   coord_flip() +
-  theme(axis.text.x=element_text(angle=45, hjust=1, color="#000000"),
-        axis.title.y=element_blank(),
-        axis.text.y=element_blank(),
-        text=element_text(size=14, color="#000000"), 
-        legend.position="top", legend.direction="horizontal",
-        panel.background=element_blank(),
-        plot.margin=unit(c(0.031,0,0.025,-0.2),"npc"))
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(),
+        axis.title.y=element_blank(), axis.text.y=element_blank(),
+        legend.position="right", legend.direction="vertical",
+        panel.background=element_blank())
 
-# Create column of colored circles to represent phylogenetic clade
-cladeLabels <- ggplot(data=denCladeData) +
-  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=1, size=5) +
-  scale_fill_manual(values=c("#97E2DE", "#96B8E3", "#A295E5", "#E894E2", "#E6969C", "#F0C8AA", "#FFFFFF"), drop=FALSE) +
-  theme_void() +
-  theme(legend.position="none",
-        plot.margin=unit(c(0.081,0,0.093,-7.2),"npc"))
+# Combine dendrograms and heatmap into 1 figure
+heatmap <- plot_grid(heatmap)
+speciesDendrogram <- plot_grid(speciesDenPlot, cladeLabels, nrow=1)
+flavonoidDendogram <- plot_grid(flavonoidDenPlot)
 
-# Comconte dendrogram and heatmap into 1 figure
-finalFigure <- plot_grid(contDenPlot, cladeLabels, heatmap, nrow=1, rel_widths=c(0.575, 0.025, 0.4))
-print(finalFigure)
+# Export dendrograms and heatmaps separately
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
+  plot=heatmap,
+  device=png(),
+  width=20, height=30, units="cm")
 
-# Export at size 1000x1000
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
+  plot=speciesDendrogram,
+  device=png(),
+  width=30, height=30, units="cm")
+
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/flavonoidDendrogram.png",
+  plot=flavonoidDendogram,
+  device=png(),
+  width=10, height=5, units="cm")

@@ -18,7 +18,7 @@ allData$organ <- as.factor(allData$organ)
 allData$metabolite <- as.factor(allData$metabolite)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC"), collapse = '|')
+excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastafolia", "hastifolia"), collapse = '|')
 excludeOrgans <- paste(c("flowers"), collapse = '|')
 # excludeMetabolites <- paste(c(), collapse = '|')
 allData <- allData %>%
@@ -92,12 +92,18 @@ for(i in 1:nrow(allData)){
 allData$concentration_microM <- concentration_microM
 allData$stError_microM <- stError_microM
 
-# Set order of metabolites to appear in heatmaps
+# Set order of metabolites to appear in heatmaps based on pathway
 allData$metabolite <- factor(allData$metabolite, levels=c(
   "chrysin", "chrysinG", "oroxylinA", "oroxyloside", "baicalein", "baicalin", "wogonin",
   "wogonoside", "acetoside", "apigenin", "apigeninG", "scutellarein", "scutellarin",
   "hispidulin", "hispidulinG")
-)
+) 
+# Set order of metabolites to appear in heatmaps based on heirarchical clustering
+#allData$metabolite <- factor(allData$metabolite, levels=c(
+#  "acetoside", "hispidulinG", "baicalin", "chrysinG", "oroxylinA", "oroxyloside", "hispidulin",
+#  "baicalein", "wogonin", "wogonoside", "scutellarein", "scutellarin", "chrysin", "apigenin",
+#  "apigeninG"
+#))
 
 # Create new column w/ factor nums - for bar plot section labeling
 allData$metNum <- as.numeric(allData$metabolite) 
@@ -130,7 +136,7 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
     group_by(species) %>%
     mutate(text_y = sum(concentration_microM) - (cumsum(concentration_microM) - concentration_microM/2))
   organData$species <- factor(organData$species, levels=c(
-    "baicalensis", "havanensis", "arenicola", "hastifolia", "dependens", "strigillosa", "barbata",
+    "baicalensis", "havanensis", "arenicola", "dependens", "strigillosa", "barbata",
     "indica", "insignis", "racemosa", "tournefortii", "altissima", "leonardii", "pekinesis")
   )
   

@@ -1,7 +1,0 @@
-Manual mode
-Shutter speed - 1/80
-F-stop - F2.8
-ISO 125
-Focus - macro
-White balance - custom (set with grey card)
-Resolution - 4000x3000

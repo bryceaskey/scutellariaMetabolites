@@ -37,6 +37,7 @@ Once your account has been created, the next step is to connect to hipergator us
 **Windows users -** Since Windows doesn't come with an SSH preinstalled, you will need to download one. [MobaXTerm](https://mobaxterm.mobatek.net/) has a pretty friendly user interface, so I recommend it for newer users. [This video](https://mediasite.video.ufl.edu/Mediasite/Play/2bf4c860f19b48a593fb581018b813a11d) from ufrc provides a good tutorial for first time setup of MobaXTerm. In short, after opening MobaXTerm and clicking the "New session" button, select the "SSH" option at the top of the popup window. Then enter the name of the remote host (hpg.rc.ufl.edu), check the "Specify username" box, enter your gatorlink username, and click the "OK" button.
 
 ![Image of MobaXTerm SSH setup](figures/docImages/MobaXTerm.PNG)
+
 *An image of what MobaXTerm SSH setup would look like for my account (with gatorlink username braskey).*
 
 If this is the first time you have connected to hipergator on the computer, you may need to click "OK" on a prompt that says something like "Host not recognized". You should then be asked for your gatorlink password. Type in your password and press enter. *Note that the cursor won't move as you type in your password - this is just a security feature meant to hide the length of your password.* MobaXTerm then may ask if your want to save your password, which you can choose to do if you're the only one using the computer. 
@@ -83,11 +84,13 @@ SFTP stands for Secure File Transfer Protocol. An SFTP is needed to to transfer 
 **Windows users -** If you are using MobaXTerm as your SSH client, you can use the SFTP client that is included. To start an SFTP session, click the "New session" button on the MobaXTerm home screen, and select the "SFTP" option at the top of the popup window. Similar to the SSH setup process, enter the name of the remote host (hpg.rc.ufl.edu), your gatorlink username, and click the "OK" button.
 
 ![Image of MobaXTerm SFTP setup](figures/docImages/MobaXTerm-SFTP.PNG)
+
 *An image of what MobaXTerm SFTP setup would look like for my account (with gatorlink username braskey).*
 
 If this is the first time you have connected to hipergator on the computer, you may need to click "OK" on a prompt that says something like "Host not recognized". Once you've successfully connected to hipergator with the SFTP, you should see something similar to the image below.
 
 ![Image of MobaXTerm SFTP client](figures/docImages/MobaXTerm-Client.PNG)
+
 *An image of what the MobaXTerm client should look like after setting up an SFTP.*
 
 **Linux and MacOS users -** The SFTP client recommended by ufrc is [FileZilla](https://filezilla-project.org/). Make sure you download the client version, and not the server version. [This video](https://mediasite.video.ufl.edu/Mediasite/Play/873a2b08bf1d4ccda49a51f5c84692491d) from ufrc provides a good tutorial on how to setup FileZilla on a MacOS system. The process should be nearly identical on a Linux system. In short, after downloading and opening FileZilla, 
