@@ -17,10 +17,11 @@ echo "Aligning baicalensis WGS data to reference genome"
 
 ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_SRR6940088/
 wgs=/ufrc/lee/braskey/Data/SRP096180/
+aln=/ufrc/lee/braskey/Data/SRP096180/novoaln/
 
-novoindex ${ref}GCA005771605.nix ${ref}GCA005771605.fa
-novoalign -d ${ref}GCA005771605.nix -f  ${wgs}SRR6940088_1.fastq ${wgs}SRR6940088_2.fastq -o SAM > ${wgs}SRR6940088_novoaln.sam
-samtools view -bS ${wgs}SRR6940088_novoaln.sam > ${wgs}SRR6940088_novoaln.bam
-samtools sort -O bam -o ${wgs}SRR6940088_novoaln_sorted.bam ${wgs}SRR6940088_novoaln.bam
-samtools index ${wgs}SRR6940088_novoaln_sorted.bam
-samtools stats ${wgs}SRR6940088_novoaln_sorted.bam
+#novoindex ${ref}GCA005771605.nix ${ref}GCA005771605.fa
+novoalign -d ${ref}GCA005771605.nix -f  ${wgs}SRR6940088_1.fastq ${wgs}SRR6940088_2.fastq -o SAM > ${aln}SRR6940088_novoaln.sam
+samtools view -bS ${aln}SRR6940088_novoaln.sam > ${aln}SRR6940088_novoaln.bam
+samtools sort -O bam -o ${aln}SRR6940088_novoaln_sorted.bam ${aln}SRR6940088_novoaln.bam
+samtools index ${aln}SRR6940088_novoaln_sorted.bam
+samtools stats ${aln}SRR6940088_novoaln_sorted.bam

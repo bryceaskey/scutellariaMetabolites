@@ -1,0 +1,4 @@
+n,n:500,L50,min,N80,N50,N20,E-size,max,sum,name
+1254443,73474,15542,500,945,2072,4255,2850,51545,113.4e6,/ufrc/lee/braskey/Data/WGS/bwa/contigs/ALT_unmapped-unitigs.fa
+1195692,64782,12493,500,1110,2689,5404,3622,55638,116.8e6,/ufrc/lee/braskey/Data/WGS/bwa/contigs/ALT_unmapped-contigs.fa
+1194122,63643,11752,500,1112,2821,5807,3860,73511,116.8e6,/ufrc/lee/braskey/Data/WGS/bwa/contigs/ALT_unmapped-scaffolds.fa

@@ -1,0 +1,4 @@
+n,n:500,L50,min,N80,N50,N20,E-size,max,sum,name
+3564312,117651,42257,500,563,708,1076,1023,43124,87.93e6,/ufrc/lee/braskey/Data/WGS/bwa/contigs/HAV/HAV_unmapped-unitigs.fa
+3557081,116272,40454,500,564,713,1152,1248,79213,88.59e6,/ufrc/lee/braskey/Data/WGS/bwa/contigs/HAV/HAV_unmapped-contigs.fa
+3556900,116128,40495,500,564,712,1152,1290,79213,88.58e6,/ufrc/lee/braskey/Data/WGS/bwa/contigs/HAV/HAV_unmapped-scaffolds.fa

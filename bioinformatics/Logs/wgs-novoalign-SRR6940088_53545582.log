@@ -1,0 +1,30 @@
+/ufrc/lee/braskey/SLURM_scripts
+c3a-s17.ufhpc
+Sun Jun 14 12:49:46 EDT 2020
+Aligning baicalensis WGS data to reference genome
+# novoindex (3.0) - Universal k-mer index constructor.
+# (C) 2008 - 2011 NovoCraft Technologies Sdn Bhd
+# novoindex /ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_SRR6940088/GCA005771605.nix /ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_SRR6940088/GCA005771605.fa 
+# Creating 64 indexing threads.
+# Building with 13-mer and step of 1 bp.
+# novoindex construction dT = 258.1s
+# Index memory size   1.829Gbyte.
+# Done.
+# novoalign (V3.00.02 - Build Apr  1 2013 @ 09:45:36 - A short read aligner with qualities.
+# (C) 2008,2009,2010,2011 NovoCraft Technologies Sdn Bhd.
+# License file not found.
+# Licensed for evaluation, educational, and not-for-profit use only.
+#  novoalign -d /ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/copy_SRR6940088/GCA005771605.nix -f /ufrc/lee/braskey/Data/SRP096180/SRR6940088_1.fastq /ufrc/lee/braskey/Data/SRP096180/SRR6940088_2.fastq -o SAM 
+# Starting at Sun Jun 14 12:54:07 2020
+# Interpreting input files as Sanger FASTQ.
+# Index Build Version: 3.0
+# Hash length: 13
+# Step size: 1
+/tmp/slurmd/job53545582/slurm_script: line 22: 15514 Bus error               novoalign -d ${ref}GCA005771605.nix -f ${wgs}SRR6940088_1.fastq ${wgs}SRR6940088_2.fastq -o SAM > ${wgs}SRR6940088_novoaln.sam
+[E::bgzf_flush] File write failed (wrong size)
+[E::bgzf_close] File write failed
+samtools sort: failed to create temporary file "/ufrc/lee/braskey/Data/SRP096180/SRR6940088_novoaln_sorted.bam.tmp.0002.bam": No space left on device
+[E::hts_open_format] Failed to open file "/ufrc/lee/braskey/Data/SRP096180/SRR6940088_novoaln_sorted.bam" : No such file or directory
+samtools index: failed to open "/ufrc/lee/braskey/Data/SRP096180/SRR6940088_novoaln_sorted.bam": No such file or directory
+[E::hts_open_format] Failed to open file "/ufrc/lee/braskey/Data/SRP096180/SRR6940088_novoaln_sorted.bam" : No such file or directory
+samtools stats: failed to open "/ufrc/lee/braskey/Data/SRP096180/SRR6940088_novoaln_sorted.bam": No such file or directory
