@@ -1,0 +1,26 @@
+/ufrc/lee/braskey/SLURM_scripts
+c2a-s19.ufhpc
+Sun Jul 12 18:30:14 EDT 2020
+Mapping SRP179837 (baicalensis) leaf1 RNAseq data to baicalensis reference genome
+TrimmomaticPE: Started with arguments:
+ -threads 1 /ufrc/lee/braskey/Data/SRP179837/SRP179837_leaf1_1.fastq /ufrc/lee/braskey/Data/SRP179837/SRP179837_leaf1_2.fastq /ufrc/lee/braskey/Data/SRP179837/SRP179837_leaf1_trimmed_1.fastq /ufrc/lee/braskey/Data/SRP179837/SRP179837_leaf1_unpaired_1.fastq /ufrc/lee/braskey/Data/SRP179837/SRP179837_leaf1_trimmed_2.fastq /ufrc/lee/braskey/Data/SRP179837/SRP179837_leaf1_unpaired_2.fastq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:100
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 22595120 Both Surviving: 13505734 (59.77%) Forward Only Surviving: 8170192 (36.16%) Reverse Only Surviving: 0 (0.00%) Dropped: 919194 (4.07%)
+TrimmomaticPE: Completed successfully
+13505734 reads; of these:
+  13505734 (100.00%) were paired; of these:
+    2465073 (18.25%) aligned concordantly 0 times
+    9643911 (71.41%) aligned concordantly exactly 1 time
+    1396750 (10.34%) aligned concordantly >1 times
+    ----
+    2465073 pairs aligned concordantly 0 times; of these:
+      73585 (2.99%) aligned discordantly 1 time
+    ----
+    2391488 pairs aligned 0 times concordantly or discordantly; of these:
+      4782976 mates make up the pairs; of these:
+        3181443 (66.52%) aligned 0 times
+        1400147 (29.27%) aligned exactly 1 time
+        201386 (4.21%) aligned >1 times
+88.22% overall alignment rate

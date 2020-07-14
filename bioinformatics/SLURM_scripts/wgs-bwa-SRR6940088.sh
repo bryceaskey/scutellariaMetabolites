@@ -13,13 +13,14 @@ pwd; hostname; date
 
 module load bwa/0.7.17 samtools/1.10
 
-echo "Aligning SRR6940088 transcriptome data to reference genome"
+echo "Aligning SRR6940088 WGS shotgun sequencing data to reference genome"
 
-ref=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/
-main=/ufrc/lee/braskey/Data/SRP096180/
+index=/ufrc/lee/braskey/Data/ASM577160v1/ncbi_dataset/data/GCA_005771605.1/
+reads=/ufrc/lee/braskey/Data/SRP096180/
+aln=/ufrc/lee/braskey/Data/SRP096180/bwa/
 
-bwa index ${ref}GCA005771605.fa
-bwa mem ${ref}GCA005771605.fa ${main}SRR6940088.fastq > ${main}SRR6940088_aln.sam
-samtools fixmate -O bam ${main}SRR6940088_aln.sam ${main}SRR6940088_aln_fixmate.bam
-samtools sort -O bam -o ${main}SRR6940088_aln_sorted.bam ${main}SRR6940088_aln_fixmate.bam
-samtools stats ${main}SRR6940088_aln_sorted.bam
+#bwa index ${ref}GCA005771605.fa
+bwa mem ${index}GCA005771605.fa ${reads}SRR6940088_1.fastq ${reads}SRR6940088_2.fastq > ${aln}SRR6940088.sam
+samtools fixmate -O bam ${aln}SRR6940088.sam ${aln}SRR6940088_fixmate.bam
+samtools sort -O bam -o ${aln}SRR6940088_sorted.bam ${aln}SRR6940088_fixmate.bam
+samtools stats ${aln}SRR6940088_sorted.bam

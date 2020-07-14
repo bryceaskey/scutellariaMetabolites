@@ -1,0 +1,26 @@
+/ufrc/lee/braskey/SLURM_scripts
+c22a-s25.ufhpc
+Sun Jul 12 18:30:12 EDT 2020
+Mapping racemosa leaf2 RNAseq data to baicalensis reference genome
+TrimmomaticPE: Started with arguments:
+ -threads 1 /ufrc/lee/braskey/Data/RNAseq/RAC_leaf2_1.fastq /ufrc/lee/braskey/Data/RNAseq/RAC_leaf2_2.fastq /ufrc/lee/braskey/Data/RNAseq/RAC_leaf2_trimmed_1.fastq /ufrc/lee/braskey/Data/RNAseq/RAC_leaf2_unpaired_1.fastq /ufrc/lee/braskey/Data/RNAseq/RAC_leaf2_trimmed_2.fastq /ufrc/lee/braskey/Data/RNAseq/RAC_leaf2_unpaired_2.fastq ILLUMINACLIP:TruSeq3-PE.fa:2:30:10:2:keepBothReads LEADING:3 TRAILING:3 MINLEN:80
+Using PrefixPair: 'TACACTCTTTCCCTACACGACGCTCTTCCGATCT' and 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT'
+ILLUMINACLIP: Using 1 prefix pairs, 0 forward/reverse sequences, 0 forward only sequences, 0 reverse only sequences
+Quality encoding detected as phred33
+Input Read Pairs: 39743330 Both Surviving: 39333015 (98.97%) Forward Only Surviving: 368675 (0.93%) Reverse Only Surviving: 0 (0.00%) Dropped: 41640 (0.10%)
+TrimmomaticPE: Completed successfully
+39333015 reads; of these:
+  39333015 (100.00%) were paired; of these:
+    35812415 (91.05%) aligned concordantly 0 times
+    3037720 (7.72%) aligned concordantly exactly 1 time
+    482880 (1.23%) aligned concordantly >1 times
+    ----
+    35812415 pairs aligned concordantly 0 times; of these:
+      52805 (0.15%) aligned discordantly 1 time
+    ----
+    35759610 pairs aligned 0 times concordantly or discordantly; of these:
+      71519220 mates make up the pairs; of these:
+        63214553 (88.39%) aligned 0 times
+        6864640 (9.60%) aligned exactly 1 time
+        1440027 (2.01%) aligned >1 times
+19.64% overall alignment rate
