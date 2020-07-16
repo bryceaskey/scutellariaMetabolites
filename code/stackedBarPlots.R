@@ -7,8 +7,8 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
 
 # Combine all data into a single data frame and change classifiers (species, organs, metabolites)
 # into factors
@@ -95,7 +95,7 @@ allData$stError_microM <- stError_microM
 
 # Set order of metabolites to appear in heatmaps based on pathway
 allData$metabolite <- factor(allData$metabolite, levels=c(
-  "chrysin", "chrysinG", "oroxylinA", "oroxyloside", "baicalein", "baicalin", "wogonin",
+  "chrysin", "chrysinG", "baicalein", "baicalin", "oroxylinA", "oroxyloside", "wogonin",
   "wogonoside", "acetoside", "apigenin", "apigeninG", "scutellarein", "scutellarin",
   "hispidulin", "hispidulinG")
 ) 
@@ -111,8 +111,8 @@ allData$metNum <- as.numeric(allData$metabolite)
 
 # Set colors to be used for metabolites across all plots
 metaboliteColors <- c(
-  "#8B0000", "#DC143C", "#FF7F50", "#FFD700", "#B8860B", "#BDB76B", "#808000", "#9ACD32", 
-  "#2E8B57", "#66CDAA", "#2F4F4F", "#008080", "#4682B4", "#8A2BE2", "#8B008B")
+  "#e50000", "#e65235", "#da6900", "#f2a155", "#CF9C00", "#C9C300", "#83c400", "#2dbf00", 
+  "#00D8E5", "#00b3e5", "#4232f0", "#1000D2", "#a032f0", "#a200bf", "#bf009c")
 names(metaboliteColors) <- levels(allData$metabolite)
 
 # Function to create color legend for scaled pie charts
