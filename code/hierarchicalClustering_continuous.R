@@ -6,9 +6,9 @@ library(viridis)
 library(dplyr)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+herbarium1_30 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
 
 # Adjust herbarium ppm to correct for dilution
 herbarium1_30 <- herbarium1_30 %>%
@@ -41,6 +41,8 @@ allData$species <- as.character(allData$species)
 allData$species[allData$species=="RNA Seq"] <- "racemosa"
 allData$species[allData$species=="havenesis"] <- "havanensis"
 allData$species[allData$species=="hastafolia"] <- "hastifolia"
+allData$species[allData$species=="pekinesis"] <- "pekinensis"
+allData$species[allData$species=="siphocampuloides"] <- "siphocampyloides"
 allData$species <- as.factor(allData$species)
 
 # Separate organ-specific data from non organ-specific data
@@ -147,7 +149,7 @@ flavonoidOrder <- label(flavonoidDenData)$label
 heatmapData$metabolite <- factor(heatmapData$metabolite, levels=flavonoidOrder)
 
 # Load clade data from phylogenetic tree generated from chloroplast genome
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 speciesList <- vector(mode="character", length=nrow(label(speciesDenData)))
 cladeList <- vector(mode="numeric", length=nrow(label(speciesDenData)))
 for (i in 1:nrow(label(speciesDenData))){
@@ -206,17 +208,17 @@ speciesDendrogram <- plot_grid(speciesDenPlot, cladeLabels, nrow=1)
 flavonoidDendogram <- plot_grid(flavonoidDenPlot)
 
 # Export dendrograms and heatmaps separately
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
   plot=heatmap,
   device=png(),
   width=20, height=30, units="cm")
 
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
   plot=speciesDendrogram,
   device=png(),
   width=30, height=30, units="cm")
 
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/flavonoidDendrogram.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/flavonoidDendrogram.png",
   plot=flavonoidDendogram,
   device=png(),
   width=10, height=5, units="cm")

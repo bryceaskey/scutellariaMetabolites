@@ -1,14 +1,14 @@
 # TODO: if a species doesn't produce any of the 15 metabolites in an organ, the bars will be
 # shifted left but labels won't be. Add placeholder data point and then photoshop out later?
 
+library(dplyr)
 library(ggplot2)
 library(ggrepel)
 library(cowplot)
-library(dplyr)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
 
 # Combine all data into a single data frame and change classifiers (species, organs, metabolites)
 # into factors
@@ -32,6 +32,7 @@ allData$species[allData$species=="RNA Seq"] <- "racemosa"
 allData$species[allData$species=="havenesis"] <- "havanesis"
 allData$species[allData$species=="hastafolia"] <- "hastifolia"
 allData$species[allData$species=="havanesis"] <- "havanensis"
+allData$species[allData$species=="pekinesis"] <- "pekinensis"
 allData$species <- as.factor(allData$species)
 
 # Average together any duplicate data points
@@ -135,9 +136,10 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
     filter(concentration_microM > 0) %>%
     group_by(species) %>%
     mutate(text_y = sum(concentration_microM) - (cumsum(concentration_microM) - concentration_microM/2))
+  organData$species <- paste("S.", organData$species)
   organData$species <- factor(organData$species, levels=c(
-    "baicalensis", "havanensis", "arenicola", "dependens", "strigillosa", "barbata",
-    "indica", "insignis", "racemosa", "tournefortii", "altissima", "leonardii", "pekinesis")
+    "S. baicalensis", "S. strigillosa", "S. dependens", "S. indica", "S. barbata", "S. insignis", "S. racemosa", 
+    "S. arenicola", "S. havanensis", "S. altissima", "S. tournefortii", "S. leonardii", "S. pekinensis")
   )
   
   if(length(speciesList) != length(levels(organData$species))){
@@ -156,6 +158,7 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
   organData <- organData %>%
     group_by(species) %>%
     mutate(text_x = as.numeric(species) - 0.25)
+  
   print(organData)
   
   chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
@@ -188,6 +191,7 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
             panel.background = element_rect(fill="#cce8ff"),
             text=element_text(size=20))
     }
+  print(chart)
 }
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
