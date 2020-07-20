@@ -9,6 +9,7 @@ library(cowplot)
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
 frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Combine all data into a single data frame and change classifiers (species, organs, metabolites)
 # into factors
@@ -93,11 +94,18 @@ for(i in 1:nrow(allData)){
 allData$concentration_microM <- concentration_microM
 allData$stError_microM <- stError_microM
 
+# Capitalize first letter of each flavonoid name
+capString <- function(string) {
+  c <- strsplit(string, " ")[[1]]
+  paste(toupper(substring(c, 1,1)), substring(c, 2), sep="", collapse=" ")
+}
+allData$metabolite <- as.character(allData$metabolite)
+allData$metabolite <- sapply(allData$metabolite, capString)
+
 # Set order of metabolites to appear in heatmaps based on pathway
 allData$metabolite <- factor(allData$metabolite, levels=c(
-  "chrysin", "chrysinG", "baicalein", "baicalin", "oroxylinA", "oroxyloside", "wogonin",
-  "wogonoside", "acetoside", "apigenin", "apigeninG", "scutellarein", "scutellarin",
-  "hispidulin", "hispidulinG")
+  "Apigenin", "ApigeninG", "Scutellarein", "Scutellarin", "Hispidulin", "HispidulinG",
+  "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Acetoside")
 ) 
 # Set order of metabolites to appear in heatmaps based on heirarchical clustering
 #allData$metabolite <- factor(allData$metabolite, levels=c(
@@ -111,15 +119,19 @@ allData$metNum <- as.numeric(allData$metabolite)
 
 # Set colors to be used for metabolites across all plots
 metaboliteColors <- c(
-  "#e50000", "#e65235", "#da6900", "#f2a155", "#CF9C00", "#C9C300", "#83c400", "#2dbf00", 
-  "#00D8E5", "#00b3e5", "#4232f0", "#1000D2", "#a032f0", "#a200bf", "#bf009c")
+  "#4726dd", "#006bff", "#008afe", "#009ec2", "#00ad76", "#169E18", 
+  "#eff238", "#ffd320", "#ffb329", "#ff9040", "#ff6d5a", "#ff4b76", "#ff3291", "#e52dab", "#D12DE5")
 names(metaboliteColors) <- levels(allData$metabolite)
 
 # Function to create color legend for scaled pie charts
 createLegend <- function(allData, metaboliteColors, legendOrientation="horizontal"){
   x <- ggplot(filter(allData, species==levels(allData$species)[1])) +
     geom_bar(mapping=aes(x="", y=concentration_microM, fill=metabolite), stat="identity") +
-    theme(legend.position="bottom", legend.direction=legendOrientation, legend.text=element_text(size=12), legend.title=element_text(size=16)) +
+    theme(legend.position="bottom", 
+          legend.direction=legendOrientation, 
+          legend.text=element_text(size=16), 
+          legend.title=element_text(size=20),
+          legend.key.size=unit(1, "cm")) +
     labs(fill="Flavonoid") +
     scale_fill_manual(values=metaboliteColors, labels=paste(seq(1, 15), ". ", names(metaboliteColors), sep=""))
   legend <- get_legend(x)
@@ -127,7 +139,7 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
 }
 
 # Function to create stacked bar charts
-createStackedBars <- function(allData, metaboliteColors, plantOrgan){
+createStackedBars <- function(allData, metaboliteColors, plantOrgan, cladeData){
   speciesList <- levels(allData$species)
   
   organData <- allData[order(allData$metNum), ]
@@ -159,61 +171,64 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
     group_by(species) %>%
     mutate(text_x = as.numeric(species) - 0.25)
   
-  print(organData)
-  
   chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
     geom_bar(position="stack", stat="identity", width=0.5) +
-    ylim(0, 400) +
+    #ylim(0, 400) +
     labs(title=paste("Flavonoid concentrations in Scutellaria", plantOrgan),
          x="Species", 
          y=expression(paste("Concentration (", mu, "M)", sep=""))) +
     scale_fill_manual(values=metaboliteColors) +
+    theme(axis.text.x=element_text(face="italic")) +
     geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), hjust=1, direction="y", nudge_x=-0.2) +
     if(plantOrgan=="roots"){
       theme(legend.position="none",
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
+            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(40, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#ffe0cf"),
-            text=element_text(size=20))
+            text=element_text(size=20),
+            plot.margin=margin(0, 0, 2, 0, unit="cm"))
     }else if(plantOrgan=="shoots"){
       theme(legend.position="none", 
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
+            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(40, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#d5ffcc"),
-            text=element_text(size=20))
+            text=element_text(size=20),
+            plot.margin=margin(0, 0, 2, 0, unit="cm"))
     }else{
       theme(legend.position="none",
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
+            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(40, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background = element_rect(fill="#cce8ff"),
-            text=element_text(size=20))
+            text=element_text(size=20),
+            plot.margin=margin(0, 0, 2, 0, unit="cm"))
     }
-  print(chart)
 }
 
-rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
-shootPlot <- createStackedBars(allData, metaboliteColors, "shoots")
-leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
+
+
+rootPlot <- createStackedBars(allData, metaboliteColors, "roots", cladeData)
+shootPlot <- createStackedBars(allData, metaboliteColors, "shoots", cladeData)
+leafPlot <- createStackedBars(allData, metaboliteColors, "leaves", cladeData)
 
 #justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 
 finalRootFigure <- plot_grid(rootPlot, legend,
   nrow=1, ncol=2, 
-  rel_widths=c(1, 0.15))
+  rel_widths=c(1, 0.2))
 print(finalRootFigure)
 
 finalShootFigure <- plot_grid(shootPlot, legend,
   nrow=1, ncol=2, 
-  rel_widths=c(1, 0.15))
+  rel_widths=c(1, 0.2))
 print(finalShootFigure)
 
 finalLeafFigure <- plot_grid(leafPlot, legend,
   nrow=1, ncol=2,
-  rel_widths=c(1, 0.15))
+  rel_widths=c(1, 0.2))
 print(finalLeafFigure)
 
 # Export at size 1800x1000

@@ -1,7 +1,8 @@
 # Code to create metabolite bar graphs for pathway figure
-
+library(tidyr)
 library(ggplot2)
 library(dplyr)
+library(cowplot)
 
 # Load data from .csv files ----
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
@@ -157,6 +158,36 @@ createPathwayPlots <- function(allData, metaboliteColors, speciesNames, metaboli
   return(barGraph)
 }
 
+organCounts <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/organCounts.csv", header=TRUE)
+createOrganCountPlots <- function(organCounts, flavonoidName){
+  plotData <- filter(organCounts, flavonoid==flavonoidName)
+  plotData$roots <- plotData$roots*-1
+  plotData <- pivot_longer(plotData, -flavonoid, names_to="organ", values_to="count")
+  print(plotData)
+  
+  barGraph <- ggplot(data=plotData, mapping=aes(x=flavonoid, y=count, fill=organ)) +
+    geom_col() + 
+    scale_fill_manual(values=c("#ff8745", "#45abff")) +
+    geom_hline(yintercept=0, size=1) + 
+    #geom_hline(yintercept=c(-13,13), size=1) +
+    theme_minimal() +
+    scale_y_continuous(breaks=c(-13,0,13), label=c(13,0,13), limits=c(-13,13)) +
+    theme(
+      panel.grid.minor.y=element_blank(), panel.grid.major.x=element_blank(), panel.grid.major.y=element_blank(),
+      axis.title=element_blank(), axis.text.x=element_blank(), axis.text.y=element_blank(),
+      axis.text=element_text(color="black", size=14),
+      legend.position="none"
+    )
+  return(barGraph)
+}
 
-testPlot <- createPathwayPlots(allData, metaboliteColors, c("baicalensis" ,"havanensis", "arenicola", "racemosa"), "oroxyloside")
-print(testPlot)
+for(flavonoid in organCounts$flavonoid){
+  organCountPlot <- createOrganCountPlots(organCounts, flavonoid) 
+  ggdraw() +
+    draw_plot(organCountPlot, 0.1, 0.1, 0.9, 0.9)
+ 
+  ggsave(filename=paste("C:/Users/Bryce/Documents/scutellariaMetabolites/figures/organCountPlots/", flavonoid, ".png", sep=""),
+         plot=organCountPlot, device=png(),
+         width=5, height=15, units="cm"
+  )
+}

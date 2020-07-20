@@ -6,9 +6,10 @@ library(viridis)
 library(dplyr)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Adjust herbarium ppm to correct for dilution
 herbarium1_30 <- herbarium1_30 %>%
@@ -149,7 +150,6 @@ flavonoidOrder <- label(flavonoidDenData)$label
 heatmapData$metabolite <- factor(heatmapData$metabolite, levels=flavonoidOrder)
 
 # Load clade data from phylogenetic tree generated from chloroplast genome
-cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 speciesList <- vector(mode="character", length=nrow(label(speciesDenData)))
 cladeList <- vector(mode="numeric", length=nrow(label(speciesDenData)))
 for (i in 1:nrow(label(speciesDenData))){
@@ -163,18 +163,25 @@ for (i in 1:nrow(label(speciesDenData))){
   }
 } 
 denCladeData <- data.frame(x=1, y=1:nrow(label(speciesDenData)), speciesList, cladeList)
-denCladeData$cladeList <- factor(denCladeData$cladeList, levels=c(1, 2, 3, 4, 5, 6))
+denCladeData$cladeList <- factor(denCladeData$cladeList, levels=c(1, 2, 3, 4))
 
 # Create column of colored circles to represent phylogenetic clade
 cladeLabels <- ggplot(data=denCladeData) +
   geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=0.6, size=5) +
-  scale_fill_manual(values=c("#9c8aea", "#e07fea", "#eb74a1", "#eb9569", "#e5ec5e", "#78ed54", "#FFFFFF"), drop=FALSE) +
+  scale_fill_manual(values=c("#59D3D9", "#80C585", "#CAA349", "#FB7070", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
         plot.margin=margin(6, 70, 21, -500, "pt"))
 
-# Add "S." to beginning of each species' name - not working
+# Add "S." to beginning of each species name
 speciesDenData$labels$label <- paste("S.", speciesDenData$labels$label)
+
+# Capitalize first letter of each flavonoid name
+capString <- function(string) {
+  c <- strsplit(string, " ")[[1]]
+  paste(toupper(substring(c, 1,1)), substring(c, 2), sep="", collapse=" ")
+}
+flavonoidDenData$labels$label <- sapply(flavonoidDenData$labels$label, capString)
 
 # Create dendrogram for species
 speciesDenPlot <- ggplot() +
@@ -187,7 +194,7 @@ speciesDenPlot <- ggplot() +
 # Create dendrogram for flavonoids
 flavonoidDenPlot <- ggplot() +
   geom_segment(data=segment(flavonoidDenData), mapping=aes(x=x, y=y, xend=xend, yend=yend)) +
-  geom_text(data=label(flavonoidDenData), mapping=aes(x=x, y=y, label=label), hjust=1, nudge_y=6, angle=90, size=2.5) +
+  geom_text(data=label(flavonoidDenData), mapping=aes(x=x, y=y, label=label), hjust=1, nudge_y=10, angle=90, size=2.25) +
   theme_dendro() +
   scale_y_reverse()
 
@@ -208,17 +215,17 @@ speciesDendrogram <- plot_grid(speciesDenPlot, cladeLabels, nrow=1)
 flavonoidDendogram <- plot_grid(flavonoidDenPlot)
 
 # Export dendrograms and heatmaps separately
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
   plot=heatmap,
   device=png(),
   width=20, height=30, units="cm")
 
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
   plot=speciesDendrogram,
   device=png(),
   width=30, height=30, units="cm")
 
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/flavonoidDendrogram.png",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/flavonoidDendrogram.png",
   plot=flavonoidDendogram,
   device=png(),
-  width=10, height=5, units="cm")
+  width=10, height=4, units="cm")
