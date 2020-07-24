@@ -30,7 +30,7 @@ allData$metabolite <- as.factor(allData$metabolite)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
 excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
-excludeOrgans <- paste(c("flowers"), collapse = '|')
+excludeOrgans <- paste(c("flowers", "roots"), collapse = '|')
 #excludeMetabolites <- paste(c("chrysinG", "oroxyloside", "baicalin", "wogonoside", "acetoside", "apigeninG", "scutellarin", "hispidulinG"), collapse = '|')
 allData <- allData %>%
   filter(!grepl(excludeSpecies, species)) %>%
@@ -146,7 +146,9 @@ speciesOrder <- label(speciesDenData)$label
 heatmapData$species <- factor(heatmapData$species, levels=speciesOrder)
 
 # Adjust flavonoid order in heatmap data to match order in dendrogram
-flavonoidOrder <- label(flavonoidDenData)$label
+#flavonoidOrder <- label(flavonoidDenData)$label
+flavonoidOrder <- c("apigenin", "apigeninG", "scutellarein", "scutellarin", "hispidulin", "hispidulinG",
+                    "chrysin", "chrysinG", "baicalein", "baicalin", "oroxylinA", "oroxyloside", "wogonin", "wogonoside", "acetoside")
 heatmapData$metabolite <- factor(heatmapData$metabolite, levels=flavonoidOrder)
 
 # Load clade data from phylogenetic tree generated from chloroplast genome
@@ -182,11 +184,14 @@ capString <- function(string) {
   paste(toupper(substring(c, 1,1)), substring(c, 2), sep="", collapse=" ")
 }
 flavonoidDenData$labels$label <- sapply(flavonoidDenData$labels$label, capString)
+heatmapData$metabolite <- as.character(heatmapData$metabolite)
+heatmapData$metabolite <- sapply(heatmapData$metabolite, capString)
+heatmapData$metabolite <- factor(heatmapData$metabolite, levels=sapply(flavonoidOrder, capString))
 
 # Create dendrogram for species
 speciesDenPlot <- ggplot() +
   geom_segment(data=segment(speciesDenData), mapping=aes(x=x, y=y, xend=xend, yend=yend)) +
-  geom_text(data=label(speciesDenData), mapping=aes(x=x, y=y, label=label, hjust=1), nudge_y=6, size=4, fontface="italic") +
+  geom_text(data=label(speciesDenData), mapping=aes(x=x, y=y, label=label, hjust=1), nudge_y=6.5, size=4, fontface="italic") +
   coord_flip() +
   scale_y_reverse(expand=c(0.3, 0)) +
   theme_dendro()
@@ -204,9 +209,9 @@ heatmap <- ggplot(data=heatmapData) +
   scale_fill_viridis() +
   labs(y="Flavonoid", fill=expression(paste("Conc (", mu, "M)", sep=""))) +
   coord_flip() +
-  theme(axis.title.x=element_blank(), axis.text.x=element_blank(),
+  theme(axis.title.x=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, size=12, margin=margin(5,0,0,0), color="black"),
         axis.title.y=element_blank(), axis.text.y=element_blank(),
-        legend.position="right", legend.direction="vertical",
+        legend.position="right", legend.direction="vertical", legend.title=element_text(size=16), legend.text=element_text(size=14), legend.key.size=unit(1, "cm"),
         panel.background=element_blank())
 
 # Combine dendrograms and heatmap into 1 figure
