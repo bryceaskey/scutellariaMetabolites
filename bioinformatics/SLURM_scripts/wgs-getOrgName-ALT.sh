@@ -13,4 +13,4 @@ pwd; hostname; date
 module load R/4.0
 echo "Finding organism names for BLAST search results"
 
-Rscript /ufrc/lee/braskey/R_scripts/get_sci_name_ALT.R
+Rscript /blue/lee/braskey/R_scripts/get_sci_name_ALT.R

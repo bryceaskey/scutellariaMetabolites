@@ -41,8 +41,9 @@ allData$species <- as.character(allData$species)
 allData$species[allData$species=="RNA Seq"] <- "racemosa"
 allData$species[allData$species=="havenesis"] <- "havanensis"
 allData$species[allData$species=="hastafolia"] <- "hastifolia"
-allData$species[allData$species=="pekinesis"] <- "pekinensis"
+allData$species[allData$species=="pekinesis"] <- "pekinensis var. alpina"
 allData$species[allData$species=="siphocampuloides"] <- "siphocampyloides"
+allData$species[allData$species=="indica"] <- "indica var. coccinea"
 allData$species <- as.factor(allData$species)
 
 # Separate organ-specific data from non organ-specific data
@@ -121,12 +122,19 @@ speciesData <- speciesData %>%
   remove_rownames %>%
   column_to_rownames(var="species")
 
+# Capitalize first letter of flavonoid names
+capString <- function(string) {
+  c <- strsplit(string, " ")[[1]]
+  paste(toupper(substring(c, 1,1)), substring(c, 2), sep="", collapse=" ")
+}
+colnames(speciesData) <- sapply(colnames(speciesData), capString)
+
 # Add column to indicate clade which the species belongs to
 cladeList <- vector(mode="numeric", length=nrow(speciesData))
 for (i in 1:nrow(speciesData)){
   species <- rownames(speciesData)[i]
-  clade <- cladeData$clade[grep(species, cladeData$species)]
-  if (length(clade)>0){
+  clade <- cladeData$clade[cladeData$species==species]
+  if (length(clade)>0 && !is.na(clade)){
     cladeList[i] <- clade
   }else{
     cladeList[i] <- NA
@@ -134,7 +142,11 @@ for (i in 1:nrow(speciesData)){
 } 
 speciesData$clade <- factor(cladeList)
 
-pca_data <- PCA(speciesData[, c(1:15)], scale.unit=TRUE, graph=TRUE)
+for(i in 1:15){
+  speciesData[, i] <- as.logical(speciesData[, i])
+}
+
+pca_data <- MCA(speciesData[, c(1:15)], ncp=2, graph=TRUE)
 pc1_ind <- pca_data$ind$coord[,1]
 pc2_ind <- pca_data$ind$coord[,2]
 pc1_expl <- round(pca_data$eig[1,2],2)
@@ -142,8 +154,8 @@ pc2_expl <- round(pca_data$eig[2,2],2)
 clade <- speciesData$clade
 
 pcaPlot <- ggplot() +
-  geom_point(aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=5) +
-  scale_fill_manual(values=c("#59D3D9", "#80C585", "#CAA349", "#FB7070", "#FFFFFF")) +
+  geom_point(aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=7) +
+  scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   #coord_fixed(ratio=1) +
   #xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
   #ylab(paste("PC2 (", pc2_expl, "%)", sep="")) +

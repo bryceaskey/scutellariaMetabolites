@@ -30,10 +30,10 @@ allData <- allData %>%
 # Fix naming errors
 allData$species <- as.character(allData$species)
 allData$species[allData$species=="RNA Seq"] <- "racemosa"
-allData$species[allData$species=="havenesis"] <- "havanesis"
+allData$species[allData$species=="havenesis"] <- "havanensis"
 allData$species[allData$species=="hastafolia"] <- "hastifolia"
-allData$species[allData$species=="havanesis"] <- "havanensis"
-allData$species[allData$species=="pekinesis"] <- "pekinensis"
+allData$species[allData$species=="pekinesis"] <- "pekinensis var. alpina"
+allData$species[allData$species=="indica"] <- "indica var. coccinea"
 allData$species <- as.factor(allData$species)
 
 # Average together any duplicate data points
@@ -139,7 +139,7 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
 }
 
 # Function to create stacked bar charts
-createStackedBars <- function(allData, metaboliteColors, plantOrgan, cladeData){
+createStackedBars <- function(allData, metaboliteColors, plantOrgan){
   speciesList <- levels(allData$species)
   
   organData <- allData[order(allData$metNum), ]
@@ -150,8 +150,8 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan, cladeData){
     mutate(text_y = sum(concentration_microM) - (cumsum(concentration_microM) - concentration_microM/2))
   organData$species <- paste("S.", organData$species)
   organData$species <- factor(organData$species, levels=c(
-    "S. baicalensis", "S. strigillosa", "S. dependens", "S. indica", "S. barbata", "S. insignis", "S. racemosa", 
-    "S. arenicola", "S. havanensis", "S. altissima", "S. tournefortii", "S. leonardii", "S. pekinensis")
+    "S. baicalensis", "S. strigillosa", "S. dependens", "S. indica var. coccinea", "S. barbata", "S. insignis", "S. racemosa", 
+    "S. arenicola", "S. havanensis", "S. altissima", "S. tournefortii", "S. leonardii", "S. pekinensis var. alpina")
   )
   
   if(length(speciesList) != length(levels(organData$species))){
@@ -174,16 +174,15 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan, cladeData){
   chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
     geom_bar(position="stack", stat="identity", width=0.5) +
     #ylim(0, 400) +
-    labs(title=paste("Flavonoid concentrations in Scutellaria", plantOrgan),
-         x="Species", 
-         y=expression(paste("Concentration (", mu, "M)", sep=""))) +
+    labs(x="Species",
+         y=paste("Concentration in ", plantOrgan, " (µM)",  sep="")) +
     scale_fill_manual(values=metaboliteColors) +
     theme(axis.text.x=element_text(face="italic")) +
     geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), hjust=1, direction="y", nudge_x=-0.2) +
     if(plantOrgan=="roots"){
       theme(legend.position="none",
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(40, 0, 0, 0)),
+            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#ffe0cf"),
             text=element_text(size=20),
@@ -191,7 +190,7 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan, cladeData){
     }else if(plantOrgan=="shoots"){
       theme(legend.position="none", 
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(40, 0, 0, 0)),
+            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#d5ffcc"),
             text=element_text(size=20),
@@ -199,7 +198,7 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan, cladeData){
     }else{
       theme(legend.position="none",
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(40, 0, 0, 0)),
+            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background = element_rect(fill="#cce8ff"),
             text=element_text(size=20),
@@ -207,11 +206,56 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan, cladeData){
     }
 }
 
+# Get clade data for all species to be plotted
+allData$species <- factor(allData$species, levels=c(
+  "baicalensis", "strigillosa", "dependens", "indica var. coccinea", "barbata", "insignis", "racemosa", 
+  "arenicola", "havanensis", "altissima", "tournefortii", "leonardii", "pekinensis var. alpina")
+)
+speciesList <- vector(mode="character", length=length(levels(allData$species)))
+cladeList <- vector(mode="numeric", length=length(levels(allData$species)))
+for (i in 1:length(levels(allData$species))){
+  species <- levels(allData$species)[i]
+  speciesList[i] <- species
+  clade <- cladeData$clade[cladeData$species==species]
+  if (length(clade)>0 && !is.na(clade)){
+    cladeList[i] <- clade
+  }else{
+    cladeList[i] <- NA
+  }
+} 
+plotCladeData <- data.frame(x=1:length(levels(allData$species)), y=1, speciesList, cladeList)
+plotCladeData$cladeList <- factor(plotCladeData$cladeList, levels=c(1, 2, 3, 4, 5))
+
+# Create row of colored circles to represent phylogenetic clade
+cladeLabels <- ggplot(data=plotCladeData) +
+  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=0.6, size=7) +
+  scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
+  theme_void() +
+  theme(legend.position="none",
+        plot.margin=margin(-600,0,0,55,"pt"))
+
+rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
+rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/rootPlotClades.png",
+       plot=rootPlotClades,
+       device=png(),
+       width=30, height=25, units="cm")
 
 
-rootPlot <- createStackedBars(allData, metaboliteColors, "roots", cladeData)
-shootPlot <- createStackedBars(allData, metaboliteColors, "shoots", cladeData)
-leafPlot <- createStackedBars(allData, metaboliteColors, "leaves", cladeData)
+shootPlot <- createStackedBars(allData, metaboliteColors, "shoots")
+shootPlotClades <- plot_grid(shootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/shootPlotClades.png",
+       plot=shootPlotClades,
+       device=png(),
+       width=30, height=25, units="cm")
+
+
+leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
+leafPlotClades <- plot_grid(leafPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/leafPlotClades.png",
+       plot=leafPlotClades,
+       device=png(),
+       width=30, height=25, units="cm")
 
 #justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
@@ -219,16 +263,16 @@ legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 finalRootFigure <- plot_grid(rootPlot, legend,
   nrow=1, ncol=2, 
   rel_widths=c(1, 0.2))
-print(finalRootFigure)
+#print(finalRootFigure)
 
 finalShootFigure <- plot_grid(shootPlot, legend,
   nrow=1, ncol=2, 
   rel_widths=c(1, 0.2))
-print(finalShootFigure)
+#print(finalShootFigure)
 
 finalLeafFigure <- plot_grid(leafPlot, legend,
   nrow=1, ncol=2,
   rel_widths=c(1, 0.2))
-print(finalLeafFigure)
+#print(finalLeafFigure)
 
 # Export at size 1800x1000
