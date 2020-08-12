@@ -140,32 +140,31 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
 
 # Function to create stacked bar charts
 createStackedBars <- function(allData, metaboliteColors, plantOrgan){
-  speciesList <- levels(allData$species)
-  
   organData <- allData[order(allData$metNum), ]
   organData <- organData %>%
     filter(grepl(plantOrgan, organ)) %>%
     filter(concentration_microM > 0) %>%
     group_by(species) %>%
     mutate(text_y = sum(concentration_microM) - (cumsum(concentration_microM) - concentration_microM/2))
-  organData$species <- paste("S.", organData$species)
-  organData$species <- factor(organData$species, levels=c(
-    "S. baicalensis", "S. strigillosa", "S. dependens", "S. indica var. coccinea", "S. barbata", "S. insignis", "S. racemosa", 
-    "S. arenicola", "S. havanensis", "S. altissima", "S. tournefortii", "S. leonardii", "S. pekinensis var. alpina")
-  )
   
-  if(length(speciesList) != length(levels(organData$species))){
-    for(speciesName in speciesList){
-      if(sum(grepl(speciesName, levels(organData$species))) == 0){
+  if(length(levels(droplevels(organData$species))) != length(levels(organData$species))){
+    print("TRUE")
+    for(speciesName in levels(organData$species)){
+      if(sum(grepl(speciesName, levels(droplevels(organData$species)))) == 0){
+        print("TRUE")
         NA_df <- data.frame(species=speciesName, organ=NA, metabolite=NA, concentration_ppm=0,
                             stError_ppm=NA, concentration_microM=0, stError_microM=NA,
                             metNum=NA, text_x=NA, text_y=NA)
         organData <- rbind(organData, NA_df)
-        organData$species <- as.factor(organData$species)
+        organData$species <- factor(organData$species)
       }
     }
   }
   
+organData$species <- paste("S.", organData$species)
+organData$species <- factor(organData$species, levels=c(
+  "S. baicalensis", "S. strigillosa", "S. dependens", "S. indica var. coccinea", "S. barbata", "S. insignis", "S. racemosa", 
+  "S. arenicola", "S. havanensis", "S. altissima", "S. tournefortii", "S. leonardii", "S. pekinensis var. alpina"))
   
   organData <- organData %>%
     group_by(species) %>%
