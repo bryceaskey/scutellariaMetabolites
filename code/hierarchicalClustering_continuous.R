@@ -9,6 +9,7 @@ library(dplyr)
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
 frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
 herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
 cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Adjust herbarium ppm to correct for dilution
@@ -21,47 +22,97 @@ herbarium1_30 <- herbarium1_30 %>%
     stError_ppm=stError_ppm/2
   )
 
-# Combine all data into a single data frame and change classifiers (species, organs, metabolites)
-# into factors
-allData <- rbind(fresh, frozenKR, herbarium1_30)
-allData$species <- as.factor(allData$species)
-allData$organ <- as.factor(allData$organ)
-allData$metabolite <- as.factor(allData$metabolite)
+herbarium31_78 <- herbarium31_78 %>%
+  transmute(
+    species=species,
+    organ=organ,
+    metabolite=metabolite,
+    concentration_ppm=concentration_ppm/2,
+    stError_ppm=stError_ppm/2
+  )
 
-# Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
-excludeOrgans <- paste(c("flowers", "roots"), collapse = '|')
-#excludeMetabolites <- paste(c("chrysinG", "oroxyloside", "baicalin", "wogonoside", "acetoside", "apigeninG", "scutellarin", "hispidulinG"), collapse = '|')
-allData <- allData %>%
-  filter(!grepl(excludeSpecies, species)) %>%
-  filter(!grepl(excludeOrgans, organ)) #%>%
-#filter(!grepl(excludeMetabolites, metabolite))
+# Specify any species, organs, or metabolites to be removed
+speciesToRemove <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
+organsToRemove <- paste(c("flowers", "roots"), collapse = '|')
+#metabolitesToRemove <- paste(c("chrysinG", "oroxyloside", "baicalin", "wogonoside", "acetoside", "apigeninG", "scutellarin", "hispidulinG"), collapse = '|')
 
-# Fix naming error
-allData$species <- as.character(allData$species)
-allData$species[allData$species=="RNA Seq"] <- "racemosa"
-allData$species[allData$species=="havenesis"] <- "havanensis"
-allData$species[allData$species=="hastafolia"] <- "hastifolia"
-allData$species[allData$species=="pekinesis"] <- "pekinensis var. alpina"
-allData$species[allData$species=="siphocampuloides"] <- "siphocampyloides"
-allData$species[allData$species=="indica"] <- "indica var. coccinea"
-allData$species <- as.factor(allData$species)
+# Processing for fresh samples ----
+freshData <- rbind(fresh, frozenKR)
 
-# Separate organ-specific data from non organ-specific data
-organSpData <- filter(allData, organ != "all")
-nonOrganSpData <- filter(allData, organ == "all")
+freshData$species <- factor(freshData$species)
+freshData$organ <- factor(freshData$organ)
+freshData$metabolite <- factor(freshData$metabolite)
 
-# Average together organ-specific data and recombine with non organ-specific data
-organSpData_avgd <- organSpData %>%
+freshData <- freshData %>%
+  filter(!grepl(speciesToRemove, species)) %>%
+  filter(!grepl(organsToRemove, organ)) #%>%
+#filter(!grepl(metaboliteToRemove, metabolite))
+
+# Fix naming errors
+freshData$species <- as.character(freshData$species)
+freshData$species[freshData$species=="RNA Seq"] <- "racemosa"
+freshData$species[freshData$species=="havenesis"] <- "havanensis"
+freshData$species[freshData$species=="hastafolia"] <- "hastifolia"
+freshData$species[freshData$species=="pekinesis"] <- "pekinensis var. alpina"
+freshData$species[freshData$species=="siphocampuloides"] <- "siphocampyloides"
+freshData$species[freshData$species=="indica"] <- "indica var. coccinea"
+freshData$species[freshData$species=="angustifolia ssp. angustifolia"] <- "angustifolia"
+freshData$species[freshData$species=="drumondii"] <- "drummondii"
+freshData$species[freshData$species=="holmgrenierum"] <- "holmgreniorum"
+freshData$species[freshData$species=="leptosiplonsipkon"] <- "leptosiphon"
+freshData$species[freshData$species=="multicularis"] <- "multicaulis"
+freshData$species[freshData$species=="suffrutscens"] <- "suffrutescens"
+freshData$species <- factor(freshData$species)
+
+# Average together duplicate species, and leaf and shoot data
+freshData <- freshData %>%
   group_by(species, metabolite) %>%
   summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
-nonOrganSpData$organ <- NULL
-heatmapData <- rbind(organSpData_avgd, nonOrganSpData)
 
-# Average together any duplicate data points
-heatmapData <- heatmapData %>%
+# Processing for herbarium samples ----
+herbariumData <- rbind(herbarium1_30, herbarium31_78)
+
+herbariumData$species <- factor(herbariumData$species)
+herbariumData$organ <- factor(herbariumData$organ)
+herbariumData$metabolite <- factor(herbariumData$metabolite)
+
+herbariumData <- herbariumData %>%
+  filter(!grepl(speciesToRemove, species)) %>%
+  filter(!grepl(organsToRemove, organ)) #%>%
+#filter(!grepl(metaboliteToRemove, metabolite))
+
+# Fix naming errors
+herbariumData$species <- as.character(herbariumData$species)
+herbariumData$species[herbariumData$species=="RNA Seq"] <- "racemosa"
+herbariumData$species[herbariumData$species=="havenesis"] <- "havanensis"
+herbariumData$species[herbariumData$species=="hastafolia"] <- "hastifolia"
+herbariumData$species[herbariumData$species=="pekinesis"] <- "pekinensis var. alpina"
+herbariumData$species[herbariumData$species=="siphocampuloides"] <- "siphocampyloides"
+herbariumData$species[herbariumData$species=="indica"] <- "indica var. coccinea"
+herbariumData$species[herbariumData$species=="angustifolia ssp. angustifolia"] <- "angustifolia"
+herbariumData$species[herbariumData$species=="drumondii"] <- "drummondii"
+herbariumData$species[herbariumData$species=="holmgrenierum"] <- "holmgreniorum"
+herbariumData$species[herbariumData$species=="leptosiplonsipkon"] <- "leptosiphon"
+herbariumData$species[herbariumData$species=="multicularis"] <- "multicaulis"
+herbariumData$species[herbariumData$species=="suffrutscens"] <- "suffrutescens"
+herbariumData$species <- factor(herbariumData$species)
+
+# Average together duplicate species, and leaf and shoot data
+herbariumData <- herbariumData %>%
   group_by(species, metabolite) %>%
   summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
+
+# Merge fresh and herbarium data ----
+# If both fresh and herbarium samples are available for a species, the herbarium data should be used
+# Iterate through herbarium species, and delete any rows in freshData which match
+for(herbariumSpecies in levels(herbariumData$species)){
+  freshData <- freshData[!freshData$species==herbariumSpecies, ]
+}
+
+# Combine fresh and herbarium data into a single dataframe
+freshData$species <- as.character(freshData$species)
+herbariumData$species <- as.character(herbariumData$species)
+heatmapData <- rbind(freshData, herbariumData)
 
 # Define function to convert units of ppm to micromol/L
 ppm2microM <- function(input_ppm, metaboliteName){
@@ -117,24 +168,24 @@ heatmapData$concentration_microM <- concentration_microM
 heatmapData$stError_microM <- stError_microM
 
 # Transform data into wide format to use for heirarchical clustering 
-speciesData <- subset(heatmapData, select=-c(concentration_ppm, stError_ppm, stError_microM))
-speciesData <- speciesData %>%
-  pivot_wider(names_from=metabolite, values_from=concentration_microM) %>%
-  remove_rownames %>%
-  column_to_rownames(var="species")
-speciesData <- scale(speciesData)
+#speciesData <- subset(heatmapData, select=-c(concentration_ppm, stError_ppm, stError_microM))
+#speciesData <- speciesData %>%
+#  pivot_wider(names_from=metabolite, values_from=concentration_microM) %>%
+#  remove_rownames %>%
+#  column_to_rownames(var="species")
+#speciesData <- scale(speciesData)
 
 # Calculate distance matrix and perform heirarchical clustering of species
-speciesDist <- dist(speciesData, method="euclidian")
-speciesCluster <- hclust(d=speciesDist, method="average")
-print(paste("Correlation between cophenetic distances and actual distances:", cor(speciesDist, cophenetic(speciesCluster))))
-speciesDenData <- dendro_data(as.dendrogram(speciesCluster), type="rectangle")
+#speciesDist <- dist(speciesData, method="euclidian")
+#speciesCluster <- hclust(d=speciesDist, method="average")
+#print(paste("Correlation between cophenetic distances and actual distances:", cor(speciesDist, cophenetic(speciesCluster))))
+#speciesDenData <- dendro_data(as.dendrogram(speciesCluster), type="rectangle")
 
 # Transpose distance matrix and perform heirarchical clustering of flavonoids
-flavonoidData <- t(speciesData)
-flavonoidDist <- dist(flavonoidData, method="euclidian")
-flavonoidCluster <- hclust(d=flavonoidDist, method="average")
-flavonoidDenData <- dendro_data(as.dendrogram(flavonoidCluster), type="rectangle")
+#flavonoidData <- t(speciesData)
+#flavonoidDist <- dist(flavonoidData, method="euclidian")
+#flavonoidCluster <- hclust(d=flavonoidDist, method="average")
+#flavonoidDenData <- dendro_data(as.dendrogram(flavonoidCluster), type="rectangle")
 
 # Adjust species order in heatmap data to match order in dendrogram
 #speciesOrder <- label(speciesDenData)$label
@@ -164,11 +215,13 @@ for (i in 1:length(levels(heatmapData$species))){
     cladeList[i] <- NA
   }
 } 
-heatmapCladeData <- data.frame(x=1, y=1:nrow(label(speciesDenData)), speciesList, cladeList)
+heatmapCladeData <- data.frame(x=1, y=1:length(speciesList), speciesList, cladeList)
 heatmapCladeData$cladeList <- factor(heatmapCladeData$cladeList, levels=c(1, 2, 3, 4, 5))
 
+#TODO: cladeData has 2 more obs. than heatmapCladeData - possible mismatch/missing data?
+
 # Add "S." to beginning of each species name
-speciesDenData$labels$label <- paste("S.", speciesDenData$labels$label)
+#speciesDenData$labels$label <- paste("S.", speciesDenData$labels$label)
 heatmapData$species <- as.character(heatmapData$species)
 heatmapData$species <- paste("S.", heatmapData$species)
 heatmapData$species <- factor(heatmapData$species, levels=paste("S.", speciesList))
@@ -191,25 +244,25 @@ capString <- function(string) {
   c <- strsplit(string, " ")[[1]]
   paste(toupper(substring(c, 1,1)), substring(c, 2), sep="", collapse=" ")
 }
-flavonoidDenData$labels$label <- sapply(flavonoidDenData$labels$label, capString)
+#flavonoidDenData$labels$label <- sapply(flavonoidDenData$labels$label, capString)
 heatmapData$metabolite <- as.character(heatmapData$metabolite)
 heatmapData$metabolite <- sapply(heatmapData$metabolite, capString)
 heatmapData$metabolite <- factor(heatmapData$metabolite, levels=sapply(flavonoidOrder, capString))
 
 # Create dendrogram for species
-speciesDenPlot <- ggplot() +
-  geom_segment(data=segment(speciesDenData), mapping=aes(x=x, y=y, xend=xend, yend=yend)) +
-  geom_text(data=label(speciesDenData), mapping=aes(x=x, y=y, label=label, hjust=1), nudge_y=6.5, size=4, fontface="italic") +
-  coord_flip() +
-  scale_y_reverse(expand=c(0.3, 0)) +
-  theme_dendro()
+#speciesDenPlot <- ggplot() +
+#  geom_segment(data=segment(speciesDenData), mapping=aes(x=x, y=y, xend=xend, yend=yend)) +
+#  geom_text(data=label(speciesDenData), mapping=aes(x=x, y=y, label=label, hjust=1), nudge_y=6.5, size=4, fontface="italic") +
+#  coord_flip() +
+#  scale_y_reverse(expand=c(0.3, 0)) +
+#  theme_dendro()
 
 # Create dendrogram for flavonoids
-flavonoidDenPlot <- ggplot() +
-  geom_segment(data=segment(flavonoidDenData), mapping=aes(x=x, y=y, xend=xend, yend=yend)) +
-  geom_text(data=label(flavonoidDenData), mapping=aes(x=x, y=y, label=label), hjust=1, nudge_y=10, angle=90, size=2.25) +
-  theme_dendro() +
-  scale_y_reverse()
+#flavonoidDenPlot <- ggplot() +
+#  geom_segment(data=segment(flavonoidDenData), mapping=aes(x=x, y=y, xend=xend, yend=yend)) +
+#  geom_text(data=label(flavonoidDenData), mapping=aes(x=x, y=y, label=label), hjust=1, nudge_y=10, angle=90, size=2.25) +
+#  theme_dendro() +
+#  scale_y_reverse()
 
 # Create heatmap without species or flavonoid labels
 heatmap <- ggplot(data=heatmapData) +
@@ -225,7 +278,7 @@ heatmap <- ggplot(data=heatmapData) +
 # Combine dendrograms and heatmap into 1 figure
 heatmap <- plot_grid(heatmap, cladeLabels, nrow=1, rel_widths=c(1.5, 0.05))
 #speciesDendrogram <- plot_grid(speciesDenPlot, cladeLabels, nrow=1)
-flavonoidDendogram <- plot_grid(flavonoidDenPlot)
+#flavonoidDendogram <- plot_grid(flavonoidDenPlot)
 
 # Export dendrograms and heatmaps separately
 ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
@@ -238,7 +291,7 @@ ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmap
 #  device=png(),
 #  width=30, height=30, units="cm")
 
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/flavonoidDendrogram.png",
-  plot=flavonoidDendogram,
-  device=png(),
-  width=10, height=4, units="cm")
+#ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/flavonoidDendrogram.png",
+#  plot=flavonoidDendogram,
+#  device=png(),
+#  width=10, height=4, units="cm")

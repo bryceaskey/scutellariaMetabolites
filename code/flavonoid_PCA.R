@@ -3,6 +3,7 @@ library(FactoMineR)
 library(factoextra)
 library(ggpubr)
 
+
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
 frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
@@ -182,13 +183,19 @@ for (i in 1:nrow(speciesData)){
 speciesData$clade <- factor(cladeList)
 
 # For MCA with binary data
-for(i in 1:15){
-  speciesData[, i] <- as.logical(speciesData[, i])
-}
-pca_data <- MCA(speciesData, quali.sup=16,  graph=FALSE)
+#for(i in 1:15){
+#  speciesData[, i] <- as.logical(speciesData[, i])
+#}
+#pca_data <- MCA(speciesData[, c(1:15)],  graph=TRUE)
+#varRepPlot <- fviz_mca_var(pca_data, choice="mca.cor", repel=TRUE, pointsize=4, labelsize=6) +
+#  theme(axis.text=element_text(size=14))
+#print(varRepPlot)
 
 # For PCA with continuous data
-#pca_data <- PCA(speciesData[, c(1:15)], ncp=2, scale.unit=FALSE, graph=TRUE)
+pca_data <- PCA(speciesData[, c(1:15)], ncp=2, scale.unit=TRUE, graph=TRUE)
+varRepPlot <- fviz_pca_var(pca_data, choice="pca.cor", geom="point", repel=TRUE, label=TRUE, pointsize=4, labelsize=6) +
+  theme(axis.text=element_text(size=14))
+print(varRepPlot)
 
 # Extract data for plotting
 pca_inds <- data.frame(pc1_ind=pca_data$ind$coord[,1],
