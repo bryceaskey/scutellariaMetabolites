@@ -1,13 +1,13 @@
 library(tidyverse)
-library(ggplot2)
-library(grid)
-library(dplyr)
 library(FactoMineR)
+library(factoextra)
+library(ggpubr)
 
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
 frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
 herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
 cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Adjust herbarium ppm to correct for dilution
@@ -20,49 +20,88 @@ herbarium1_30 <- herbarium1_30 %>%
     stError_ppm=stError_ppm/2
   )
 
-# Combine all data into a single data frame and change classifiers (species, organs, metabolites)
-# into factors
-allData <- rbind(fresh, frozenKR, herbarium1_30)
-allData$species <- as.factor(allData$species)
-allData$organ <- as.factor(allData$organ)
-allData$metabolite <- as.factor(allData$metabolite)
+herbarium31_78 <- herbarium31_78 %>%
+  transmute(
+    species=species,
+    organ=organ,
+    metabolite=metabolite,
+    concentration_ppm=concentration_ppm/2,
+    stError_ppm=stError_ppm/2
+  )
 
-# Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
-excludeOrgans <- paste(c("flowers", "roots"), collapse = '|')
-#excludeMetabolites <- paste(c("chrysinG", "oroxyloside", "baicalin", "wogonoside", "acetoside", "apigeninG", "scutellarin", "hispidulinG"), collapse = '|')
-allData <- allData %>%
-  filter(!grepl(excludeSpecies, species)) %>%
-  filter(!grepl(excludeOrgans, organ)) #%>%
-#filter(!grepl(excludeMetabolites, metabolite))
+# Specify any species, organs, or metabolites to be removed
+speciesToRemove <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
+organsToRemove <- paste(c("flowers", "roots"), collapse = '|')
+#metabolitesToRemove <- paste(c("chrysinG", "oroxyloside", "baicalin", "wogonoside", "acetoside", "apigeninG", "scutellarin", "hispidulinG"), collapse = '|')
 
-# Fix naming error
-allData$species <- as.character(allData$species)
-allData$species[allData$species=="RNA Seq"] <- "racemosa"
-allData$species[allData$species=="havenesis"] <- "havanensis"
-allData$species[allData$species=="hastafolia"] <- "hastifolia"
-allData$species[allData$species=="pekinesis"] <- "pekinensis var. alpina"
-allData$species[allData$species=="siphocampuloides"] <- "siphocampyloides"
-allData$species[allData$species=="indica"] <- "indica var. coccinea"
-allData$species <- as.factor(allData$species)
+# Processing for fresh samples ----
+freshData <- rbind(fresh, frozenKR)
 
-# Separate organ-specific data from non organ-specific data
-organSpData <- filter(allData, organ != "all")
-nonOrganSpData <- filter(allData, organ == "all")
+freshData$species <- factor(freshData$species)
+freshData$organ <- factor(freshData$organ)
+freshData$metabolite <- factor(freshData$metabolite)
 
-# Average together organ-specific data and recombine with non organ-specific data
-organSpData_avgd <- organSpData %>%
+freshData <- freshData %>%
+  filter(!grepl(speciesToRemove, species)) %>%
+  filter(!grepl(organsToRemove, organ)) #%>%
+#filter(!grepl(metaboliteToRemove, metabolite))
+
+# Fix naming errors
+freshData$species <- as.character(freshData$species)
+freshData$species[freshData$species=="RNA Seq"] <- "racemosa"
+freshData$species[freshData$species=="havenesis"] <- "havanensis"
+freshData$species[freshData$species=="hastafolia"] <- "hastifolia"
+freshData$species[freshData$species=="pekinesis"] <- "pekinensis var. alpina"
+freshData$species[freshData$species=="siphocampuloides"] <- "siphocampyloides"
+freshData$species[freshData$species=="indica"] <- "indica var. coccinea"
+freshData$species <- factor(freshData$species)
+
+# Average together duplicate species, and leaf and shoot data
+freshData <- freshData %>%
   group_by(species, metabolite) %>%
   summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
-nonOrganSpData$organ <- NULL
-heatmapData <- rbind(organSpData_avgd, nonOrganSpData)
 
-# Average together any duplicate data points
-heatmapData <- heatmapData %>%
+# Processing for herbarium samples ----
+herbariumData <- rbind(herbarium1_30, herbarium31_78)
+
+herbariumData$species <- factor(herbariumData$species)
+herbariumData$organ <- factor(herbariumData$organ)
+herbariumData$metabolite <- factor(herbariumData$metabolite)
+
+herbariumData <- herbariumData %>%
+  filter(!grepl(speciesToRemove, species)) %>%
+  filter(!grepl(organsToRemove, organ)) #%>%
+#filter(!grepl(metaboliteToRemove, metabolite))
+
+# Fix naming errors
+herbariumData$species <- as.character(herbariumData$species)
+herbariumData$species[herbariumData$species=="RNA Seq"] <- "racemosa"
+herbariumData$species[herbariumData$species=="havenesis"] <- "havanensis"
+herbariumData$species[herbariumData$species=="hastafolia"] <- "hastifolia"
+herbariumData$species[herbariumData$species=="pekinesis"] <- "pekinensis var. alpina"
+herbariumData$species[herbariumData$species=="siphocampuloides"] <- "siphocampyloides"
+herbariumData$species[herbariumData$species=="indica"] <- "indica var. coccinea"
+herbariumData$species <- factor(herbariumData$species)
+
+# Average together duplicate species, and leaf and shoot data
+herbariumData <- herbariumData %>%
   group_by(species, metabolite) %>%
   summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
 
-# Define function to convert units of ppm to micromol/L
+# Merge fresh and herbarium data ----
+# If both fresh and herbarium samples are available for a species, the herbarium data should be used
+# Iterate through herbarium species, and delete any rows in freshData which match
+for(herbariumSpecies in levels(herbariumData$species)){
+  freshData <- freshData[!freshData$species==herbariumSpecies, ]
+}
+
+# Combine fresh and herbarium data into a single dataframe
+freshData$species <- as.character(freshData$species)
+herbariumData$species <- as.character(herbariumData$species)
+allData <- rbind(freshData, herbariumData)
+
+
+# Function to convert units of ppm to micromol/L
 ppm2microM <- function(input_ppm, metaboliteName){
   if(!is.na(input_ppm)){
     if(metaboliteName=="acetoside"){ #PubChem CID: 5281800 
@@ -106,17 +145,17 @@ ppm2microM <- function(input_ppm, metaboliteName){
 }
 
 # Convert concentration and stError from ppm to mM for each data point
-concentration_microM <- vector(mode="numeric", length=nrow(heatmapData))
-stError_microM <- vector(mode="numeric", length=nrow(heatmapData))
-for(i in 1:nrow(heatmapData)){
-  concentration_microM[i] <- ppm2microM(heatmapData$concentration_ppm[i], heatmapData$metabolite[i])
-  stError_microM[i] <- ppm2microM(heatmapData$stError_ppm[i], heatmapData$metabolite[i])
+concentration_microM <- vector(mode="numeric", length=nrow(allData))
+stError_microM <- vector(mode="numeric", length=nrow(allData))
+for(i in 1:nrow(allData)){
+  concentration_microM[i] <- ppm2microM(allData$concentration_ppm[i], allData$metabolite[i])
+  stError_microM[i] <- ppm2microM(allData$stError_ppm[i], allData$metabolite[i])
 }
-heatmapData$concentration_microM <- concentration_microM
-heatmapData$stError_microM <- stError_microM
+allData$concentration_microM <- concentration_microM
+allData$stError_microM <- stError_microM
 
 # Transform data into wide format to use for heirarchical clustering 
-speciesData <- subset(heatmapData, select=-c(concentration_ppm, stError_ppm, stError_microM))
+speciesData <- subset(allData, select=-c(concentration_ppm, stError_ppm, stError_microM))
 speciesData <- speciesData %>%
   pivot_wider(names_from=metabolite, values_from=concentration_microM) %>%
   remove_rownames %>%
@@ -142,25 +181,49 @@ for (i in 1:nrow(speciesData)){
 } 
 speciesData$clade <- factor(cladeList)
 
+# For MCA with binary data
 for(i in 1:15){
   speciesData[, i] <- as.logical(speciesData[, i])
 }
+pca_data <- MCA(speciesData, quali.sup=16,  graph=FALSE)
 
-pca_data <- MCA(speciesData[, c(1:15)], ncp=2, graph=TRUE)
-pc1_ind <- pca_data$ind$coord[,1]
-pc2_ind <- pca_data$ind$coord[,2]
+# For PCA with continuous data
+#pca_data <- PCA(speciesData[, c(1:15)], ncp=2, scale.unit=FALSE, graph=TRUE)
+
+# Extract data for plotting
+pca_inds <- data.frame(pc1_ind=pca_data$ind$coord[,1],
+                       pc2_ind=pca_data$ind$coord[,2],
+                       clade=speciesData$clade)
 pc1_expl <- round(pca_data$eig[1,2],2)
 pc2_expl <- round(pca_data$eig[2,2],2)
-clade <- speciesData$clade
+
+# Create 95% confidence ellipses
+#clade1_cor <- cor(filter(pca_inds, clade==1)[,1:2])
+#clade1_ellipse <- as.data.frame(ellipse(clade1_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==1)[,1:2]), level=0.95))
+
+#clade2_cor <- cor(filter(pca_inds, clade==2)[,1:2])
+#clade2_ellipse <- as.data.frame(ellipse(clade2_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==2)[,1:2]), level=0.95))
+
+#clade3_cor <- cor(filter(pca_inds, clade==3)[,1:2])
+#clade3_ellipse <- as.data.frame(ellipse(clade3_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==3)[,1:2]), level=0.95))
+
+#clade4_cor <- cor(filter(pca_inds, clade==4)[,1:2])
+#clade4_ellipse <- as.data.frame(ellipse(clade4_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==4)[,1:2]), level=0.95))
+
+#clade5_cor <- cor(filter(pca_inds, clade==5)[,1:2])
+#clade5_ellipse <- as.data.frame(ellipse(clade5_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==5)[,1:2]), level=0.95))
 
 pcaPlot <- ggplot() +
-  geom_point(aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=7) +
+  #geom_polygon(data=clade1_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#62e8ec") +
+  #geom_polygon(data=clade2_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#90dfb0") +
+  #geom_polygon(data=clade3_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#c6ce86") +
+  #geom_polygon(data=clade4_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#f0b682") +
+  #geom_polygon(data=clade5_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#ffa2a2") +
+  geom_point(data=pca_inds, mapping=aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=7) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
-  #coord_fixed(ratio=1) +
-  #xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
-  #ylab(paste("PC2 (", pc2_expl, "%)", sep="")) +
-  xlab("Principal component 1") +
-  ylab("Principal component 2") +
+  coord_fixed(ratio=1) +
+  xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
+  ylab(paste("PC2 (", pc2_expl, "%)", sep="")) +
   theme_classic() +
   theme(legend.position="none",
         panel.grid.major=element_line(size=0.5), panel.grid.minor=element_line(size=0.25),

@@ -17,5 +17,5 @@ Notes:
 
 Sample info:
 Data for fresh samples (20190813_fresh, 20200117_frozenKR) is from samples prepared
-at 5000 ppm. Data for dried samples (20200214_herbarium1_30) is from samples prepared
-at 1000 ppm.
+at 5000 ppm. Data for dried samples (20200214_herbarium1_30, 20200812_herbarium31_78)
+is from samples prepared at 1000 ppm.

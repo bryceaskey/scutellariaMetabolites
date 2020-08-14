@@ -17,6 +17,9 @@ herbariumList <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/
 
 getSampleName <- function(injectionName, nameList){
   sampleName <- nameList[injectionName==nameList$Label, 3]
+  if(length(sampleName)==0){
+    print("TRUE")
+  }
   return(as.character(sampleName))
 }
 

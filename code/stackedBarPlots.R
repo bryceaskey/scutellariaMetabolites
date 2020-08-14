@@ -1,6 +1,3 @@
-# TODO: if a species doesn't produce any of the 15 metabolites in an organ, the bars will be
-# shifted left but labels won't be. Add placeholder data point and then photoshop out later?
-
 library(dplyr)
 library(ggplot2)
 library(ggrepel)

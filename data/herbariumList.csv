@@ -1,4 +1,4 @@
-Label,Herbarium Code,Species,Organ,Dry Weight,Solvent volume for 10000 ppm (µL)
+Label,Herbarium Code,Species,Organ,Dry Weight,Solvent volume for 10000 ppm (ï¿½L)
 1,NYBG01,altissima,leaves,,
 2,NYBG12,galericulata,leaves,,
 2-1,NYBG12,galericulata,shoots,,
@@ -43,61 +43,51 @@ Label,Herbarium Code,Species,Organ,Dry Weight,Solvent volume for 10000 ppm (µL)
 28-1,NYBG54,orientalis,shoots,,
 29,NYBG55,pulchella,roots,,
 30,NYBG59,fruticosa,leaves,,
-31,NYBG03,S. angustifolia ssp. micranthum,,0.0073,730
-32,NYBG04,S. angustifolia ssp. angustifolia,,0.0153,1530
-33,NYBG05,S. antirrhinoides,,0.0091,910
-34,NYBG07,S. brittonii,,0.0135,1350
-35,NYBG08,S. californica,,0.0047,470
-36,NYBG09,S. coccinea,,0.0051,510
-37,NYBG10,S. drumondii,,0.021,2100
-38,NYBG13,S. glabriuscula,,0.0088,880
-39,NYBG14,S. havanensis,,0.0159,1590
-40,NYBG15,S. holmgrenierum,,0.0129,1290
-41,NYBG17,S. incana,,0.006,600
-42,NYBG19,S. leonardii,,0.009,900
-43,NYBG22,S. multiglandulosa,,0.0068,680
-44,NYBG23,S. muriculata,,0.0138,1380
-45,NYBG25,S. sapphirina,,0.0119,1190
-46,NYBG29,S. pseudoserrata,,0.0057,570
-47,NYBG30,S. racemosa,,0.0103,1030
-48,NYBG32,S. sapphirina,,0.0205,2050
-49,NYBG38,S. blepharophylla,,0.0096,960
-50,NYBG42,S. hispidula,,0.0062,620
-51,NYBG44,S. guatemalensis,,0.0112,1120
-52,NYBG48,S. lutea,,0.0225,2250
-53,NYBG50,S. purpurascens,,0.0138,1380
-54,NYBG51,S. seleriana,,0.0164,1640
-55,NYBG55,S. suffrutscens,,0.0199,1990
-56,NYBG56,S. przewalskii,,0.014,1400
-57,NYBG57,S. scordiifolia,,0.0287,2870
-58,NYBG58,S. discolor,,0.0064,640
-59,NYBG60,S. multicularis,,0.0825,8250
-60,NYBG61,S. oblonga,,0.0123,1230
-61,NYBG62,S. heterophylla,,0.076,7600
-62,NYBG63,S. heydei,,0.0555,5550
-63,NYBG64,S. javanica,,0.029,2900
-64,NYBG65,S. pinnatifida,,0.0257,2570
-65,NYBG66,S. prostrata,,0.0219,2190
-66,NYBG67,S. peregrina,,0.0102,1020
-67,NYBG68,S. relenorskyi,,0.0222,2220
-68,NYBG69,S. angulosa,,0.0088,880
-69,NYBG71,S. paucifolia,,0.1972,19720
-70,NYBG72,S. sumatrana,,0.0073,730
-71,NYBG73,S. javalambrensis,,0.0323,3230
-72,NYBG74,S. leptosiplonsipkon,,0.012,1200
-73,FLAS01,S. arenicola,,0.0084,840
-74,FLAS02,S. arenicola,,0.0164,1640
-75,FLAS04,S. elliptica,,0.017,1700
-76,FLAS05,S. integrifolia,,0.0046,460
-77,FLAS06,S. multiglandulosa,,0.0157,1570
-78,FLAS07,S. racemosa,,0.0339,3390
-,,S.hastifolia,,,
-,,S.arenicola,,,
-,,S.tournefortii,,,
-,,S.baicalensis,,,
-,,S.barbata,,,
-,,S.indica,,,
-,,S.Pekinesis,,,
-,,S.dependens,,,
-,,S.strigillosa,,,
-,,S.insignis,,,
+31,NYBG03,angustifolia ssp. micranthum,leaves,0.0073,730
+32,NYBG04,angustifolia ssp. angustifolia,leaves,0.0153,1530
+33,NYBG05,antirrhinoides,leaves,0.0091,910
+34,NYBG07,brittonii,leaves,0.0135,1350
+35,NYBG08,californica,leaves,0.0047,470
+36,NYBG09,coccinea,leaves,0.0051,510
+37,NYBG10,drumondii,shoots,0.021,2100
+38,NYBG13,glabriuscula,leaves,0.0088,880
+39,NYBG14,havanensis,shoots,0.0159,1590
+40,NYBG15,holmgrenierum,leaves,0.0129,1290
+41,NYBG17,incana,leaves,0.006,600
+42,NYBG19,leonardii,shoots,0.009,900
+43,NYBG22,multiglandulosa,leaves,0.0068,680
+44,NYBG23,muriculata,shoots,0.0138,1380
+45,NYBG25,sapphirina,leaves,0.0119,1190
+46,NYBG29,pseudoserrata,leaves,0.0057,570
+47,NYBG30,racemosa,leaves,0.0103,1030
+48,NYBG32,sapphirina,shoots,0.0205,2050
+49,NYBG38,blepharophylla,shoots,0.0096,960
+50,NYBG42,hispidula,shoots,0.0062,620
+51,NYBG44,guatemalensis,shoots,0.0112,1120
+52,NYBG48,lutea,shoots,0.0225,2250
+53,NYBG50,purpurascens,shoots,0.0138,1380
+54,NYBG51,seleriana,shoots,0.0164,1640
+55,NYBG55,suffrutscens,shoots,0.0199,1990
+56,NYBG56,przewalskii,shoots,0.014,1400
+57,NYBG57,scordiifolia,shoots,0.0287,2870
+58,NYBG58,discolor,leaves,0.0064,640
+59,NYBG60,multicularis,shoots,0.0825,8250
+60,NYBG61,oblonga,leaves,0.0123,1230
+61,NYBG62,heterophylla,roots,0.076,7600
+62,NYBG63,heydei,leaves,0.0555,5550
+63,NYBG64,javanica,leaves,0.029,2900
+64,NYBG65,pinnatifida,shoots,0.0257,2570
+65,NYBG66,prostrata,shoots,0.0219,2190
+66,NYBG67,peregrina,leaves,0.0102,1020
+67,NYBG68,relenorskyi,leaves,0.0222,2220
+68,NYBG69,angulosa,leaves,0.0088,880
+69,NYBG71,paucifolia,shoots,0.1972,19720
+70,NYBG72,sumatrana,leaves,0.0073,730
+71,NYBG73,javalambrensis,shoots,0.0323,3230
+72,NYBG74,leptosiplonsipkon,leaves,0.012,1200
+73,FLAS01,arenicola,leaves,0.0084,840
+74,FLAS02,arenicola,leaves,0.0164,1640
+75,FLAS04,elliptica,leaves,0.017,1700
+76,FLAS05,integrifolia,leaves,0.0046,460
+77,FLAS06,multiglandulosa,leaves,0.0157,1570
+78,FLAS07,racemosa,shoots,0.0339,3390
