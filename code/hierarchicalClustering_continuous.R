@@ -1,9 +1,7 @@
 library(tidyverse)
-library(ggplot2)
 library(ggdendro)
 library(cowplot)
 library(viridis)
-library(dplyr)
 
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
@@ -105,8 +103,9 @@ herbariumData <- herbariumData %>%
 # Merge fresh and herbarium data ----
 # If both fresh and herbarium samples are available for a species, the herbarium data should be used
 # Iterate through herbarium species, and delete any rows in freshData which match
-for(herbariumSpecies in levels(herbariumData$species)){
-  freshData <- freshData[!freshData$species==herbariumSpecies, ]
+# TODO: should fresh data be used instead? See herbarium results for baicalensis and havanensis
+for(species in levels(herbariumData$species)){
+  freshData <- freshData[!freshData$species==species, ]
 }
 
 # Combine fresh and herbarium data into a single dataframe
@@ -218,8 +217,6 @@ for (i in 1:length(levels(heatmapData$species))){
 heatmapCladeData <- data.frame(x=1, y=1:length(speciesList), speciesList, cladeList)
 heatmapCladeData$cladeList <- factor(heatmapCladeData$cladeList, levels=c(1, 2, 3, 4, 5))
 
-#TODO: cladeData has 2 more obs. than heatmapCladeData - possible mismatch/missing data?
-
 # Add "S." to beginning of each species name
 #speciesDenData$labels$label <- paste("S.", speciesDenData$labels$label)
 heatmapData$species <- as.character(heatmapData$species)
@@ -229,7 +226,7 @@ heatmapData$species <- fct_rev(heatmapData$species)
 
 heatmapCladeData$speciesList <- paste("S.", heatmapCladeData$speciesList)
 heatmapCladeData$speciesList <- factor(heatmapCladeData$speciesList, levels=levels(heatmapData$species))
-heatmapCladeData$y <- 40-heatmapCladeData$y
+heatmapCladeData$y <- (nrow(heatmapCladeData)+1)-heatmapCladeData$y
 
 # Create column of colored circles to represent phylogenetic clade
 cladeLabels <- ggplot(data=heatmapCladeData) +
@@ -237,7 +234,7 @@ cladeLabels <- ggplot(data=heatmapCladeData) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(44,0,58,-715,"pt"))
+        plot.margin=margin(21,0,34,-642,"pt"))
 
 # Capitalize first letter of each flavonoid name
 capString <- function(string) {
@@ -284,7 +281,7 @@ heatmap <- plot_grid(heatmap, cladeLabels, nrow=1, rel_widths=c(1.5, 0.05))
 ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
   plot=heatmap,
   device=png(),
-  width=18, height=30, units="cm")
+  width=18, height=45, units="cm")
 
 #ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
 #  plot=speciesDendrogram,

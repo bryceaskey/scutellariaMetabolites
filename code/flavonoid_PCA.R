@@ -2,7 +2,7 @@ library(tidyverse)
 library(FactoMineR)
 library(factoextra)
 library(ggpubr)
-
+library(mixtools)
 
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
@@ -55,6 +55,12 @@ freshData$species[freshData$species=="hastafolia"] <- "hastifolia"
 freshData$species[freshData$species=="pekinesis"] <- "pekinensis var. alpina"
 freshData$species[freshData$species=="siphocampuloides"] <- "siphocampyloides"
 freshData$species[freshData$species=="indica"] <- "indica var. coccinea"
+freshData$species[freshData$species=="angustifolia ssp. angustifolia"] <- "angustifolia"
+freshData$species[freshData$species=="drumondii"] <- "drummondii"
+freshData$species[freshData$species=="holmgrenierum"] <- "holmgreniorum"
+freshData$species[freshData$species=="leptosiplonsipkon"] <- "leptosiphon"
+freshData$species[freshData$species=="multicularis"] <- "multicaulis"
+freshData$species[freshData$species=="suffrutscens"] <- "suffrutescens"
 freshData$species <- factor(freshData$species)
 
 # Average together duplicate species, and leaf and shoot data
@@ -82,6 +88,12 @@ herbariumData$species[herbariumData$species=="hastafolia"] <- "hastifolia"
 herbariumData$species[herbariumData$species=="pekinesis"] <- "pekinensis var. alpina"
 herbariumData$species[herbariumData$species=="siphocampuloides"] <- "siphocampyloides"
 herbariumData$species[herbariumData$species=="indica"] <- "indica var. coccinea"
+herbariumData$species[herbariumData$species=="angustifolia ssp. angustifolia"] <- "angustifolia"
+herbariumData$species[herbariumData$species=="drumondii"] <- "drummondii"
+herbariumData$species[herbariumData$species=="holmgrenierum"] <- "holmgreniorum"
+herbariumData$species[herbariumData$species=="leptosiplonsipkon"] <- "leptosiphon"
+herbariumData$species[herbariumData$species=="multicularis"] <- "multicaulis"
+herbariumData$species[herbariumData$species=="suffrutscens"] <- "suffrutescens"
 herbariumData$species <- factor(herbariumData$species)
 
 # Average together duplicate species, and leaf and shoot data
@@ -92,15 +104,15 @@ herbariumData <- herbariumData %>%
 # Merge fresh and herbarium data ----
 # If both fresh and herbarium samples are available for a species, the herbarium data should be used
 # Iterate through herbarium species, and delete any rows in freshData which match
-for(herbariumSpecies in levels(herbariumData$species)){
-  freshData <- freshData[!freshData$species==herbariumSpecies, ]
+for(species in levels(herbariumData$species)){
+  freshData <- freshData[!freshData$species==species, ]
 }
 
 # Combine fresh and herbarium data into a single dataframe
 freshData$species <- as.character(freshData$species)
 herbariumData$species <- as.character(herbariumData$species)
 allData <- rbind(freshData, herbariumData)
-
+allData$species <- factor(allData$species)
 
 # Function to convert units of ppm to micromol/L
 ppm2microM <- function(input_ppm, metaboliteName){
@@ -183,19 +195,19 @@ for (i in 1:nrow(speciesData)){
 speciesData$clade <- factor(cladeList)
 
 # For MCA with binary data
-#for(i in 1:15){
-#  speciesData[, i] <- as.logical(speciesData[, i])
-#}
-#pca_data <- MCA(speciesData[, c(1:15)],  graph=TRUE)
-#varRepPlot <- fviz_mca_var(pca_data, choice="mca.cor", repel=TRUE, pointsize=4, labelsize=6) +
-#  theme(axis.text=element_text(size=14))
-#print(varRepPlot)
-
-# For PCA with continuous data
-pca_data <- PCA(speciesData[, c(1:15)], ncp=2, scale.unit=TRUE, graph=TRUE)
-varRepPlot <- fviz_pca_var(pca_data, choice="pca.cor", geom="point", repel=TRUE, label=TRUE, pointsize=4, labelsize=6) +
+for(i in 1:15){
+  speciesData[, i] <- as.logical(speciesData[, i])
+}
+pca_data <- MCA(speciesData[, c(1:15)],  graph=TRUE)
+varRepPlot <- fviz_mca_var(pca_data, choice="mca.cor", repel=TRUE, pointsize=4, labelsize=6) +
   theme(axis.text=element_text(size=14))
 print(varRepPlot)
+
+# For PCA with continuous data
+#pca_data <- PCA(speciesData[, c(1:15)], ncp=2, scale.unit=TRUE, graph=TRUE)
+#varRepPlot <- fviz_pca_var(pca_data, choice="pca.cor", geom="point", repel=TRUE, label=TRUE, pointsize=4, labelsize=6) +
+#  theme(axis.text=element_text(size=14))
+#print(varRepPlot)
 
 # Extract data for plotting
 pca_inds <- data.frame(pc1_ind=pca_data$ind$coord[,1],
@@ -205,30 +217,23 @@ pc1_expl <- round(pca_data$eig[1,2],2)
 pc2_expl <- round(pca_data$eig[2,2],2)
 
 # Create 95% confidence ellipses
-#clade1_cor <- cor(filter(pca_inds, clade==1)[,1:2])
-#clade1_ellipse <- as.data.frame(ellipse(clade1_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==1)[,1:2]), level=0.95))
-
-#clade2_cor <- cor(filter(pca_inds, clade==2)[,1:2])
-#clade2_ellipse <- as.data.frame(ellipse(clade2_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==2)[,1:2]), level=0.95))
-
-#clade3_cor <- cor(filter(pca_inds, clade==3)[,1:2])
-#clade3_ellipse <- as.data.frame(ellipse(clade3_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==3)[,1:2]), level=0.95))
-
-#clade4_cor <- cor(filter(pca_inds, clade==4)[,1:2])
-#clade4_ellipse <- as.data.frame(ellipse(clade4_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==4)[,1:2]), level=0.95))
-
-#clade5_cor <- cor(filter(pca_inds, clade==5)[,1:2])
-#clade5_ellipse <- as.data.frame(ellipse(clade5_cor*pca_data$eig[1,1], centre=colMeans(filter(pca_inds, clade==5)[,1:2]), level=0.95))
+ellipse_allClade <- data.frame(pc1=numeric(), pc2=numeric(), clade=factor())
+for(i in levels(pca_inds$clade)){
+  covariance <- covMcd(filter(pca_inds, clade==i)[,1:2], alpha=0.95)
+  ellipse_center <- unname(covariance$center)
+  ellipse_cov <- covariance$cov
+  ellipse_matrix <- ellipse(ellipse_center, ellipse_cov, draw=FALSE, alpha=0.20)
+  ellipse_df <- data.frame(pc1=ellipse_matrix[,1], pc2=ellipse_matrix[,2], clade=i)
+  ellipse_allClade <- rbind(ellipse_allClade, ellipse_df)
+}
 
 pcaPlot <- ggplot() +
-  #geom_polygon(data=clade1_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#62e8ec") +
-  #geom_polygon(data=clade2_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#90dfb0") +
-  #geom_polygon(data=clade3_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#c6ce86") +
-  #geom_polygon(data=clade4_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#f0b682") +
-  #geom_polygon(data=clade5_ellipse, mapping=aes(x=pc1_ind, y=pc2_ind), fill=NA, color="#ffa2a2") +
+  geom_polygon(data=ellipse_allClade, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), fill=NA, size=1) +
   geom_point(data=pca_inds, mapping=aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=7) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
+  scale_color_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   coord_fixed(ratio=1) +
+  coord_cartesian(xlim=c(-1, 1), ylim=c(-1, 1)) +
   xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
   ylab(paste("PC2 (", pc2_expl, "%)", sep="")) +
   theme_classic() +
