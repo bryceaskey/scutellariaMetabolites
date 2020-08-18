@@ -3,6 +3,7 @@ library(FactoMineR)
 library(factoextra)
 library(ggpubr)
 library(mixtools)
+library(robustbase)
 
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
@@ -198,10 +199,18 @@ speciesData$clade <- factor(cladeList)
 for(i in 1:15){
   speciesData[, i] <- as.logical(speciesData[, i])
 }
-pca_data <- MCA(speciesData[, c(1:15)],  graph=TRUE)
-varRepPlot <- fviz_mca_var(pca_data, choice="mca.cor", repel=TRUE, pointsize=4, labelsize=6) +
-  theme(axis.text=element_text(size=14))
-print(varRepPlot)
+speciesData <- speciesData[c("Apigenin", "ApigeninG", "Scutellarein", "Scutellarin", "Hispidulin", "HispidulinG",
+                             "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Acetoside",
+                             "clade")]
+pca_data <- MFA(speciesData[, c(1:15)], 
+                group=c(6, 9),
+                type=c("n", "n"),
+                name.group=c("aerialFlavonoids", "rootFlavonoids"),
+                graph=TRUE)
+#pca_data <- MCA(speciesData[, c(1:15)],  graph=TRUE)
+#varRepPlot <- fviz_mca_var(pca_data, choice="mca.cor", repel=TRUE, pointsize=4, labelsize=6) +
+#  theme(axis.text=element_text(size=14))
+#print(varRepPlot)
 
 # For PCA with continuous data
 #pca_data <- PCA(speciesData[, c(1:15)], ncp=2, scale.unit=TRUE, graph=TRUE)
@@ -233,7 +242,7 @@ pcaPlot <- ggplot() +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   scale_color_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   coord_fixed(ratio=1) +
-  coord_cartesian(xlim=c(-1, 1), ylim=c(-1, 1)) +
+  #coord_cartesian(xlim=c(-1, 1), ylim=c(-1, 1)) +
   xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
   ylab(paste("PC2 (", pc2_expl, "%)", sep="")) +
   theme_classic() +
