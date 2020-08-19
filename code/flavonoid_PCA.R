@@ -6,11 +6,11 @@ library(mixtools)
 library(robustbase)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
-herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+herbarium1_30 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+herbarium31_78 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Adjust herbarium ppm to correct for dilution
 herbarium1_30 <- herbarium1_30 %>%
@@ -203,8 +203,8 @@ speciesData <- speciesData[c("Apigenin", "ApigeninG", "Scutellarein", "Scutellar
                              "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Acetoside",
                              "clade")]
 pca_data <- MFA(speciesData[, c(1:15)], 
-                group=c(6, 9),
-                type=c("n", "n"),
+                group=c(6,9),
+                type=c("n","n"),
                 name.group=c("aerialFlavonoids", "rootFlavonoids"),
                 graph=TRUE)
 #pca_data <- MCA(speciesData[, c(1:15)],  graph=TRUE)
@@ -225,24 +225,31 @@ pca_inds <- data.frame(pc1_ind=pca_data$ind$coord[,1],
 pc1_expl <- round(pca_data$eig[1,2],2)
 pc2_expl <- round(pca_data$eig[2,2],2)
 
-# Create 95% confidence ellipses
-ellipse_allClade <- data.frame(pc1=numeric(), pc2=numeric(), clade=factor())
+# Create 95% and 80% confidence ellipses
+ellipse_allClade_0.95 <- data.frame(pc1=numeric(), pc2=numeric(), clade=factor())
+ellipse_allClade_0.80 <- data.frame(pc1=numeric(), pc2=numeric(), clade=factor())
 for(i in levels(pca_inds$clade)){
   covariance <- covMcd(filter(pca_inds, clade==i)[,1:2], alpha=0.95)
   ellipse_center <- unname(covariance$center)
   ellipse_cov <- covariance$cov
-  ellipse_matrix <- ellipse(ellipse_center, ellipse_cov, draw=FALSE, alpha=0.20)
-  ellipse_df <- data.frame(pc1=ellipse_matrix[,1], pc2=ellipse_matrix[,2], clade=i)
-  ellipse_allClade <- rbind(ellipse_allClade, ellipse_df)
+  
+  ellipse_matrix_0.95 <- ellipse(ellipse_center, ellipse_cov, draw=FALSE, alpha=0.05)
+  ellipse_df_0.95 <- data.frame(pc1=ellipse_matrix_0.95[,1], pc2=ellipse_matrix_0.95[,2], clade=i)
+  ellipse_allClade_0.95 <- rbind(ellipse_allClade_0.95, ellipse_df_0.95)
+  
+  ellipse_matrix_0.80 <- ellipse(ellipse_center, ellipse_cov, draw=FALSE, alpha=0.20)
+  ellipse_df_0.80 <- data.frame(pc1=ellipse_matrix_0.80[,1], pc2=ellipse_matrix_0.80[,2], clade=i)
+  ellipse_allClade_0.80 <- rbind(ellipse_allClade_0.80, ellipse_df_0.80)
 }
 
 pcaPlot <- ggplot() +
-  geom_polygon(data=ellipse_allClade, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), fill=NA, size=1) +
+  geom_polygon(data=ellipse_allClade_0.95, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), linetype=1, fill=NA, size=1) +
+  #geom_polygon(data=ellipse_allClade_0.80, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), linetype=1, fill=NA, size=1) +
   geom_point(data=pca_inds, mapping=aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=7) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   scale_color_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   coord_fixed(ratio=1) +
-  #coord_cartesian(xlim=c(-1, 1), ylim=c(-1, 1)) +
+  coord_cartesian(xlim=c(-2.5, 2.5), ylim=c(-2.5, 2.5)) +
   xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
   ylab(paste("PC2 (", pc2_expl, "%)", sep="")) +
   theme_classic() +
