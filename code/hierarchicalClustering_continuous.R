@@ -4,11 +4,11 @@ library(cowplot)
 library(viridis)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
-herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+herbarium1_30 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+herbarium31_78 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Adjust herbarium ppm to correct for dilution
 herbarium1_30 <- herbarium1_30 %>%
@@ -103,7 +103,6 @@ herbariumData <- herbariumData %>%
 # Merge fresh and herbarium data ----
 # If both fresh and herbarium samples are available for a species, the herbarium data should be used
 # Iterate through herbarium species, and delete any rows in freshData which match
-# TODO: should fresh data be used instead? See herbarium results for baicalensis and havanensis
 for(species in levels(herbariumData$species)){
   freshData <- freshData[!freshData$species==species, ]
 }
@@ -234,7 +233,18 @@ cladeLabels <- ggplot(data=heatmapCladeData) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(21,0,34,-642,"pt"))
+        plot.margin=margin(21,0,34,-610,"pt"))
+
+# Label fresh data with asterisks
+freshLabelData <- data.frame(x=numeric(), y=numeric(), speciesList=factor())
+for(species in paste("S.", unique(freshData$species))){
+  freshLabelData <- rbind(freshLabelData, heatmapCladeData[heatmapCladeData$speciesList==species, 1:3])
+}
+freshLabels <- ggplot(data=freshLabelData) + 
+  geom_point(mapping=aes(x=x, y=y), shape=8, color="black", size=2.5) +
+  ylim(1, 75) +
+  theme_void() +
+  theme(plot.margin=margin(21,0,34,-49,"pt"))
 
 # Capitalize first letter of each flavonoid name
 capString <- function(string) {
@@ -261,27 +271,28 @@ heatmapData$metabolite <- factor(heatmapData$metabolite, levels=sapply(flavonoid
 #  theme_dendro() +
 #  scale_y_reverse()
 
-# Create heatmap without species or flavonoid labels
+# Create heatmap
 heatmap <- ggplot(data=heatmapData) +
   geom_raster(mapping=aes(x=species, y=metabolite, fill=concentration_microM)) +
   scale_fill_viridis() +
   labs(y="Flavonoid", fill=expression(paste("Conc (", mu, "M)", sep=""))) +
   coord_flip() +
   theme(axis.title.x=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, size=12, margin=margin(5,0,0,0), color="black"),
-        axis.title.y=element_blank(), axis.text.y=element_text(size=12, margin=margin(0,20,0,0), face="italic"),
+        axis.title.y=element_blank(), axis.text.y=element_text(size=12, margin=margin(0,20,0,0), face="italic", color="black"),
         legend.position="top", legend.direction="horizontal", legend.title=element_text(size=14), legend.text=element_text(size=12), legend.key.size=unit(0.75, "cm"),
         panel.background=element_blank())
 
 # Combine dendrograms and heatmap into 1 figure
-heatmap <- plot_grid(heatmap, cladeLabels, nrow=1, rel_widths=c(1.5, 0.05))
+heatmap <- plot_grid(heatmap, cladeLabels, freshLabels, nrow=1, rel_widths=c(1.5, 0.05, 0.05))
 #speciesDendrogram <- plot_grid(speciesDenPlot, cladeLabels, nrow=1)
 #flavonoidDendogram <- plot_grid(flavonoidDenPlot)
 
 # Export dendrograms and heatmaps separately
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
   plot=heatmap,
   device=png(),
   width=18, height=45, units="cm")
+dev.off()
 
 #ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
 #  plot=speciesDendrogram,
@@ -292,3 +303,16 @@ ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmap
 #  plot=flavonoidDendogram,
 #  device=png(),
 #  width=10, height=4, units="cm")
+
+# Print summary statistics
+print(paste("# of species included:", nrow(heatmapCladeData)))
+print(paste("# of species assigned to a clade:", sum(!is.na(heatmapCladeData$cladeList))))
+flavonoidAbundance <- data.frame(flavonoid=character(), count=numeric())
+for(flavonoid in levels(heatmapData$metabolite)){
+  occurrence <- data.frame(flavonoid=flavonoid, 
+                           count=sum(heatmapData$metabolite==flavonoid & heatmapData$concentration_microM>0))
+  flavonoidAbundance <- rbind(flavonoidAbundance, occurrence)
+}
+flavonoidAbundance <- flavonoidAbundance[order(flavonoidAbundance$count), ]
+print("Flavonoids in order of abundance:")
+print(flavonoidAbundance)
