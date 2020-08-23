@@ -288,11 +288,11 @@ heatmap <- plot_grid(heatmap, cladeLabels, freshLabels, nrow=1, rel_widths=c(1.5
 #flavonoidDendogram <- plot_grid(flavonoidDenPlot)
 
 # Export dendrograms and heatmaps separately
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
-  plot=heatmap,
-  device=png(),
-  width=18, height=45, units="cm")
-dev.off()
+#ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
+#  plot=heatmap,
+#  device=png(),
+#  width=18, height=45, units="cm")
+#dev.off()
 
 #ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
 #  plot=speciesDendrogram,
@@ -307,12 +307,24 @@ dev.off()
 # Print summary statistics
 print(paste("# of species included:", nrow(heatmapCladeData)))
 print(paste("# of species assigned to a clade:", sum(!is.na(heatmapCladeData$cladeList))))
-flavonoidAbundance <- data.frame(flavonoid=character(), count=numeric())
+flavonoidAbundance <- data.frame(flavonoid=character(), totalCount=numeric(), totalPct=numeric(), avgConc=numeric(),
+                                 clade1Pct=numeric(), clade2Pct=numeric(), clade3Pct=numeric(), clade4Pct=numeric(), clade5Pct=numeric())
+for(clade in 1:5){
+  assign(paste("clade", clade, "Sp", sep=""), as.character(heatmapCladeData$speciesList[heatmapCladeData$cladeList==clade & !is.na(heatmapCladeData$cladeList)]))
+  assign(paste("clade", clade, "heatmapData", sep=""), heatmapData[heatmapData$species %in% get(paste("clade", clade, "Sp", sep="")), ])
+}
 for(flavonoid in levels(heatmapData$metabolite)){
   occurrence <- data.frame(flavonoid=flavonoid, 
-                           count=sum(heatmapData$metabolite==flavonoid & heatmapData$concentration_microM>0))
+                           totalCount=sum(heatmapData$metabolite==flavonoid & heatmapData$concentration_microM>0),
+                           totalPct=sum(heatmapData$metabolite==flavonoid & heatmapData$concentration_microM>0)/nrow(heatmapCladeData),
+                           avgConc=mean(heatmapData$concentration_microM[heatmapData$metabolite==flavonoid & heatmapData$concentration_microM>0]),
+                           clade1Pct=sum(clade1heatmapData$metabolite==flavonoid & clade1heatmapData$concentration_microM>0)/sum(clade1heatmapData$metabolite==flavonoid),
+                           clade2Pct=sum(clade2heatmapData$metabolite==flavonoid & clade2heatmapData$concentration_microM>0)/sum(clade2heatmapData$metabolite==flavonoid),
+                           clade3Pct=sum(clade3heatmapData$metabolite==flavonoid & clade3heatmapData$concentration_microM>0)/sum(clade3heatmapData$metabolite==flavonoid),
+                           clade4Pct=sum(clade4heatmapData$metabolite==flavonoid & clade4heatmapData$concentration_microM>0)/sum(clade4heatmapData$metabolite==flavonoid),
+                           clade5Pct=sum(clade5heatmapData$metabolite==flavonoid & clade5heatmapData$concentration_microM>0)/sum(clade5heatmapData$metabolite==flavonoid))
   flavonoidAbundance <- rbind(flavonoidAbundance, occurrence)
 }
-flavonoidAbundance <- flavonoidAbundance[order(flavonoidAbundance$count), ]
+flavonoidAbundance <- flavonoidAbundance[order(flavonoidAbundance$totalCount), ]
 print("Flavonoids in order of abundance:")
 print(flavonoidAbundance)
