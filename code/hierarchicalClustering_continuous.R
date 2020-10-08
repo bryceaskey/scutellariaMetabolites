@@ -4,11 +4,12 @@ library(cowplot)
 library(viridis)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
-herbarium31_78 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Adjust herbarium ppm to correct for dilution
 herbarium1_30 <- herbarium1_30 %>%
@@ -35,7 +36,7 @@ organsToRemove <- paste(c("flowers", "roots"), collapse = '|')
 #metabolitesToRemove <- paste(c("chrysinG", "oroxyloside", "baicalin", "wogonoside", "acetoside", "apigeninG", "scutellarin", "hispidulinG"), collapse = '|')
 
 # Processing for fresh samples ----
-freshData <- rbind(fresh, frozenKR)
+freshData <- rbind(fresh, frozenKR, wrightii)
 
 freshData$species <- factor(freshData$species)
 freshData$organ <- factor(freshData$organ)
@@ -119,7 +120,7 @@ ppm2microM <- function(input_ppm, metaboliteName){
       output_microM <- (input_ppm/624.6)*1000
     }else if(metaboliteName=="apigenin"){ #PubChem CID: 5280443
       output_microM <- (input_ppm/270.24)*1000
-    }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5280704
+    }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5491384
       output_microM <- (input_ppm/432.4)*1000
     }else if(metaboliteName=="baicalein"){ #PubChem CID: 5281605
       output_microM <- (input_ppm/270.24)*1000
@@ -242,7 +243,7 @@ for(species in paste("S.", unique(freshData$species))){
 }
 freshLabels <- ggplot(data=freshLabelData) + 
   geom_point(mapping=aes(x=x, y=y), shape=8, color="black", size=2.5) +
-  ylim(1, 75) +
+  ylim(1, length(speciesList)) +
   theme_void() +
   theme(plot.margin=margin(21,0,34,-49,"pt"))
 
@@ -288,11 +289,11 @@ heatmap <- plot_grid(heatmap, cladeLabels, freshLabels, nrow=1, rel_widths=c(1.5
 #flavonoidDendogram <- plot_grid(flavonoidDenPlot)
 
 # Export dendrograms and heatmaps separately
-#ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
-#  plot=heatmap,
-#  device=png(),
-#  width=18, height=45, units="cm")
-#dev.off()
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
+  plot=heatmap,
+  device=png(),
+  width=18, height=45, units="cm")
+dev.off()
 
 #ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
 #  plot=speciesDendrogram,

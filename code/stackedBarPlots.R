@@ -6,11 +6,12 @@ library(cowplot)
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
 frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
 cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Combine all data into a single data frame and change classifiers (species, organs, metabolites)
 # into factors
-allData <- rbind(fresh, frozenKR)
+allData <- rbind(fresh, frozenKR, wrightii)
 allData$species <- as.factor(allData$species)
 allData$organ <- as.factor(allData$organ)
 allData$metabolite <- as.factor(allData$metabolite)
@@ -130,7 +131,7 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
           legend.title=element_text(size=20),
           legend.key.size=unit(1, "cm")) +
     labs(fill="Flavonoid") +
-    scale_fill_manual(values=metaboliteColors, labels=paste(seq(1, 15), ". ", names(metaboliteColors), sep=""))
+    scale_fill_manual(name="Metabolite", values=metaboliteColors, labels=paste(seq(1, 15), ". ", names(metaboliteColors), sep=""))
   legend <- get_legend(x)
   return(legend)
 }
@@ -161,11 +162,13 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
 organData$species <- paste("S.", organData$species)
 organData$species <- factor(organData$species, levels=c(
   "S. baicalensis", "S. strigillosa", "S. dependens", "S. indica var. coccinea", "S. barbata", "S. insignis", "S. racemosa", 
-  "S. arenicola", "S. havanensis", "S. altissima", "S. tournefortii", "S. leonardii", "S. pekinensis var. alpina"))
+  "S. arenicola", "S. havanensis", "S. altissima", "S. tournefortii", "S. leonardii", "S. pekinensis var. alpina", "S. wrightii"))
   
   organData <- organData %>%
     group_by(species) %>%
     mutate(text_x = as.numeric(species) - 0.25)
+  
+  if(plantOrgan=="shoots"){plantOrgan <- "stems"}
   
   chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
     geom_bar(position="stack", stat="identity", width=0.5) +
@@ -183,7 +186,7 @@ organData$species <- factor(organData$species, levels=c(
             panel.background=element_rect(fill="#ffe0cf"),
             text=element_text(size=20),
             plot.margin=margin(0, 0, 2, 0, unit="cm"))
-    }else if(plantOrgan=="shoots"){
+    }else if(plantOrgan=="stems"){
       theme(legend.position="none", 
             axis.title.x=element_blank(),
             axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
@@ -205,7 +208,7 @@ organData$species <- factor(organData$species, levels=c(
 # Get clade data for all species to be plotted
 allData$species <- factor(allData$species, levels=c(
   "baicalensis", "strigillosa", "dependens", "indica var. coccinea", "barbata", "insignis", "racemosa", 
-  "arenicola", "havanensis", "altissima", "tournefortii", "leonardii", "pekinensis var. alpina")
+  "arenicola", "havanensis", "altissima", "tournefortii", "leonardii", "pekinensis var. alpina", "wrightii")
 )
 speciesList <- vector(mode="character", length=length(levels(allData$species)))
 cladeList <- vector(mode="numeric", length=length(levels(allData$species)))
@@ -228,7 +231,7 @@ cladeLabels <- ggplot(data=plotCladeData) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(-600,0,0,55,"pt"))
+        plot.margin=margin(-600,0,0,50,"pt"))
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
 rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
@@ -255,6 +258,7 @@ ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stacked
 
 #justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
+print(plot_grid(legend), nrow=1, ncol=1)
 
 finalRootFigure <- plot_grid(rootPlot, legend,
   nrow=1, ncol=2, 

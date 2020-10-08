@@ -106,5 +106,7 @@ herbariumData1_30$stError_ppm <- NA
 herbariumData31_78 <- pivot_longer(herbariumData31_78, cols=c(3:17), names_to="metabolite", values_to="concentration_ppm")
 herbariumData31_78$stError_ppm <- NA
 
+
+
 write.csv(herbariumData1_30, file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")
 write.csv(herbariumData31_78, file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")
