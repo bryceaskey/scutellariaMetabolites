@@ -161,9 +161,8 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
   
 organData$species <- paste("S.", organData$species)
 organData$species <- factor(organData$species, levels=c(
-  "S. baicalensis", "S. strigillosa", "S. dependens", "S. indica var. coccinea", "S. barbata", "S. insignis", "S. racemosa", 
-  "S. arenicola", "S. havanensis", "S. altissima", "S. tournefortii", "S. leonardii", "S. pekinensis var. alpina", "S. wrightii"))
-  
+  "S. havanensis", "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii",
+  "S. arenicola", "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"))
   organData <- organData %>%
     group_by(species) %>%
     mutate(text_x = as.numeric(species) - 0.25)
@@ -207,8 +206,8 @@ organData$species <- factor(organData$species, levels=c(
 
 # Get clade data for all species to be plotted
 allData$species <- factor(allData$species, levels=c(
-  "baicalensis", "strigillosa", "dependens", "indica var. coccinea", "barbata", "insignis", "racemosa", 
-  "arenicola", "havanensis", "altissima", "tournefortii", "leonardii", "pekinensis var. alpina", "wrightii")
+  "havanensis", "insignis", "indica var. coccinea", "barbata", "racemosa", "strigillosa", "dependens", "wrightii",
+  "arenicola", "baicalensis", "tournefortii", "altissima", "leonardii", "pekinensis var. alpina")
 )
 speciesList <- vector(mode="character", length=length(levels(allData$species)))
 cladeList <- vector(mode="numeric", length=length(levels(allData$species)))
