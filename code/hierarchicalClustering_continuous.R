@@ -4,12 +4,12 @@ library(cowplot)
 library(viridis)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
-herbarium31_78 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Adjust herbarium ppm to correct for dilution
 herbarium1_30 <- herbarium1_30 %>%
@@ -280,7 +280,7 @@ heatmapData$metabolite <- factor(heatmapData$metabolite, levels=sapply(flavonoid
 heatmap <- ggplot(data=heatmapData) +
   geom_raster(mapping=aes(x=species, y=metabolite, fill=concentration_microM)) +
   scale_fill_viridis() +
-  labs(y="Flavonoid", fill=expression(paste("Conc (", mu, "M)", sep=""))) +
+  labs(y="Flavonoid", fill="Concentration") +
   coord_flip() +
   theme(axis.title.x=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, size=12, margin=margin(5,0,0,0), color="black"),
         axis.title.y=element_blank(), axis.text.y=element_text(size=12, margin=margin(0,20,0,0), face="italic", color="black"),
@@ -293,18 +293,18 @@ heatmap <- plot_grid(heatmap, cladeLabels, freshLabels, nrow=1, rel_widths=c(1.5
 #flavonoidDendogram <- plot_grid(flavonoidDenPlot)
 
 # Export dendrograms and heatmaps separately
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
   plot=heatmap,
   device=png(),
   width=18, height=45, units="cm")
 dev.off()
 
-#ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
+#ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/speciesDendrogram.png",
 #  plot=speciesDendrogram,
 #  device=png(),
 #  width=30, height=30, units="cm")
 
-#ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/heatmaps/flavonoidDendrogram.png",
+#ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/flavonoidDendrogram.png",
 #  plot=flavonoidDendogram,
 #  device=png(),
 #  width=10, height=4, units="cm")
@@ -333,3 +333,9 @@ for(flavonoid in levels(heatmapData$metabolite)){
 flavonoidAbundance <- flavonoidAbundance[order(flavonoidAbundance$totalCount), ]
 print("Flavonoids in order of abundance:")
 print(flavonoidAbundance)
+
+deoxyflavones <- heatmapData[heatmapData$metabolite %in% c("Chrysin", "ChrysinG", "Baicalin", "Baicalein", "Wogonin", "Wogonoside", "OroxylinA", "Oroxyloside"), ]
+deoxyflavones <- deoxyflavones %>%
+  group_by(species) %>%
+  summarise(totalDeoxyflavoneContent=sum(concentration_microM))
+print(paste("Species with no deoxyflavones detected:", sum(deoxyflavones$totalDeoxyflavoneContent==0)))

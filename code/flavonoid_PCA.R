@@ -5,6 +5,7 @@ library(ggpubr)
 library(mixtools)
 library(robustbase)
 library(ggrepel)
+library(ggsci)
 
 # Load data from .csv files
 fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
@@ -247,7 +248,7 @@ for(i in levels(pca_inds$clade)){
 pcaPlot <- ggplot() +
   geom_polygon(data=ellipse_allClade_0.80, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), linetype=1, fill=NA, size=1) +
   #geom_polygon(data=ellipse_allClade_0.80, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), linetype=1, fill=NA, size=1) +
-  geom_point(data=pca_inds, mapping=aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=7) +
+  geom_point(data=pca_inds, mapping=aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=7, position=position_jitter(h=0.05, w=0.05)) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   scale_color_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   coord_fixed(ratio=1) +
@@ -262,19 +263,19 @@ print(pcaPlot)
 
 pca_vars <- data.frame(get_mca_var(pca_data, "var")$coord[,1:2])
 pca_vars <- rownames_to_column(pca_vars, var="variable")
-pca_vars$pathwayPosition <- c(rep("aerial", 12), rep("root", 18))
-varPlot <- ggplot(data=pca_vars, mapping=aes(x=Dim.1, y=Dim.2, label=variable, color=pathwayPosition)) +
+pca_vars$metaboliteClass <- c(rep("4'-hydroxyflavone", 12), rep("4'-deoxyflavone", 16), rep("Phenylethanoid", 2))
+varPlot <- ggplot(data=pca_vars, mapping=aes(x=Dim.1, y=Dim.2, label=variable, color=metaboliteClass)) +
   geom_hline(mapping=aes(yintercept=0), color="darkgray", linetype="dashed") +
   geom_vline(mapping=aes(xintercept=0), color="darkgray", linetype="dashed") +
   geom_point(size=5) +
   geom_text_repel(color="black", point.padding=0.5) +
-  scale_color_manual(values=c("#47acff", "#ff8d4f"), name="Predicted site of accumulation:", breaks=c("aerial", "root"), labels=c("Leaves & stems     ", "Roots     "))  +
+  scale_color_npg(name="Metabolite class:")  +
   coord_fixed(ratio=1) +
   coord_cartesian(xlim=c(-1.55, 1.55), ylim=c(-1.55, 1.55)) +
   xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
   ylab(paste("PC2 (", pc2_expl, "%)", sep="")) +
   theme_classic() +
-  theme(legend.position="bottom",
+  theme(legend.position="top",
         panel.grid.major=element_line(size=0.5), panel.grid.minor=element_line(size=0.25),
         axis.title=element_text(size=14), axis.text=element_text(size=12),
         legend.title=element_text(size=12),

@@ -4,10 +4,10 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Remove barbata from fresh data - use only KR data
 fresh <- fresh %>%
@@ -177,7 +177,7 @@ organData$species <- factor(organData$species, levels=c(
     geom_bar(position="stack", stat="identity", width=0.5) +
     #ylim(0, 400) +
     labs(x="Species",
-         y=paste("Concentration in ", plantOrgan, " (µM)",  sep="")) +
+         y=paste("Concentration in ", plantOrgan, " (µmol/5 g FW)",  sep="")) +
     scale_fill_manual(values=metaboliteColors) +
     theme(axis.text.x=element_text(face="italic")) +
     geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), hjust=1, direction="y", nudge_x=-0.2) +
@@ -238,7 +238,7 @@ cladeLabels <- ggplot(data=plotCladeData) +
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
 rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/rootPlotClades.png",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/rootPlotClades.png",
        plot=rootPlotClades,
        device=png(),
        width=30, height=25, units="cm")
@@ -246,7 +246,7 @@ ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/sta
 
 shootPlot <- createStackedBars(allData, metaboliteColors, "shoots")
 shootPlotClades <- plot_grid(shootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/shootPlotClades.png",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/shootPlotClades.png",
        plot=shootPlotClades,
        device=png(),
        width=30, height=25, units="cm")
@@ -254,7 +254,7 @@ ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/sta
 
 leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
 leafPlotClades <- plot_grid(leafPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/leafPlotClades.png",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/leafPlotClades.png",
        plot=leafPlotClades,
        device=png(),
        width=30, height=25, units="cm")
