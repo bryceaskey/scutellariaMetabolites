@@ -9,13 +9,13 @@ compatibility with additional processing and visualization functions:
 
 Notes:
 1)	Each data point should be unique (i.e. there shouldn't be 2+ entries for any
-	given species-organ-metabolite combination).
+		given species-organ-metabolite combination).
 2)	Data points that aren't organ-specific should be specified by entering "all" in 
-	the "organ" column of the corresponding row.
+		the "organ" column of the corresponding row.
 3)	Data points without replicates should be specified by entering "NA" in the
-	"stError(ppm)" column of the corresponding row.
+		"stError(ppm)" column of the corresponding row.
 
 Sample info:
-Data for fresh samples (20190813_fresh, 20200117_frozenKR) is from samples prepared
-at 5000 ppm. Data for dried samples (20200214_herbarium1_30, 20200812_herbarium31_78)
-is from samples prepared at 1000 ppm.
+Data for fresh samples (20190813_fresh, 20200117_frozenKR, 20201007_wrightii) is from samples prepared
+at 5000 ppm. Data for dried samples (20200214_herbarium1_30, 20200812_herbarium31_78) is from samples 
+prepared at 1000 ppm.

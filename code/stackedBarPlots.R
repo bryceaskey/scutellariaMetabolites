@@ -41,7 +41,19 @@ allData$species <- as.factor(allData$species)
 # Average together any duplicate data points
 allData <- allData %>%
   group_by(species, organ, metabolite) %>%
-  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
+  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm)) %>%
+  ungroup()
+
+# Adjust fresh ppm to correct for dilution
+# Data is saved at 5000 ppm. Divide by 5 to calculate at 1000 ppm (= umol/1 g FW)
+allData <- allData %>%
+  transmute(
+    species=species,
+    organ=organ,
+    metabolite=metabolite,
+    concentration_ppm=concentration_ppm/5,
+    stError_ppm=stError_ppm/5
+  )
 
 # Define function to convert units of ppm to micromol/L
 ppm2microM <- function(input_ppm, metaboliteName){
@@ -177,7 +189,7 @@ organData$species <- factor(organData$species, levels=c(
     geom_bar(position="stack", stat="identity", width=0.5) +
     #ylim(0, 400) +
     labs(x="Species",
-         y=paste("Concentration in ", plantOrgan, " (µmol/5 g FW)",  sep="")) +
+         y=paste("Concentration in ", plantOrgan, " (µmol/g FW)",  sep="")) +
     scale_fill_manual(values=metaboliteColors) +
     theme(axis.text.x=element_text(face="italic")) +
     geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), hjust=1, direction="y", nudge_x=-0.2) +
@@ -234,7 +246,7 @@ cladeLabels <- ggplot(data=plotCladeData) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(-600,0,0,50,"pt"))
+        plot.margin=margin(-600,-4,0,52,"pt"))
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
 rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))

@@ -11,25 +11,6 @@ herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data
 wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
 cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
-# Adjust herbarium ppm to correct for dilution
-herbarium1_30 <- herbarium1_30 %>%
-  transmute(
-    species=species,
-    organ=organ,
-    metabolite=metabolite,
-    concentration_ppm=concentration_ppm/2,
-    stError_ppm=stError_ppm/2
-  )
-
-herbarium31_78 <- herbarium31_78 %>%
-  transmute(
-    species=species,
-    organ=organ,
-    metabolite=metabolite,
-    concentration_ppm=concentration_ppm/2,
-    stError_ppm=stError_ppm/2
-  )
-
 # Specify any species, organs, or metabolites to be removed
 speciesToRemove <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
 organsToRemove <- paste(c("flowers", "roots"), collapse = '|')
@@ -70,7 +51,18 @@ freshData$species <- factor(freshData$species)
 # Average together duplicate species, and leaf and shoot data
 freshData <- freshData %>%
   group_by(species, metabolite) %>%
-  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
+  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm)) %>%
+  ungroup()
+
+# Adjust fresh ppm to correct for dilution
+# Data is saved at 5000 ppm. Divide by 5 to calculate at 1000 ppm (= umol/1 g FW)
+freshData <- freshData %>%
+  transmute(
+    species=species,
+    metabolite=metabolite,
+    concentration_ppm=concentration_ppm/5,
+    stError_ppm=stError_ppm/5
+  )
 
 # Processing for herbarium samples ----
 herbariumData <- rbind(herbarium1_30, herbarium31_78)
@@ -103,7 +95,18 @@ herbariumData$species <- factor(herbariumData$species)
 # Average together duplicate species, and leaf and shoot data
 herbariumData <- herbariumData %>%
   group_by(species, metabolite) %>%
-  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
+  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm)) %>%
+  ungroup()
+
+# Adjust herbarium ppm to correct for dilution
+# Data is saved at 1000 ppm. Divide by 10 to calculate at 100 ppm (= umol/0.1 g DW)
+herbariumData <- herbariumData %>%
+  transmute(
+    species=species,
+    metabolite=metabolite,
+    concentration_ppm=concentration_ppm/10,
+    stError_ppm=stError_ppm/10
+  )
 
 # Merge fresh and herbarium data ----
 # If both fresh and herbarium samples are available for a species, the herbarium data should be used
@@ -117,7 +120,7 @@ freshData$species <- as.character(freshData$species)
 herbariumData$species <- as.character(herbariumData$species)
 heatmapData <- rbind(freshData, herbariumData)
 
-# Define function to convert units of ppm to micromol/L
+# Define function to convert units of ppm to micromol/L ----
 ppm2microM <- function(input_ppm, metaboliteName){
   if(!is.na(input_ppm)){
     if(metaboliteName=="acetoside"){ #PubChem CID: 5281800 
@@ -280,7 +283,7 @@ heatmapData$metabolite <- factor(heatmapData$metabolite, levels=sapply(flavonoid
 heatmap <- ggplot(data=heatmapData) +
   geom_raster(mapping=aes(x=species, y=metabolite, fill=concentration_microM)) +
   scale_fill_viridis() +
-  labs(y="Flavonoid", fill="Concentration") +
+  labs(y="Flavonoid", fill="Concentration \n(µmol/g FW)") +
   coord_flip() +
   theme(axis.title.x=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, size=12, margin=margin(5,0,0,0), color="black"),
         axis.title.y=element_blank(), axis.text.y=element_text(size=12, margin=margin(0,20,0,0), face="italic", color="black"),

@@ -15,25 +15,6 @@ herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data
 wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
 cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
-# Adjust herbarium ppm to correct for dilution
-herbarium1_30 <- herbarium1_30 %>%
-  transmute(
-    species=species,
-    organ=organ,
-    metabolite=metabolite,
-    concentration_ppm=concentration_ppm/2,
-    stError_ppm=stError_ppm/2
-  )
-
-herbarium31_78 <- herbarium31_78 %>%
-  transmute(
-    species=species,
-    organ=organ,
-    metabolite=metabolite,
-    concentration_ppm=concentration_ppm/2,
-    stError_ppm=stError_ppm/2
-  )
-
 # Specify any species, organs, or metabolites to be removed
 speciesToRemove <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
 organsToRemove <- paste(c("flowers", "roots"), collapse = '|')
@@ -70,11 +51,21 @@ freshData$species <- factor(freshData$species)
 # Average together duplicate species, and leaf and shoot data
 freshData <- freshData %>%
   group_by(species, metabolite) %>%
-  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
+  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm)) %>%
+  ungroup()
+
+# Adjust fresh ppm to correct for dilution
+# Data is saved at 5000 ppm. Divide by 5 to calculate at 1000 ppm (= umol/1 g FW)
+freshData <- freshData %>%
+  transmute(
+    species=species,
+    metabolite=metabolite,
+    concentration_ppm=concentration_ppm/5,
+    stError_ppm=stError_ppm/5
+  )
 
 # Processing for herbarium samples ----
 herbariumData <- rbind(herbarium1_30, herbarium31_78)
-
 herbariumData$species <- factor(herbariumData$species)
 herbariumData$organ <- factor(herbariumData$organ)
 herbariumData$metabolite <- factor(herbariumData$metabolite)
@@ -103,7 +94,18 @@ herbariumData$species <- factor(herbariumData$species)
 # Average together duplicate species, and leaf and shoot data
 herbariumData <- herbariumData %>%
   group_by(species, metabolite) %>%
-  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
+  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm)) %>%
+  ungroup()
+
+# Adjust herbarium ppm to correct for dilution
+# Data is saved at 1000 ppm. Divide by 10 to calculate at 100 ppm (= umol/0.1 g DW)
+herbariumData <- herbariumData %>%
+  transmute(
+    species=species,
+    metabolite=metabolite,
+    concentration_ppm=concentration_ppm/10,
+    stError_ppm=stError_ppm/10
+  )
 
 # Merge fresh and herbarium data ----
 # If both fresh and herbarium samples are available for a species, the herbarium data should be used
@@ -248,7 +250,7 @@ for(i in levels(pca_inds$clade)){
 pcaPlot <- ggplot() +
   geom_polygon(data=ellipse_allClade_0.80, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), linetype=1, fill=NA, size=1) +
   #geom_polygon(data=ellipse_allClade_0.80, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), linetype=1, fill=NA, size=1) +
-  geom_point(data=pca_inds, mapping=aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=7, position=position_jitter(h=0.05, w=0.05)) +
+  geom_point(data=pca_inds, mapping=aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=6, position=position_jitter(h=0.05, w=0.05)) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   scale_color_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
   coord_fixed(ratio=1) +

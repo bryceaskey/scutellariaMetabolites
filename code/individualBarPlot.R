@@ -49,7 +49,19 @@ allData$organ <- droplevels(allData$organ)
 # Average together any duplicate data points
 allData <- allData %>%
   group_by(species, organ, metabolite) %>%
-  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm))
+  summarise(concentration_ppm=mean(concentration_ppm), stError_ppm=mean(stError_ppm)) %>%
+  ungroup()
+
+# Adjust fresh ppm to correct for dilution
+# Data is saved at 5000 ppm. Divide by 5 to calculate at 1000 ppm (= umol/1 g FW)
+allData <- allData %>%
+  transmute(
+    species=species,
+    organ=organ,
+    metabolite=metabolite,
+    concentration_ppm=concentration_ppm/5,
+    stError_ppm=stError_ppm/5
+  )
 
 # Define function to convert units of ppm to micromol/L
 ppm2microM <- function(input_ppm, metaboliteName){
@@ -134,7 +146,7 @@ createIndividualBars <- function(allData, metaboliteColors, indMetabolite){
     geom_col(position="dodge") +
     geom_errorbar(mapping=aes(ymin=concentration_microM-stError_microM, ymax=concentration_microM+stError_microM), color="black", width=0.2, position=position_dodge(0.9)) +
     scale_fill_manual(values=c("#47acff", "#62c44d", "#ff8d4f"), name="Organ:", breaks=c("leaves", "stems", "roots"), labels=c("Leaf     ", "Stem     ", "Root")) +
-    labs(y=paste(indMetabolite, "concentration (µmol/5 g FW)")) +
+    labs(y=paste(indMetabolite, "concentration (µmol/g FW)")) +
     theme_classic() +
     theme(panel.grid.major=element_line(size=0.5), panel.grid.minor=element_line(size=0.25),
           axis.title.x=element_blank(), axis.title.y=element_text(size=16), axis.text.y=element_text(size=14, color="black"),
@@ -166,7 +178,7 @@ plotCladeData$cladeList <- factor(plotCladeData$cladeList, levels=c(1, 2, 3, 4, 
 
 # Create row of colored circles to represent phylogenetic clade
 cladeLabels <- ggplot(data=plotCladeData) +
-  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=0.6, size=7) +
+  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=0.6, size=6) +
   scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
