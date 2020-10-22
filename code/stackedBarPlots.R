@@ -4,10 +4,10 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Remove barbata from fresh data - use only KR data
 fresh <- fresh %>%
@@ -109,7 +109,7 @@ allData$concentration_microM <- concentration_microM
 allData$stError_microM <- stError_microM
 
 allData$metabolite <- as.character(allData$metabolite)
-allData$metabolite[allData$metabolite=="acetoside"] <- "aceteoside"
+allData$metabolite[allData$metabolite=="acetoside"] <- "acteoside"
 allData$metabolite <- factor(allData$metabolite)
 
 # Capitalize first letter of each flavonoid name
@@ -123,7 +123,7 @@ allData$metabolite <- sapply(allData$metabolite, capString)
 # Set order of metabolites to appear in heatmaps based on pathway
 allData$metabolite <- factor(allData$metabolite, levels=c(
   "Apigenin", "ApigeninG", "Scutellarein", "Scutellarin", "Hispidulin", "HispidulinG",
-  "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Aceteoside")
+  "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Acteoside")
 ) 
 # Set order of metabolites to appear in heatmaps based on heirarchical clustering
 #allData$metabolite <- factor(allData$metabolite, levels=c(
@@ -254,7 +254,7 @@ cladeLabels <- ggplot(data=plotCladeData) +
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
 rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/rootPlotClades.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/rootPlotClades.png",
        plot=rootPlotClades,
        device=png(),
        width=30, height=25, units="cm")
@@ -262,7 +262,7 @@ ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stacked
 
 shootPlot <- createStackedBars(allData, metaboliteColors, "shoots")
 shootPlotClades <- plot_grid(shootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/shootPlotClades.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/shootPlotClades.png",
        plot=shootPlotClades,
        device=png(),
        width=30, height=25, units="cm")
@@ -270,7 +270,7 @@ ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stacked
 
 leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
 leafPlotClades <- plot_grid(leafPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/leafPlotClades.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/leafPlotClades.png",
        plot=leafPlotClades,
        device=png(),
        width=30, height=25, units="cm")
