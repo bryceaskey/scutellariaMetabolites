@@ -108,6 +108,10 @@ for(i in 1:nrow(allData)){
 allData$concentration_microM <- concentration_microM
 allData$stError_microM <- stError_microM
 
+allData$metabolite <- as.character(allData$metabolite)
+allData$metabolite[allData$metabolite=="acetoside"] <- "aceteoside"
+allData$metabolite <- factor(allData$metabolite)
+
 # Capitalize first letter of each flavonoid name
 capString <- function(string) {
   c <- strsplit(string, " ")[[1]]
@@ -119,7 +123,7 @@ allData$metabolite <- sapply(allData$metabolite, capString)
 # Set order of metabolites to appear in heatmaps based on pathway
 allData$metabolite <- factor(allData$metabolite, levels=c(
   "Apigenin", "ApigeninG", "Scutellarein", "Scutellarin", "Hispidulin", "HispidulinG",
-  "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Acetoside")
+  "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Aceteoside")
 ) 
 # Set order of metabolites to appear in heatmaps based on heirarchical clustering
 #allData$metabolite <- factor(allData$metabolite, levels=c(

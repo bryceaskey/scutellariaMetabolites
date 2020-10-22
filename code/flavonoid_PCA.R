@@ -173,6 +173,10 @@ for(i in 1:nrow(allData)){
 allData$concentration_microM <- concentration_microM
 allData$stError_microM <- stError_microM
 
+allData$metabolite <- as.character(allData$metabolite)
+allData$metabolite[allData$metabolite=="acetoside"] <- "aceteoside"
+allData$metabolite <- factor(allData$metabolite)
+
 # Transform data into wide format to use for heirarchical clustering 
 speciesData <- subset(allData, select=-c(concentration_ppm, stError_ppm, stError_microM))
 speciesData <- speciesData %>%
@@ -205,7 +209,7 @@ for(i in 1:15){
   speciesData[, i] <- as.logical(speciesData[, i])
 }
 speciesData <- speciesData[c("Apigenin", "ApigeninG", "Scutellarein", "Scutellarin", "Hispidulin", "HispidulinG",
-                             "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Acetoside",
+                             "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Aceteoside",
                              "clade")]
 pca_data <- MCA(speciesData[, c(1:15)], 
                 #group=c(6,9),

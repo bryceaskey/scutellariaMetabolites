@@ -66,7 +66,6 @@ freshData <- freshData %>%
 
 # Processing for herbarium samples ----
 herbariumData <- rbind(herbarium1_30, herbarium31_78)
-
 herbariumData$species <- factor(herbariumData$species)
 herbariumData$organ <- factor(herbariumData$organ)
 herbariumData$metabolite <- factor(herbariumData$metabolite)
@@ -204,8 +203,11 @@ heatmapData$species <- droplevels(heatmapData$species)
 # Adjust flavonoid order in heatmap data to match order in dendrogram
 #flavonoidOrder <- label(flavonoidDenData)$label
 # Adjust flavonoid order in heatmap data to match order in biosynthetic pathway
+heatmapData$metabolite <- as.character(heatmapData$metabolite)
+heatmapData$metabolite[heatmapData$metabolite=="acetoside"] <- "aceteoside"
+heatmapData$metabolite <- factor(heatmapData$metabolite)
 flavonoidOrder <- c("apigenin", "apigeninG", "scutellarein", "scutellarin", "hispidulin", "hispidulinG",
-                    "chrysin", "chrysinG", "baicalein", "baicalin", "oroxylinA", "oroxyloside", "wogonin", "wogonoside", "acetoside")
+                    "chrysin", "chrysinG", "baicalein", "baicalin", "oroxylinA", "oroxyloside", "wogonin", "wogonoside", "aceteoside")
 heatmapData$metabolite <- factor(heatmapData$metabolite, levels=flavonoidOrder)
 
 # Load clade data from phylogenetic tree generated from chloroplast genome
