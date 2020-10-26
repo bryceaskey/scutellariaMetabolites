@@ -269,13 +269,13 @@ print(pcaPlot)
 
 pca_vars <- data.frame(get_mca_var(pca_data, "var")$coord[,1:2])
 pca_vars <- rownames_to_column(pca_vars, var="variable")
-pca_vars$metaboliteClass <- c(rep("4'-hydroxyflavone", 12), rep("4'-deoxyflavone", 16), rep("Phenylpropanoid", 2))
+pca_vars$metaboliteClass <- c(rep("4'-hydroxyflavone", 12), rep("4'-deoxyflavone", 16), rep("Acteoside", 2))
 varPlot <- ggplot(data=pca_vars, mapping=aes(x=Dim.1, y=Dim.2, label=variable, color=metaboliteClass)) +
   geom_hline(mapping=aes(yintercept=0), color="darkgray", linetype="dashed") +
   geom_vline(mapping=aes(xintercept=0), color="darkgray", linetype="dashed") +
   geom_point(size=5) +
   geom_text_repel(color="black", point.padding=0.5) +
-  scale_color_npg(name="Metabolite class:")  +
+  scale_color_npg(name="Metabolite:")  +
   coord_fixed(ratio=1) +
   coord_cartesian(xlim=c(-1.55, 1.55), ylim=c(-1.55, 1.55)) +
   xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
