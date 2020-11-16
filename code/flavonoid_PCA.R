@@ -254,9 +254,11 @@ for(i in levels(pca_inds$clade)){
 pcaPlot <- ggplot() +
   geom_polygon(data=ellipse_allClade_0.80, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), linetype=1, fill=NA, size=1) +
   #geom_polygon(data=ellipse_allClade_0.80, mapping=aes(x=pc1, y=pc2, color=clade, group=clade), linetype=1, fill=NA, size=1) +
-  geom_point(data=pca_inds, mapping=aes(x=pc1_ind, y=pc2_ind, fill=clade), color="black", pch=21, size=6, position=position_jitter(h=0.05, w=0.05)) +
-  scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
-  scale_color_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF")) +
+  geom_hline(mapping=aes(yintercept=0), color="darkgray", linetype="dashed") +
+  geom_vline(mapping=aes(xintercept=0), color="darkgray", linetype="dashed") +
+  geom_point(data=pca_inds, mapping=aes(x=pc1_ind, y=pc2_ind, fill=clade), shape=21, color="black", size=5, position=position_jitter(h=0.05, w=0.05)) +
+  scale_fill_manual(values=c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8"), drop=FALSE, na.value=NA) +
+  scale_color_manual(values=c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8"), drop=FALSE, na.value=NA) +
   coord_fixed(ratio=1) +
   coord_cartesian(xlim=c(-1, 1), ylim=c(-1, 1)) +
   xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
@@ -270,16 +272,18 @@ print(pcaPlot)
 pca_vars <- data.frame(get_mca_var(pca_data, "var")$coord[,1:2])
 pca_vars <- rownames_to_column(pca_vars, var="variable")
 pca_vars$metaboliteClass <- c(rep("4'-hydroxyflavone", 12), rep("4'-deoxyflavone", 16), rep("Acteoside", 2))
-varPlot <- ggplot(data=pca_vars, mapping=aes(x=Dim.1, y=Dim.2, label=variable, color=metaboliteClass)) +
+varPlot <- ggplot(data=pca_vars, mapping=aes(x=Dim.1, y=Dim.2, label=variable, fill=metaboliteClass)) +
   geom_hline(mapping=aes(yintercept=0), color="darkgray", linetype="dashed") +
   geom_vline(mapping=aes(xintercept=0), color="darkgray", linetype="dashed") +
-  geom_point(size=5) +
+  geom_point(size=5, shape=21, color="black") +
   geom_text_repel(color="black", point.padding=0.5) +
-  scale_color_npg(name="Metabolite:")  +
+  scale_fill_npg(name="Metabolite:")  +
   coord_fixed(ratio=1) +
   coord_cartesian(xlim=c(-1.55, 1.55), ylim=c(-1.55, 1.55)) +
   xlab(paste("PC1 (", pc1_expl, "%)", sep="")) +
   ylab(paste("PC2 (", pc2_expl, "%)", sep="")) +
+  scale_x_continuous(breaks=c(-1.5, -1.0, -0.5, 0, 0.5, 1.0, 1.5)) +
+  scale_y_continuous(breaks=c(-1.5, -1.0, -0.5, 0, 0.5, 1.0, 1.5)) +
   theme_classic() +
   theme(legend.position="top",
         panel.grid.major=element_line(size=0.5), panel.grid.minor=element_line(size=0.25),

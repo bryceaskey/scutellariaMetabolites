@@ -239,11 +239,11 @@ heatmapCladeData$y <- (nrow(heatmapCladeData)+1)-heatmapCladeData$y
 
 # Create column of colored circles to represent phylogenetic clade
 cladeLabels <- ggplot(data=heatmapCladeData) +
-  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=0.6, size=5.5) +
-  scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
+  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", size=4.5) +
+  scale_fill_manual(values=c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8"), drop=FALSE, na.value=NA) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(21,0,34,-610,"pt"))
+        plot.margin=margin(20.5,0,34,-610,"pt"))
 
 # Label fresh data with asterisks
 freshLabelData <- data.frame(x=numeric(), y=numeric(), speciesList=factor())

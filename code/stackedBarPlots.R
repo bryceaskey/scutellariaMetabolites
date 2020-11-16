@@ -21,7 +21,7 @@ allData$organ <- as.factor(allData$organ)
 allData$metabolite <- as.factor(allData$metabolite)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastafolia", "hastifolia"), collapse = '|')
+excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastafolia", "hastifolia", "arenicola"), collapse = '|')
 excludeOrgans <- paste(c("flowers"), collapse = '|')
 # excludeMetabolites <- paste(c(), collapse = '|')
 allData <- allData %>%
@@ -182,7 +182,8 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
 organData$species <- paste("S.", organData$species)
 organData$species <- factor(organData$species, levels=c(
   "S. havanensis", "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii",
-  "S. arenicola", "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"))
+  #"S. arenicola",
+  "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"))
   organData <- organData %>%
     group_by(species) %>%
     mutate(text_x = as.numeric(species) - 0.25)
@@ -200,26 +201,26 @@ organData$species <- factor(organData$species, levels=c(
     if(plantOrgan=="roots"){
       theme(legend.position="none",
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
+            axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#ffe0cf"),
-            text=element_text(size=20),
+            text=element_text(size=18),
             plot.margin=margin(0, 0, 2, 0, unit="cm"))
     }else if(plantOrgan=="stems"){
       theme(legend.position="none", 
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
+            axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#d5ffcc"),
-            text=element_text(size=20),
+            text=element_text(size=18),
             plot.margin=margin(0, 0, 2, 0, unit="cm"))
     }else{
       theme(legend.position="none",
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=20, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(30, 0, 0, 0)),
+            axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background = element_rect(fill="#cce8ff"),
-            text=element_text(size=20),
+            text=element_text(size=18),
             plot.margin=margin(0, 0, 2, 0, unit="cm"))
     }
 }
@@ -227,7 +228,8 @@ organData$species <- factor(organData$species, levels=c(
 # Get clade data for all species to be plotted
 allData$species <- factor(allData$species, levels=c(
   "havanensis", "insignis", "indica var. coccinea", "barbata", "racemosa", "strigillosa", "dependens", "wrightii",
-  "arenicola", "baicalensis", "tournefortii", "altissima", "leonardii", "pekinensis var. alpina")
+  #"arenicola",
+  "baicalensis", "tournefortii", "altissima", "leonardii", "pekinensis var. alpina")
 )
 speciesList <- vector(mode="character", length=length(levels(allData$species)))
 cladeList <- vector(mode="numeric", length=length(levels(allData$species)))
@@ -246,11 +248,12 @@ plotCladeData$cladeList <- factor(plotCladeData$cladeList, levels=c(1, 2, 3, 4, 
 
 # Create row of colored circles to represent phylogenetic clade
 cladeLabels <- ggplot(data=plotCladeData) +
-  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", stroke=0.6, size=7) +
-  scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
+  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", size=6.5) +
+  scale_fill_manual(values=c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8"), drop=FALSE, na.value=NA) +
+  #scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(-600,-4,0,52,"pt"))
+        plot.margin=margin(-558,0,0,49,"pt"))
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
 rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
