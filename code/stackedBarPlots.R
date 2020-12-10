@@ -257,7 +257,7 @@ cladeLabels <- ggplot(data=plotCladeData) +
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
 rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/rootPlotClades.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/rootPlot.png",
        plot=rootPlotClades,
        device=png(),
        width=30, height=25, units="cm")
@@ -265,7 +265,7 @@ ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/sta
 
 shootPlot <- createStackedBars(allData, metaboliteColors, "shoots")
 shootPlotClades <- plot_grid(shootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/shootPlotClades.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/stemPlot.png",
        plot=shootPlotClades,
        device=png(),
        width=30, height=25, units="cm")
@@ -273,10 +273,12 @@ ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/sta
 
 leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
 leafPlotClades <- plot_grid(leafPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/leafPlotClades.png",
+ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/leafPlot.png",
        plot=leafPlotClades,
        device=png(),
        width=30, height=25, units="cm")
+
+dev.off()
 
 #justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
