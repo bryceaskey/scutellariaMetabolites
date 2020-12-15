@@ -7,6 +7,7 @@ library(cowplot)
 fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
 frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
 wrightii <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+suffrutescens <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
 cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Remove barbata from fresh data - use only KR data
@@ -15,13 +16,13 @@ fresh <- fresh %>%
 
 # Combine all data into a single data frame and change classifiers (species, organs, metabolites)
 # into factors
-allData <- rbind(fresh, frozenKR, wrightii)
+allData <- rbind(fresh, frozenKR, wrightii, suffrutescens)
 allData$species <- as.factor(allData$species)
 allData$organ <- as.factor(allData$organ)
 allData$metabolite <- as.factor(allData$metabolite)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastafolia", "hastifolia", "arenicola"), collapse = '|')
+excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastafolia", "hastifolia", "arenicola", "havenesis"), collapse = '|')
 excludeOrgans <- paste(c("flowers"), collapse = '|')
 # excludeMetabolites <- paste(c(), collapse = '|')
 allData <- allData %>%
@@ -181,7 +182,8 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
   
 organData$species <- paste("S.", organData$species)
 organData$species <- factor(organData$species, levels=c(
-  "S. havanensis", "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii",
+  #"S. havanensis",
+  "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii", "S. suffrutescens",
   #"S. arenicola",
   "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"))
   organData <- organData %>%
@@ -227,7 +229,8 @@ organData$species <- factor(organData$species, levels=c(
 
 # Get clade data for all species to be plotted
 allData$species <- factor(allData$species, levels=c(
-  "havanensis", "insignis", "indica var. coccinea", "barbata", "racemosa", "strigillosa", "dependens", "wrightii",
+  #"havanensis",
+  "insignis", "indica var. coccinea", "barbata", "racemosa", "strigillosa", "dependens", "wrightii", "suffrutescens",
   #"arenicola",
   "baicalensis", "tournefortii", "altissima", "leonardii", "pekinensis var. alpina")
 )

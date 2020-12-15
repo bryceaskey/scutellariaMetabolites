@@ -1,4 +1,4 @@
-library(tidyr)
+library(tidyverse)
 
 rawData <- read.csv(file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/20201119_suffrutescens.csv", header=TRUE)
 colnames(rawData)[1] <- "injectionName"
@@ -50,10 +50,10 @@ ppmConversion <- function(peakArea, flavonoidName, mix1Rows, mix2Rows, rawData){
   }
 }
 
-mix1Rows <- c(5:12)
-mix2Rows <- c(14:21)
-dataRows <- c(23:31)
-wrightiiData <- data.frame(
+mix1Rows <- c(4:11)
+mix2Rows <- c(13:20)
+dataRows <- c(22:30)
+sufData <- data.frame(
   species=sapply(rawData$injection[dataRows], getSampleName),
   organ=sapply(rawData$injection[dataRows], getSampleOrgan),
   apigenin=sapply(rawData$apigenin[dataRows], ppmConversion, flavonoidName="apigenin", mix1Rows=mix1Rows, mix2Rows=mix2Rows, rawData=rawData),
@@ -73,10 +73,10 @@ wrightiiData <- data.frame(
   acetoside=sapply(rawData$acetoside[dataRows], ppmConversion, flavonoidName="acteoside", mix1Rows=mix1Rows, mix2Rows=mix2Rows, rawData=rawData)
 )
 
-wrightiiData <- pivot_longer(wrightiiData, cols=c(3:17), names_to="metabolite", values_to="concentration_ppm")
-wrightiiData <- wrightiiData %>%
+sufData <- pivot_longer(sufData, cols=c(3:17), names_to="metabolite", values_to="concentration_ppm")
+sufData <- sufData %>%
   group_by(species, organ, metabolite) %>%
   summarise(concentration_ppm_mean=mean(concentration_ppm), stError_ppm=sd(concentration_ppm)/sqrt(3))
-colnames(wrightiiData)[4] <- "concentration_ppm"
+colnames(sufData)[4] <- "concentration_ppm"
 
-write.csv(wrightiiData, file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")
+write.csv(sufData, file="C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")
