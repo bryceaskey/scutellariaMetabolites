@@ -4,11 +4,11 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-suffrutescens <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Remove barbata from fresh data - use only KR data
 fresh <- fresh %>%
@@ -16,13 +16,13 @@ fresh <- fresh %>%
 
 # Combine all data into a single data frame and change classifiers (species, organs, metabolites)
 # into factors
-allData <- rbind(fresh, frozenKR, wrightii)
+allData <- rbind(fresh, frozenKR, wrightii, suffrutescens)
 allData$species <- as.factor(allData$species)
 allData$organ <- as.factor(allData$organ)
 allData$metabolite <- as.factor(allData$metabolite)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastafolia", "hastifolia", "arenicola", "havanesis"), collapse = '|')
+excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastafolia", "hastifolia", "arenicola", "havenesis"), collapse = '|')
 excludeOrgans <- paste(c("flowers"), collapse = '|')
 # excludeMetabolites <- paste(c(), collapse = '|')
 allData <- allData %>%
@@ -140,7 +140,8 @@ createIndividualBars <- function(allData, metaboliteColors, indMetabolite){
   
   graphData$species <- paste("S.", graphData$species)
   graphData$species <- factor(graphData$species, levels=c(
-    "S. havanensis", "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii",
+    #"S. havanensis", 
+    "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii", "S. suffrutescens",
     #"S. arenicola", 
     "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"))
   
@@ -160,7 +161,8 @@ createIndividualBars <- function(allData, metaboliteColors, indMetabolite){
 
 # Get clade data for all species to be plotted
 allData$species <- factor(allData$species, levels=c(
-  "havanensis", "insignis", "indica var. coccinea", "barbata", "racemosa", "strigillosa", "dependens", "wrightii",
+  #"havanensis", 
+  "insignis", "indica var. coccinea", "barbata", "racemosa", "strigillosa", "dependens", "wrightii", "suffrutescens",
   #"arenicola",
   "baicalensis", "tournefortii", "altissima", "leonardii", "pekinensis var. alpina")
 )
@@ -190,14 +192,14 @@ cladeLabels <- ggplot(data=plotCladeData) +
 
 OroxylinA_plot <- createIndividualBars(allData, metaboliteColors, "OroxylinA")
 OroxylinA_plot_withClades <- plot_grid(OroxylinA_plot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/indBarPlots/OroxylinA_plot.png",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/indBarPlots/OroxylinA_plot.png",
        plot=OroxylinA_plot_withClades,
        device=png(),
        width=25, height=20, units="cm")
 
 Oroxyloside_plot <- createIndividualBars(allData, metaboliteColors, "Oroxyloside")
 Oroxyloside_plot_withClades <- plot_grid(Oroxyloside_plot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/indBarPlots/Oroxyloside_plot.png",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/indBarPlots/Oroxyloside_plot.png",
        plot=Oroxyloside_plot_withClades,
        device=png(),
        width=25, height=20, units="cm")
