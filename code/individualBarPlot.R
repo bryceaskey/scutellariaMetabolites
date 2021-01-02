@@ -4,11 +4,11 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Remove barbata from fresh data - use only KR data
 fresh <- fresh %>%
@@ -72,7 +72,7 @@ ppm2microM <- function(input_ppm, metaboliteName){
     }else if(metaboliteName=="apigenin"){ #PubChem CID: 5280443
       output_microM <- (input_ppm/270.24)*1000
     }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5280704
-      output_microM <- (input_ppm/432.4)*1000
+      output_microM <- (input_ppm/446.4)*1000
     }else if(metaboliteName=="baicalein"){ #PubChem CID: 5281605
       output_microM <- (input_ppm/270.24)*1000
     }else if(metaboliteName=="baicalin"){ #PubChem CID: 64982
@@ -80,11 +80,11 @@ ppm2microM <- function(input_ppm, metaboliteName){
     }else if(metaboliteName=="chrysin"){ #PubChem CID: 5281607
       output_microM <- (input_ppm/254.24)*1000
     }else if(metaboliteName=="chrysinG"){ #PubChem CID: 90658886
-      output_microM <- (input_ppm/416.4)*1000
+      output_microM <- (input_ppm/430.4)*1000
     }else if(metaboliteName=="hispidulin"){ #PubChem CID: 5281628
       output_microM <- (input_ppm/300.26)*1000
     }else if(metaboliteName=="hispidulinG"){ #PubChem CID: 5318083
-      output_microM <- (input_ppm/462.4)*1000
+      output_microM <- (input_ppm/476.4)*1000
     }else if(metaboliteName=="oroxylinA"){ #PubChem CID: 5320315
       output_microM <- (input_ppm/284.26)*1000
     }else if(metaboliteName=="oroxyloside"){ #PubChem CID: 14655551
@@ -123,6 +123,11 @@ capString <- function(string) {
   paste(toupper(substring(c, 1,1)), substring(c, 2), sep="", collapse=" ")
 }
 allData$metabolite <- as.character(allData$metabolite)
+allData$metabolite[allData$metabolite=="acetoside"] <- "acteoside"
+allData$metabolite[allData$metabolite=="apigeninG"] <- "apigenin 7-G"
+allData$metabolite[allData$metabolite=="chrysinG"] <- "chrysin 7-G"
+allData$metabolite[allData$metabolite=="hispidulinG"] <- "hispidulin 7-G"
+allData$metabolite[allData$metabolite=="oroxylinA"] <- "oroxylin A"
 allData$metabolite <- sapply(allData$metabolite, capString)
 
 # Set order of organs to appear in plot
@@ -131,10 +136,11 @@ allData$organ <- factor(allData$organ, levels=c("leaves", "stems", "roots"))
 # Set colors to be used for metabolites across all plots
 metaboliteColors <- c(
   "#4726dd", "#006bff", "#008afe", "#009ec2", "#00ad76", "#169E18", 
-  "#eff238", "#ffd320", "#ffb329", "#ff9040", "#ff6d5a", "#ff4b76", "#ff3291", "#e52dab", "#D12DE5")
+  "#eff238", "#ffd320", "#ffb329", "#ff9040", "#ff6d5a", "#ff4b76", "#ff3291", "#e52dab", 
+  "#8c2de5")
 names(metaboliteColors) <- levels(allData$metabolite)
 
-createIndividualBars <- function(allData, metaboliteColors, indMetabolite){
+createIndividualBars <- function(allData, metaboliteColors, indMetabolite, axisLabels=TRUE, legend=TRUE){
   graphData <- allData %>%
     filter(metabolite==indMetabolite)
   
@@ -154,7 +160,16 @@ createIndividualBars <- function(allData, metaboliteColors, indMetabolite){
     theme(panel.grid.major=element_line(size=0.5), panel.grid.minor=element_line(size=0.25),
           axis.title.x=element_blank(), axis.title.y=element_text(size=16), axis.text.y=element_text(size=14, color="black"),
           axis.text.x=element_text(size=14, face="italic", color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
-          legend.position="top", legend.title=element_text(size=14, face="bold"), legend.text=element_text(size=14))
+          legend.position="top", legend.title=element_text(size=14), legend.text=element_text(size=14))
+  
+  if(axisLabels == FALSE){
+    indBarPlot <- indBarPlot + theme(axis.text.x=element_blank())
+  }
+  
+  if(legend == FALSE){
+    indBarPlot <- indBarPlot + theme(legend.position="none")
+  }
+  
   
   return(indBarPlot)
 }
@@ -190,16 +205,11 @@ cladeLabels <- ggplot(data=plotCladeData) +
         plot.margin=margin(-357,6,0,43.5,"pt"))
 
 
-OroxylinA_plot <- createIndividualBars(allData, metaboliteColors, "OroxylinA")
-OroxylinA_plot_withClades <- plot_grid(OroxylinA_plot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/indBarPlots/OroxylinA_plot.png",
-       plot=OroxylinA_plot_withClades,
-       device=png(),
-       width=25, height=20, units="cm")
+OroxylinAPlot <- createIndividualBars(allData, metaboliteColors, "Oroxylin A", axisLabels=FALSE, legend=TRUE)
 
-Oroxyloside_plot <- createIndividualBars(allData, metaboliteColors, "Oroxyloside")
-Oroxyloside_plot_withClades <- plot_grid(Oroxyloside_plot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/indBarPlots/Oroxyloside_plot.png",
-       plot=Oroxyloside_plot_withClades,
-       device=png(),
-       width=25, height=20, units="cm")
+OroxylosidePlot <- createIndividualBars(allData, metaboliteColors, "Oroxyloside", axisLabels=TRUE, legend=FALSE)
+OroxylosidePlotClades <- plot_grid(OroxylosidePlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
+
+combinedPlot <- plot_grid(OroxylinAPlot, OroxylosidePlotClades, nrow=2, ncol=1, rel_heights=c(1,1.40))
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/indBarPlots/combinedPlot.png",
+       plot=combinedPlot, device=png(), width=20, height=32, units="cm")

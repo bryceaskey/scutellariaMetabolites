@@ -4,11 +4,11 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-suffrutescens <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Remove barbata from fresh data - use only KR data
 fresh <- fresh %>%
@@ -64,7 +64,7 @@ ppm2microM <- function(input_ppm, metaboliteName){
     }else if(metaboliteName=="apigenin"){ #PubChem CID: 5280443
       output_microM <- (input_ppm/270.24)*1000
     }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5280704
-      output_microM <- (input_ppm/432.4)*1000
+      output_microM <- (input_ppm/446.4)*1000
     }else if(metaboliteName=="baicalein"){ #PubChem CID: 5281605
       output_microM <- (input_ppm/270.24)*1000
     }else if(metaboliteName=="baicalin"){ #PubChem CID: 64982
@@ -72,11 +72,11 @@ ppm2microM <- function(input_ppm, metaboliteName){
     }else if(metaboliteName=="chrysin"){ #PubChem CID: 5281607
       output_microM <- (input_ppm/254.24)*1000
     }else if(metaboliteName=="chrysinG"){ #PubChem CID: 90658886
-      output_microM <- (input_ppm/416.4)*1000
+      output_microM <- (input_ppm/430.4)*1000
     }else if(metaboliteName=="hispidulin"){ #PubChem CID: 5281628
       output_microM <- (input_ppm/300.26)*1000
     }else if(metaboliteName=="hispidulinG"){ #PubChem CID: 5318083
-      output_microM <- (input_ppm/462.4)*1000
+      output_microM <- (input_ppm/476.4)*1000
     }else if(metaboliteName=="oroxylinA"){ #PubChem CID: 5320315
       output_microM <- (input_ppm/284.26)*1000
     }else if(metaboliteName=="oroxyloside"){ #PubChem CID: 14655551
@@ -111,6 +111,10 @@ allData$stError_microM <- stError_microM
 
 allData$metabolite <- as.character(allData$metabolite)
 allData$metabolite[allData$metabolite=="acetoside"] <- "acteoside"
+allData$metabolite[allData$metabolite=="apigeninG"] <- "apigenin 7-G"
+allData$metabolite[allData$metabolite=="chrysinG"] <- "chrysin 7-G"
+allData$metabolite[allData$metabolite=="hispidulinG"] <- "hispidulin 7-G"
+allData$metabolite[allData$metabolite=="oroxylinA"] <- "oroxylin A"
 allData$metabolite <- factor(allData$metabolite)
 
 # Capitalize first letter of each flavonoid name
@@ -123,8 +127,9 @@ allData$metabolite <- sapply(allData$metabolite, capString)
 
 # Set order of metabolites to appear in heatmaps based on pathway
 allData$metabolite <- factor(allData$metabolite, levels=c(
-  "Apigenin", "ApigeninG", "Scutellarein", "Scutellarin", "Hispidulin", "HispidulinG",
-  "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Acteoside")
+  "Apigenin", "Apigenin 7-G", "Scutellarein", "Scutellarin", "Hispidulin", "Hispidulin 7-G",
+  "Chrysin", "Chrysin 7-G", "Baicalein", "Baicalin", "Oroxylin A", "Oroxyloside", "Wogonin", "Wogonoside",
+  "Acteoside")
 ) 
 # Set order of metabolites to appear in heatmaps based on heirarchical clustering
 #allData$metabolite <- factor(allData$metabolite, levels=c(
@@ -139,7 +144,8 @@ allData$metNum <- as.numeric(allData$metabolite)
 # Set colors to be used for metabolites across all plots
 metaboliteColors <- c(
   "#4726dd", "#006bff", "#008afe", "#009ec2", "#00ad76", "#169E18", 
-  "#eff238", "#ffd320", "#ffb329", "#ff9040", "#ff6d5a", "#ff4b76", "#ff3291", "#e52dab", "#D12DE5")
+  "#eff238", "#ffd320", "#ffb329", "#ff9040", "#ff6d5a", "#ff4b76", "#ff3291", "#e52dab", 
+  "#8c2de5")
 names(metaboliteColors) <- levels(allData$metabolite)
 
 # Function to create color legend for scaled pie charts
@@ -150,7 +156,8 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
           legend.direction=legendOrientation, 
           legend.text=element_text(size=16), 
           legend.title=element_text(size=20),
-          legend.key.size=unit(1, "cm")) +
+          legend.key.size=unit(1, "cm"),
+          legend.box.margin=unit(c(-8.5,0,0,0.5), "cm")) +
     labs(fill="Flavonoid") +
     scale_fill_manual(name="Metabolite", values=metaboliteColors, labels=paste(seq(1, 15), ". ", names(metaboliteColors), sep=""))
   legend <- get_legend(x)
@@ -207,23 +214,25 @@ organData$species <- factor(organData$species, levels=c(
             axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#ffe0cf"),
             text=element_text(size=18),
-            plot.margin=margin(0, 0, 2, 0, unit="cm"))
+            plot.margin=margin(0, 0, -1.75, 0, unit="cm"))
     }else if(plantOrgan=="stems"){
       theme(legend.position="none", 
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
+            axis.text.x=element_blank(),
+            #axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background=element_rect(fill="#d5ffcc"),
             text=element_text(size=18),
-            plot.margin=margin(0, 0, 2, 0, unit="cm"))
+            plot.margin=margin(0, 0, 0.25, 0, unit="cm"))
     }else{
       theme(legend.position="none",
             axis.title.x=element_blank(),
-            axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
+            axis.text.x=element_blank(),
+            #axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
             axis.text.y=element_text(color="#000000"),
             panel.background = element_rect(fill="#cce8ff"),
             text=element_text(size=18),
-            plot.margin=margin(0, 0, 2, 0, unit="cm"))
+            plot.margin=margin(0, 0, 0.25, 0, unit="cm"))
     }
 }
 
@@ -256,50 +265,37 @@ cladeLabels <- ggplot(data=plotCladeData) +
   #scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(-558,0,0,49,"pt"))
+        plot.margin=margin(-390,0,0,49,"pt"))
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
-rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/rootPlot.png",
-       plot=rootPlotClades,
-       device=png(),
-       width=30, height=25, units="cm")
+#rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
+#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/rootPlot.png",
+#       plot=rootPlotClades,
+#       device=png(),
+#       width=30, height=25, units="cm")
 
 
 shootPlot <- createStackedBars(allData, metaboliteColors, "shoots")
-shootPlotClades <- plot_grid(shootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/stemPlot.png",
-       plot=shootPlotClades,
-       device=png(),
-       width=30, height=25, units="cm")
+#shootPlotClades <- plot_grid(shootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
+#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/stemPlot.png",
+#       plot=shootPlotClades,
+#       device=png(),
+#       width=30, height=25, units="cm")
 
 
 leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
-leafPlotClades <- plot_grid(leafPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-ggsave(filename="C:/Users/bca08_000/Documents/scutellariaMetabolites/figures/stackedBarPlots/leafPlot.png",
-       plot=leafPlotClades,
-       device=png(),
-       width=30, height=25, units="cm")
+#leafPlotClades <- plot_grid(leafPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
+#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/leafPlot.png",
+#       plot=leafPlotClades,
+#       device=png(),
+#       width=30, height=25, units="cm")
 
-dev.off()
+legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
+
+allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights=c(1,1,1.415), align="v", axis="l")
+allOrganCladePlot <- plot_grid(allOrganPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1,0.05))
+completePlot <- plot_grid(allOrganCladePlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.25))
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.png",
+       plot=completePlot, device=png(), width=35, height=50, units="cm")
 
 #justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))
-legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
-print(plot_grid(legend), nrow=1, ncol=1)
-
-finalRootFigure <- plot_grid(rootPlot, legend,
-  nrow=1, ncol=2, 
-  rel_widths=c(1, 0.2))
-#print(finalRootFigure)
-
-finalShootFigure <- plot_grid(shootPlot, legend,
-  nrow=1, ncol=2, 
-  rel_widths=c(1, 0.2))
-#print(finalShootFigure)
-
-finalLeafFigure <- plot_grid(leafPlot, legend,
-  nrow=1, ncol=2,
-  rel_widths=c(1, 0.2))
-#print(finalLeafFigure)
-
-# Export at size 1800x1000

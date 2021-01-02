@@ -4,12 +4,12 @@ library(cowplot)
 library(viridis)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
-herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+herbarium1_30 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+herbarium31_78 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Specify any species, organs, or metabolites to be removed
 speciesToRemove <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
@@ -126,20 +126,20 @@ ppm2microM <- function(input_ppm, metaboliteName){
       output_microM <- (input_ppm/624.6)*1000
     }else if(metaboliteName=="apigenin"){ #PubChem CID: 5280443
       output_microM <- (input_ppm/270.24)*1000
-    }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5491384
-      output_microM <- (input_ppm/432.4)*1000
+    }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5319484
+      output_microM <- (input_ppm/446.4)*1000
     }else if(metaboliteName=="baicalein"){ #PubChem CID: 5281605
       output_microM <- (input_ppm/270.24)*1000
     }else if(metaboliteName=="baicalin"){ #PubChem CID: 64982
       output_microM <- (input_ppm/446.4)*1000
     }else if(metaboliteName=="chrysin"){ #PubChem CID: 5281607
       output_microM <- (input_ppm/254.24)*1000
-    }else if(metaboliteName=="chrysinG"){ #PubChem CID: 90658886
-      output_microM <- (input_ppm/416.4)*1000
+    }else if(metaboliteName=="chrysinG"){ #PubChem CID: 44257628
+      output_microM <- (input_ppm/430.4)*1000
     }else if(metaboliteName=="hispidulin"){ #PubChem CID: 5281628
       output_microM <- (input_ppm/300.26)*1000
-    }else if(metaboliteName=="hispidulinG"){ #PubChem CID: 5318083
-      output_microM <- (input_ppm/462.4)*1000
+    }else if(metaboliteName=="hispidulinG"){ #PubChem CID: 44258434
+      output_microM <- (input_ppm/476.4)*1000
     }else if(metaboliteName=="oroxylinA"){ #PubChem CID: 5320315
       output_microM <- (input_ppm/284.26)*1000
     }else if(metaboliteName=="oroxyloside"){ #PubChem CID: 14655551
@@ -205,10 +205,20 @@ heatmapData$species <- droplevels(heatmapData$species)
 # Adjust flavonoid order in heatmap data to match order in biosynthetic pathway
 heatmapData$metabolite <- as.character(heatmapData$metabolite)
 heatmapData$metabolite[heatmapData$metabolite=="acetoside"] <- "acteoside"
+heatmapData$metabolite[heatmapData$metabolite=="apigeninG"] <- "apigenin 7-G"
+heatmapData$metabolite[heatmapData$metabolite=="chrysinG"] <- "chrysin 7-G"
+heatmapData$metabolite[heatmapData$metabolite=="hispidulinG"] <- "hispidulin 7-G"
+heatmapData$metabolite[heatmapData$metabolite=="oroxylinA"] <- "oroxylin A"
 heatmapData$metabolite <- factor(heatmapData$metabolite)
-flavonoidOrder <- c("apigenin", "apigeninG", "scutellarein", "scutellarin", "hispidulin", "hispidulinG",
-                    "chrysin", "chrysinG", "baicalein", "baicalin", "oroxylinA", "oroxyloside", "wogonin", "wogonoside", "acteoside")
+flavonoidOrder <- c("apigenin", "apigenin 7-G", "scutellarein", "scutellarin", "hispidulin", "hispidulin 7-G",
+                    "chrysin", "chrysin 7-G", "baicalein", "baicalin", "oroxylin A", "oroxyloside", "wogonin", "wogonoside", "acteoside")
 heatmapData$metabolite <- factor(heatmapData$metabolite, levels=flavonoidOrder)
+
+heatmapData$metabolite_group <- NA
+heatmapData$metabolite_group[heatmapData$metabolite %in% c("apigenin", "apigenin 7-G", "scutellarein", "scutellarin", "hispidulin", "hispidulin 7-G")] <- "4'-hydroxyflavones"
+heatmapData$metabolite_group[heatmapData$metabolite %in% c("chrysin", "chrysin 7-G", "baicalein", "baicalin", "oroxylin A", "oroxyloside", "wogonin", "wogonoside")] <- "4'-deoxyflavones"
+heatmapData$metabolite_group[heatmapData$metabolite=="acteoside"] <- " "
+heatmapData$metabolite_group <- factor(heatmapData$metabolite_group, levels=c("4'-hydroxyflavones", "4'-deoxyflavones", " "))
 
 # Load clade data from phylogenetic tree generated from chloroplast genome
 speciesList <- vector(mode="character", length=length(levels(heatmapData$species)))
@@ -243,7 +253,7 @@ cladeLabels <- ggplot(data=heatmapCladeData) +
   scale_fill_manual(values=c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8"), drop=FALSE, na.value=NA) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(20.5,0,34,-610,"pt"))
+        plot.margin=margin(21,0,69,-610,"pt"))
 
 # Label fresh data with asterisks
 freshLabelData <- data.frame(x=numeric(), y=numeric(), speciesList=factor())
@@ -254,7 +264,7 @@ freshLabels <- ggplot(data=freshLabelData) +
   geom_point(mapping=aes(x=x, y=y), shape=8, color="black", size=2.5) +
   ylim(1, length(speciesList)) +
   theme_void() +
-  theme(plot.margin=margin(21,0,34,-49,"pt"))
+  theme(plot.margin=margin(21,0,69,-49,"pt"))
 
 # Capitalize first letter of each flavonoid name
 capString <- function(string) {
@@ -287,10 +297,12 @@ heatmap <- ggplot(data=heatmapData) +
   scale_fill_viridis() +
   labs(y="Flavonoid", fill="Concentration \n(µmol/g FW)") +
   coord_flip() +
+  facet_grid(~metabolite_group, scales="free_x", space="free_x", switch="x") +
   theme(axis.title.x=element_blank(), axis.text.x=element_text(angle=90, vjust=0.5, hjust=1, size=12, margin=margin(5,0,0,0), color="black"),
         axis.title.y=element_blank(), axis.text.y=element_text(size=12, margin=margin(0,20,0,0), face="italic", color="black"),
         legend.position="top", legend.direction="horizontal", legend.title=element_text(size=14), legend.text=element_text(size=12), legend.key.size=unit(0.75, "cm"),
-        panel.background=element_blank())
+        panel.background=element_blank(), panel.spacing=unit(0, "lines"),
+        strip.text.x=element_text(size=12, color="black"), strip.placement="outside", strip.background=element_rect(fill="white"), axis.title=element_blank())
 
 # Combine dendrograms and heatmap into 1 figure
 heatmap <- plot_grid(heatmap, cladeLabels, freshLabels, nrow=1, rel_widths=c(1.5, 0.05, 0.05))
@@ -298,7 +310,7 @@ heatmap <- plot_grid(heatmap, cladeLabels, freshLabels, nrow=1, rel_widths=c(1.5
 #flavonoidDendogram <- plot_grid(flavonoidDenPlot)
 
 # Export dendrograms and heatmaps separately
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmaps/heatmap.png",
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/heatmaps/heatmap.png",
   plot=heatmap,
   device=png(),
   width=18, height=45, units="cm")
@@ -339,7 +351,7 @@ flavonoidAbundance <- flavonoidAbundance[order(flavonoidAbundance$totalCount), ]
 print("Flavonoids in order of abundance:")
 print(flavonoidAbundance)
 
-deoxyflavones <- heatmapData[heatmapData$metabolite %in% c("Chrysin", "ChrysinG", "Baicalin", "Baicalein", "Wogonin", "Wogonoside", "OroxylinA", "Oroxyloside"), ]
+deoxyflavones <- heatmapData[heatmapData$metabolite %in% c("Chrysin", "Chrysin 7-G", "Baicalin", "Baicalein", "Wogonin", "Wogonoside", "Oroxylin A", "Oroxyloside"), ]
 deoxyflavones <- deoxyflavones %>%
   group_by(species) %>%
   summarise(totalDeoxyflavoneContent=sum(concentration_microM))
