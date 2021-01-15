@@ -138,8 +138,8 @@ ppm2microM <- function(input_ppm, metaboliteName){
       output_microM <- (input_ppm/430.4)*1000
     }else if(metaboliteName=="hispidulin"){ #PubChem CID: 5281628
       output_microM <- (input_ppm/300.26)*1000
-    }else if(metaboliteName=="hispidulinG"){ #PubChem CID: 44258434
-      output_microM <- (input_ppm/476.4)*1000
+    }else if(metaboliteName=="hispidulinG"){ #PubChem CID: 5318083
+      output_microM <- (input_ppm/462.4)*1000
     }else if(metaboliteName=="oroxylinA"){ #PubChem CID: 5320315
       output_microM <- (input_ppm/284.26)*1000
     }else if(metaboliteName=="oroxyloside"){ #PubChem CID: 14655551
@@ -207,15 +207,15 @@ heatmapData$metabolite <- as.character(heatmapData$metabolite)
 heatmapData$metabolite[heatmapData$metabolite=="acetoside"] <- "acteoside"
 heatmapData$metabolite[heatmapData$metabolite=="apigeninG"] <- "apigenin 7-G"
 heatmapData$metabolite[heatmapData$metabolite=="chrysinG"] <- "chrysin 7-G"
-heatmapData$metabolite[heatmapData$metabolite=="hispidulinG"] <- "hispidulin 7-G"
+heatmapData$metabolite[heatmapData$metabolite=="hispidulinG"] <- "hispiduloside"
 heatmapData$metabolite[heatmapData$metabolite=="oroxylinA"] <- "oroxylin A"
 heatmapData$metabolite <- factor(heatmapData$metabolite)
-flavonoidOrder <- c("apigenin", "apigenin 7-G", "scutellarein", "scutellarin", "hispidulin", "hispidulin 7-G",
+flavonoidOrder <- c("apigenin", "apigenin 7-G", "scutellarein", "scutellarin", "hispidulin", "hispiduloside",
                     "chrysin", "chrysin 7-G", "baicalein", "baicalin", "oroxylin A", "oroxyloside", "wogonin", "wogonoside", "acteoside")
 heatmapData$metabolite <- factor(heatmapData$metabolite, levels=flavonoidOrder)
 
 heatmapData$metabolite_group <- NA
-heatmapData$metabolite_group[heatmapData$metabolite %in% c("apigenin", "apigenin 7-G", "scutellarein", "scutellarin", "hispidulin", "hispidulin 7-G")] <- "4'-hydroxyflavones"
+heatmapData$metabolite_group[heatmapData$metabolite %in% c("apigenin", "apigenin 7-G", "scutellarein", "scutellarin", "hispidulin", "hispiduloside")] <- "4'-hydroxyflavones"
 heatmapData$metabolite_group[heatmapData$metabolite %in% c("chrysin", "chrysin 7-G", "baicalein", "baicalin", "oroxylin A", "oroxyloside", "wogonin", "wogonoside")] <- "4'-deoxyflavones"
 heatmapData$metabolite_group[heatmapData$metabolite=="acteoside"] <- " "
 heatmapData$metabolite_group <- factor(heatmapData$metabolite_group, levels=c("4'-hydroxyflavones", "4'-deoxyflavones", " "))
@@ -253,7 +253,7 @@ cladeLabels <- ggplot(data=heatmapCladeData) +
   scale_fill_manual(values=c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8"), drop=FALSE, na.value=NA) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(21,0,69,-610,"pt"))
+        plot.margin=margin(21,0,64,-610,"pt"))
 
 # Label fresh data with asterisks
 freshLabelData <- data.frame(x=numeric(), y=numeric(), speciesList=factor())
@@ -264,7 +264,7 @@ freshLabels <- ggplot(data=freshLabelData) +
   geom_point(mapping=aes(x=x, y=y), shape=8, color="black", size=2.5) +
   ylim(1, length(speciesList)) +
   theme_void() +
-  theme(plot.margin=margin(21,0,69,-49,"pt"))
+  theme(plot.margin=margin(21,0,64,-49,"pt"))
 
 # Capitalize first letter of each flavonoid name
 capString <- function(string) {

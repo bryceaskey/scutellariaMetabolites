@@ -8,12 +8,12 @@ library(ggrepel)
 library(ggsci)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
-herbarium31_78 <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/bca08_000/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+herbarium1_30 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
+herbarium31_78 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Specify any species, organs, or metabolites to be removed
 speciesToRemove <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
@@ -127,16 +127,16 @@ ppm2microM <- function(input_ppm, metaboliteName){
       output_microM <- (input_ppm/624.6)*1000
     }else if(metaboliteName=="apigenin"){ #PubChem CID: 5280443
       output_microM <- (input_ppm/270.24)*1000
-    }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5280704
-      output_microM <- (input_ppm/432.4)*1000
+    }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5319484
+      output_microM <- (input_ppm/446.4)*1000
     }else if(metaboliteName=="baicalein"){ #PubChem CID: 5281605
       output_microM <- (input_ppm/270.24)*1000
     }else if(metaboliteName=="baicalin"){ #PubChem CID: 64982
       output_microM <- (input_ppm/446.4)*1000
     }else if(metaboliteName=="chrysin"){ #PubChem CID: 5281607
       output_microM <- (input_ppm/254.24)*1000
-    }else if(metaboliteName=="chrysinG"){ #PubChem CID: 90658886
-      output_microM <- (input_ppm/416.4)*1000
+    }else if(metaboliteName=="chrysinG"){ #PubChem CID: 44257628
+      output_microM <- (input_ppm/430.4)*1000
     }else if(metaboliteName=="hispidulin"){ #PubChem CID: 5281628
       output_microM <- (input_ppm/300.26)*1000
     }else if(metaboliteName=="hispidulinG"){ #PubChem CID: 5318083
@@ -175,6 +175,11 @@ allData$stError_microM <- stError_microM
 
 allData$metabolite <- as.character(allData$metabolite)
 allData$metabolite[allData$metabolite=="acetoside"] <- "acteoside"
+allData$metabolite[allData$metabolite=="acetoside"] <- "acteoside"
+allData$metabolite[allData$metabolite=="apigeninG"] <- "apigenin 7-G"
+allData$metabolite[allData$metabolite=="chrysinG"] <- "chrysin 7-G"
+allData$metabolite[allData$metabolite=="hispidulinG"] <- "hispiduloside"
+allData$metabolite[allData$metabolite=="oroxylinA"] <- "oroxylin A"
 allData$metabolite <- factor(allData$metabolite)
 
 # Transform data into wide format to use for heirarchical clustering 
@@ -208,8 +213,8 @@ speciesData$clade <- factor(cladeList)
 for(i in 1:15){
   speciesData[, i] <- as.logical(speciesData[, i])
 }
-speciesData <- speciesData[c("Apigenin", "ApigeninG", "Scutellarein", "Scutellarin", "Hispidulin", "HispidulinG",
-                             "Chrysin", "ChrysinG", "Baicalein", "Baicalin", "OroxylinA", "Oroxyloside", "Wogonin", "Wogonoside", "Acteoside",
+speciesData <- speciesData[c("Apigenin", "Apigenin 7-G", "Scutellarein", "Scutellarin", "Hispidulin", "Hispiduloside",
+                             "Chrysin", "Chrysin 7-G", "Baicalein", "Baicalin", "Oroxylin A", "Oroxyloside", "Wogonin", "Wogonoside", "Acteoside",
                              "clade")]
 pca_data <- MCA(speciesData[, c(1:15)], 
                 #group=c(6,9),
@@ -272,11 +277,13 @@ print(pcaPlot)
 pca_vars <- data.frame(get_mca_var(pca_data, "var")$coord[,1:2])
 pca_vars <- rownames_to_column(pca_vars, var="variable")
 pca_vars$metaboliteClass <- c(rep("4'-hydroxyflavone", 12), rep("4'-deoxyflavone", 16), rep("Acteoside", 2))
+pca_vars$metaboliteClass <- factor(pca_vars$metaboliteClass, levels=c("4'-hydroxyflavone", "4'-deoxyflavone", "Acteoside"))
 varPlot <- ggplot(data=pca_vars, mapping=aes(x=Dim.1, y=Dim.2, label=variable, fill=metaboliteClass)) +
   geom_hline(mapping=aes(yintercept=0), color="darkgray", linetype="dashed") +
   geom_vline(mapping=aes(xintercept=0), color="darkgray", linetype="dashed") +
   geom_point(size=5, shape=21, color="black") +
-  geom_text_repel(color="black", point.padding=0.5) +
+  geom_text_repel(data=subset(pca_vars, Dim.1<0), color="black", nudge_x=-0.5, direction="y", point.padding=1, box.padding=0.3, min.segment.length=0.25) +
+  geom_text_repel(data=subset(pca_vars, Dim.1>0), color="black", nudge_x=0.5, direction="y", point.padding=1, box.padding=0.3, min.segment.length=0.25) +
   scale_fill_npg(name="Metabolite:")  +
   coord_fixed(ratio=1) +
   coord_cartesian(xlim=c(-1.55, 1.55), ylim=c(-1.55, 1.55)) +

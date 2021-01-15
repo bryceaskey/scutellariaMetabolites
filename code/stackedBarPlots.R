@@ -63,7 +63,7 @@ ppm2microM <- function(input_ppm, metaboliteName){
       output_microM <- (input_ppm/624.6)*1000
     }else if(metaboliteName=="apigenin"){ #PubChem CID: 5280443
       output_microM <- (input_ppm/270.24)*1000
-    }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5280704
+    }else if(metaboliteName=="apigeninG"){ #PubChem CID: 5319484
       output_microM <- (input_ppm/446.4)*1000
     }else if(metaboliteName=="baicalein"){ #PubChem CID: 5281605
       output_microM <- (input_ppm/270.24)*1000
@@ -71,12 +71,12 @@ ppm2microM <- function(input_ppm, metaboliteName){
       output_microM <- (input_ppm/446.4)*1000
     }else if(metaboliteName=="chrysin"){ #PubChem CID: 5281607
       output_microM <- (input_ppm/254.24)*1000
-    }else if(metaboliteName=="chrysinG"){ #PubChem CID: 90658886
+    }else if(metaboliteName=="chrysinG"){ #PubChem CID: 44257628
       output_microM <- (input_ppm/430.4)*1000
     }else if(metaboliteName=="hispidulin"){ #PubChem CID: 5281628
       output_microM <- (input_ppm/300.26)*1000
     }else if(metaboliteName=="hispidulinG"){ #PubChem CID: 5318083
-      output_microM <- (input_ppm/476.4)*1000
+      output_microM <- (input_ppm/462.4)*1000
     }else if(metaboliteName=="oroxylinA"){ #PubChem CID: 5320315
       output_microM <- (input_ppm/284.26)*1000
     }else if(metaboliteName=="oroxyloside"){ #PubChem CID: 14655551
@@ -113,7 +113,7 @@ allData$metabolite <- as.character(allData$metabolite)
 allData$metabolite[allData$metabolite=="acetoside"] <- "acteoside"
 allData$metabolite[allData$metabolite=="apigeninG"] <- "apigenin 7-G"
 allData$metabolite[allData$metabolite=="chrysinG"] <- "chrysin 7-G"
-allData$metabolite[allData$metabolite=="hispidulinG"] <- "hispidulin 7-G"
+allData$metabolite[allData$metabolite=="hispidulinG"] <- "hispiduloside"
 allData$metabolite[allData$metabolite=="oroxylinA"] <- "oroxylin A"
 allData$metabolite <- factor(allData$metabolite)
 
@@ -127,7 +127,7 @@ allData$metabolite <- sapply(allData$metabolite, capString)
 
 # Set order of metabolites to appear in heatmaps based on pathway
 allData$metabolite <- factor(allData$metabolite, levels=c(
-  "Apigenin", "Apigenin 7-G", "Scutellarein", "Scutellarin", "Hispidulin", "Hispidulin 7-G",
+  "Apigenin", "Apigenin 7-G", "Scutellarein", "Scutellarin", "Hispidulin", "Hispiduloside",
   "Chrysin", "Chrysin 7-G", "Baicalein", "Baicalin", "Oroxylin A", "Oroxyloside", "Wogonin", "Wogonoside",
   "Acteoside")
 ) 
