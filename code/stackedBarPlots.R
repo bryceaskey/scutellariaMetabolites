@@ -4,11 +4,11 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Remove barbata from fresh data - use only KR data
 fresh <- fresh %>%
@@ -154,10 +154,10 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
     geom_bar(mapping=aes(x="", y=concentration_microM, fill=metabolite), stat="identity") +
     theme(legend.position="bottom", 
           legend.direction=legendOrientation, 
-          legend.text=element_text(size=16), 
-          legend.title=element_text(size=20),
-          legend.key.size=unit(1, "cm"),
-          legend.box.margin=unit(c(-8.5,0,0,0.5), "cm")) +
+          legend.text=element_text(size=8), 
+          legend.title=element_text(size=8),
+          legend.key.size=unit(0.5, "cm"),
+          legend.box.margin=unit(c(-3.7,0,0,0.1), "cm")) +
     labs(fill="Flavonoid") +
     scale_fill_manual(name="Metabolite", values=metaboliteColors, labels=paste(seq(1, 15), ". ", names(metaboliteColors), sep=""))
   legend <- get_legend(x)
@@ -187,53 +187,56 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
     }
   }
   
-organData$species <- paste("S.", organData$species)
-organData$species <- factor(organData$species, levels=c(
-  #"S. havanensis",
-  "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii", "S. suffrutescens",
-  #"S. arenicola",
-  "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"))
-  organData <- organData %>%
-    group_by(species) %>%
-    mutate(text_x = as.numeric(species) - 0.25)
+  organData$species <- paste("S.", organData$species)
+  organData$species <- str_wrap(organData$species, width=16)
   
-  if(plantOrgan=="shoots"){plantOrgan <- "stems"}
   
-  chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
-    geom_bar(position="stack", stat="identity", width=0.5) +
-    #ylim(0, 400) +
-    labs(x="Species",
-         y=paste("Concentration in ", plantOrgan, " (µmol/g FW)",  sep="")) +
-    scale_fill_manual(values=metaboliteColors) +
-    theme(axis.text.x=element_text(face="italic")) +
-    geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), hjust=1, direction="y", nudge_x=-0.2) +
-    if(plantOrgan=="roots"){
-      theme(legend.position="none",
-            axis.title.x=element_blank(),
-            axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
-            axis.text.y=element_text(color="#000000"),
-            panel.background=element_rect(fill="#ffe0cf"),
-            text=element_text(size=18),
-            plot.margin=margin(0, 0, -1.75, 0, unit="cm"))
-    }else if(plantOrgan=="stems"){
-      theme(legend.position="none", 
-            axis.title.x=element_blank(),
-            axis.text.x=element_blank(),
-            #axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
-            axis.text.y=element_text(color="#000000"),
-            panel.background=element_rect(fill="#d5ffcc"),
-            text=element_text(size=18),
-            plot.margin=margin(0, 0, 0.25, 0, unit="cm"))
-    }else{
-      theme(legend.position="none",
-            axis.title.x=element_blank(),
-            axis.text.x=element_blank(),
-            #axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
-            axis.text.y=element_text(color="#000000"),
-            panel.background = element_rect(fill="#cce8ff"),
-            text=element_text(size=18),
-            plot.margin=margin(0, 0, 0.25, 0, unit="cm"))
-    }
+  organData$species <- factor(organData$species, levels=str_wrap(c(
+    #"S. havanensis",
+    "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii", "S. suffrutescens",
+    #"S. arenicola",
+    "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"), width=16))
+    organData <- organData %>%
+      group_by(species) %>%
+      mutate(text_x = as.numeric(species) - 0.25)
+    
+    levels(organData$species) <- str_wrap(levels(organData$species), width=16)
+    
+    if(plantOrgan=="shoots"){plantOrgan <- "stems"}
+    
+    chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
+      geom_bar(position="stack", stat="identity", width=0.45) +
+      #ylim(0, 400) +
+      labs(x="Species",
+           y=paste("Concentration in ", plantOrgan, " (µmol/g FW)",  sep="")) +
+      scale_fill_manual(values=metaboliteColors) +
+      theme(axis.text.x=element_text(face="italic")) +
+      geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), nudge_x=-0.25, direction="y", size=6/.pt,
+                      segment.size=0.2, box.padding=0.15, segment.alpha=0.6, min.segment.length=0.25) +
+      if(plantOrgan=="roots"){
+        theme(legend.position="none",
+              axis.title.x=element_blank(),
+              axis.text.x=element_text(size=8, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(12, 0, 0, 0)),
+              axis.text.y=element_text(color="#000000", size=8), axis.title.y=element_text(color="#000000", size=8),
+              panel.background=element_rect(fill="#ffe0cf"),
+              plot.margin=margin(0, 0, 0, 0, unit="cm"))
+      }else if(plantOrgan=="stems"){
+        theme(legend.position="none", 
+              axis.title.x=element_blank(),
+              axis.text.x=element_blank(),
+              #axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
+              axis.text.y=element_text(color="#000000", size=8), axis.title.y=element_text(color="#000000", size=8),
+              panel.background=element_rect(fill="#d5ffcc"),
+              plot.margin=margin(0, 0, 0.15, 0, unit="cm"))
+      }else{
+        theme(legend.position="none",
+              axis.title.x=element_blank(),
+              axis.text.x=element_blank(),
+              #axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
+              axis.text.y=element_text(color="#000000", size=8), axis.title.y=element_text(color="#000000", size=8),
+              panel.background = element_rect(fill="#cce8ff"),
+              plot.margin=margin(0, 0, 0.15, 0, unit="cm"))
+      }
 }
 
 # Get clade data for all species to be plotted
@@ -260,12 +263,12 @@ plotCladeData$cladeList <- factor(plotCladeData$cladeList, levels=c(1, 2, 3, 4, 
 
 # Create row of colored circles to represent phylogenetic clade
 cladeLabels <- ggplot(data=plotCladeData) +
-  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", size=6.5) +
+  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", size=2.5) +
   scale_fill_manual(values=c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8"), drop=FALSE, na.value=NA) +
   #scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(-390,0,0,49,"pt"))
+        plot.margin=margin(-160,0.25,0,28.75,"pt"))
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
 #rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
@@ -292,10 +295,13 @@ leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
 
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 
-allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights=c(1,1,1.415), align="v", axis="l")
+allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights=c(1,1,1.35), align="v", axis="l")
 allOrganCladePlot <- plot_grid(allOrganPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1,0.05))
-completePlot <- plot_grid(allOrganCladePlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.25))
-ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.png",
-       plot=completePlot, device=png(), width=35, height=50, units="cm")
+completePlot <- plot_grid(allOrganCladePlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.2))
+
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.pdf",
+       plot=completePlot,
+       device=pdf(),
+       width=7.25, height=9, units="in")
 
 #justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))

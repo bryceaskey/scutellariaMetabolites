@@ -4,11 +4,11 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Remove barbata from fresh data - use only KR data
 fresh <- fresh %>%
@@ -145,22 +145,26 @@ createIndividualBars <- function(allData, metaboliteColors, indMetabolite, axisL
     filter(metabolite==indMetabolite)
   
   graphData$species <- paste("S.", graphData$species)
-  graphData$species <- factor(graphData$species, levels=c(
+  graphData$species <- str_wrap(graphData$species, width=16)
+  
+  graphData$species <- factor(graphData$species, levels=str_wrap(c(
     #"S. havanensis", 
     "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii", "S. suffrutescens",
     #"S. arenicola", 
-    "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"))
+    "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"), width=16))
   
   indBarPlot <- ggplot(data=graphData, mapping=aes(x=species, y=concentration_microM, fill=organ)) +
     geom_col(position="dodge") +
-    geom_errorbar(mapping=aes(ymin=concentration_microM-stError_microM, ymax=concentration_microM+stError_microM), color="black", width=0.2, position=position_dodge(0.9)) +
+    geom_errorbar(mapping=aes(ymin=concentration_microM-stError_microM, ymax=concentration_microM+stError_microM), color="black", width=0.35, size=0.35, position=position_dodge(0.9)) +
     scale_fill_manual(values=c("#47acff", "#62c44d", "#ff8d4f"), name="Organ:", breaks=c("leaves", "stems", "roots"), labels=c("Leaf     ", "Stem     ", "Root")) +
     labs(y=paste(indMetabolite, "concentration (µmol/g FW)")) +
     theme_classic() +
     theme(panel.grid.major=element_line(size=0.5), panel.grid.minor=element_line(size=0.25),
-          axis.title.x=element_blank(), axis.title.y=element_text(size=16), axis.text.y=element_text(size=14, color="black"),
-          axis.text.x=element_text(size=14, face="italic", color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
-          legend.position="top", legend.title=element_text(size=14), legend.text=element_text(size=14))
+          axis.title.x=element_blank(), axis.title.y=element_text(size=8), axis.text.y=element_text(size=8, color="black"),
+          axis.text.x=element_text(size=8, face="italic", color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(12, 0, 0, 0)),
+          legend.position="top", legend.title=element_text(size=8), legend.text=element_text(size=8), legend.key.size=unit(0.35, "cm"), legend.box.margin=margin(-5,0,-8,0),
+          axis.ticks=element_line(color="black")
+    )
   
   if(axisLabels == FALSE){
     indBarPlot <- indBarPlot + theme(axis.text.x=element_blank())
@@ -198,11 +202,11 @@ plotCladeData$cladeList <- factor(plotCladeData$cladeList, levels=c(1, 2, 3, 4, 
 
 # Create row of colored circles to represent phylogenetic clade
 cladeLabels <- ggplot(data=plotCladeData) +
-  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", size=6) +
+  geom_point(mapping=aes(x=x, y=y, fill=cladeList), shape=21, color="black", size=2.5) +
   scale_fill_manual(values=c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8"), drop=FALSE, na.value=NA) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(-357,6,0,43.5,"pt"))
+        plot.margin=margin(-149,5.5,0,29.75,"pt"))
 
 
 OroxylinAPlot <- createIndividualBars(allData, metaboliteColors, "Oroxylin A", axisLabels=FALSE, legend=TRUE)
@@ -211,5 +215,7 @@ OroxylosidePlot <- createIndividualBars(allData, metaboliteColors, "Oroxyloside"
 OroxylosidePlotClades <- plot_grid(OroxylosidePlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
 
 combinedPlot <- plot_grid(OroxylinAPlot, OroxylosidePlotClades, nrow=2, ncol=1, rel_heights=c(1,1.40))
-ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/indBarPlots/combinedPlot.png",
-       plot=combinedPlot, device=png(), width=20, height=32, units="cm")
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/indBarPlots/combinedPlot.pdf",
+       plot=combinedPlot,
+       device=pdf(),
+       width=5, height=6, units="in")

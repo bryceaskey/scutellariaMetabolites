@@ -569,8 +569,8 @@ totalPlot <- plot_grid(heatmap, pcaVarPlot, ncol=2, nrow=1, rel_widths=c(1,1.1),
 
 
 # Export figure
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/manuscript/Figure_3.pdf",
-       plot=totalPlot,
-       device=png(),
-       width=7.25, height=8.5, units="in")
-dev.off()
+#ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/manuscript/Figure_3.pdf",
+#       plot=totalPlot,
+#       device=pdf(),
+#       width=7.25, height=8.5, units="in")
+#dev.off()
