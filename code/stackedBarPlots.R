@@ -1,14 +1,15 @@
 library(dplyr)
 library(ggplot2)
+library(stringr)
 library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
+suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/phylo-tree-clades.csv")
 
 # Remove barbata from fresh data - use only KR data
 fresh <- fresh %>%
@@ -299,9 +300,9 @@ allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_hei
 allOrganCladePlot <- plot_grid(allOrganPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1,0.05))
 completePlot <- plot_grid(allOrganCladePlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.2))
 
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.pdf",
-       plot=completePlot,
-       device=pdf(),
-       width=7.25, height=9, units="in")
+#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.pdf",
+#       plot=completePlot,
+#       device=pdf(),
+#       width=7.25, height=9, units="in")
 
 #justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))

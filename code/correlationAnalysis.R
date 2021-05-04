@@ -574,3 +574,34 @@ totalPlot <- plot_grid(heatmap, pcaVarPlot, ncol=2, nrow=1, rel_widths=c(1,1.1),
 #       device=pdf(),
 #       width=7.25, height=8.5, units="in")
 #dev.off()
+
+# Print summary statistics
+print(paste("# of species included:", nrow(heatmapCladeData)))
+print(paste("# of species assigned to a clade:", sum(!is.na(heatmapCladeData$cladeList))))
+flavonoidAbundance <- data.frame(flavonoid=character(), totalCount=numeric(), totalPct=numeric(), avgConc=numeric(),
+                                 clade1Pct=numeric(), clade2Pct=numeric(), clade3Pct=numeric(), clade4Pct=numeric(), clade5Pct=numeric())
+for(clade in 1:5){
+  assign(paste("clade", clade, "Sp", sep=""), as.character(heatmapCladeData$speciesList[heatmapCladeData$cladeList==clade & !is.na(heatmapCladeData$cladeList)]))
+  assign(paste("clade", clade, "heatmapData", sep=""), heatmapData[heatmapData$species %in% get(paste("clade", clade, "Sp", sep="")), ])
+}
+for(flavonoid in levels(heatmapData$metabolite)){
+  occurrence <- data.frame(flavonoid=flavonoid, 
+                           totalCount=sum(heatmapData$metabolite==flavonoid & heatmapData$concentration_microM>0),
+                           totalPct=sum(heatmapData$metabolite==flavonoid & heatmapData$concentration_microM>0)/nrow(heatmapCladeData),
+                           avgConc=mean(heatmapData$concentration_microM[heatmapData$metabolite==flavonoid & heatmapData$concentration_microM>0]),
+                           clade1Pct=sum(clade1heatmapData$metabolite==flavonoid & clade1heatmapData$concentration_microM>0)/sum(clade1heatmapData$metabolite==flavonoid),
+                           clade2Pct=sum(clade2heatmapData$metabolite==flavonoid & clade2heatmapData$concentration_microM>0)/sum(clade2heatmapData$metabolite==flavonoid),
+                           clade3Pct=sum(clade3heatmapData$metabolite==flavonoid & clade3heatmapData$concentration_microM>0)/sum(clade3heatmapData$metabolite==flavonoid),
+                           clade4Pct=sum(clade4heatmapData$metabolite==flavonoid & clade4heatmapData$concentration_microM>0)/sum(clade4heatmapData$metabolite==flavonoid),
+                           clade5Pct=sum(clade5heatmapData$metabolite==flavonoid & clade5heatmapData$concentration_microM>0)/sum(clade5heatmapData$metabolite==flavonoid))
+  flavonoidAbundance <- rbind(flavonoidAbundance, occurrence)
+}
+flavonoidAbundance <- flavonoidAbundance[order(flavonoidAbundance$totalCount), ]
+print("Flavonoids in order of abundance:")
+print(flavonoidAbundance)
+
+deoxyflavones <- heatmapData[heatmapData$metabolite %in% c("Chrysin", "Chrysin 7-G", "Baicalin", "Baicalein", "Wogonin", "Wogonoside", "Oroxylin A", "Oroxyloside"), ]
+deoxyflavones <- deoxyflavones %>%
+  group_by(species) %>%
+  summarise(totalDeoxyflavoneContent=sum(concentration_microM))
+print(paste("Species with no deoxyflavones detected:", sum(deoxyflavones$totalDeoxyflavoneContent==0)))
