@@ -1,11 +1,17 @@
 library(tidyverse)
 
-rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/raw_data/20200924_freshWrightii.csv", header=TRUE)
+rawData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/raw_data/20190813_fresh.csv")
 
-# Define function to interpret injection names
+# Define functions for interpreting injection names
+abbrevNames <- data.frame(
+  abbrev=c("HV", "AC", "AS", "BT", "TT", "HF", "BL", "LD", "RMSEQ", "R071119", "R_MS", "R_SC"),
+  fullName=c("havanensis", "arenicola", "altissima", "barbata", "tournefortii", "hastifolia", "baicalensis", "leonardii", "racemosa_RNAseq", "racemosa_071119", "racemosa_MS", "racemosa_SC")
+)
+
 getSampleName <- function(injectionName){
-  sampleName <- "wrightii"
-  return(as.character(sampleName))
+  sampleAbbrev <- strsplit(injectionName, "-")[[1]][1]
+  sampleName <- abbrevNames[grep(sampleAbbrev, abbrevNames$abbrev), 2]
+  return(sampleName)
 }
 
 getSampleRep <- function(injectionName){
@@ -30,7 +36,7 @@ ppmConversion <- function(peakArea, metaboliteName, rawData=rawData){
   mix2Metabolites <- c("hispidulinG", "apigeninG", "isoscutellarin", "scutellarein", "chrysinG", "hispidulin", "chrysin")
   mix1Rows <- 5:12
   mix2Rows <- 14:21
-  scutellarinRows <- 35:42
+  scutellarinRows <- 117:124
   
   if(metaboliteName %in% mix1Metabolites){
     calibrations <- data.frame(ppm=c(0.1, 0.5, 1, 5, 10, 25, 50, 100), area=rawData[[metaboliteName]][mix1Rows])
@@ -48,7 +54,7 @@ ppmConversion <- function(peakArea, metaboliteName, rawData=rawData){
 }
 
 # Create dataframe with preprocessed data
-dataRows <- c(23:31)
+dataRows <- c(23:112)
 allData <- data.frame(
   species=sapply(rawData$injectionName[dataRows], getSampleName),
   replicate=sapply(rawData$injectionName[dataRows], getSampleRep),
@@ -71,10 +77,11 @@ allData <- data.frame(
   scutellarin=sapply(rawData$scutellarin[dataRows], ppmConversion, metaboliteName="scutellarin", rawData=rawData)
 )
 
+# Calculate mean and standard error
 allData <- pivot_longer(allData, cols=c(4:19), names_to="metabolite", values_to="concentration_ppm")
 allData <- allData %>%
   group_by(species, organ, metabolite) %>%
   summarise(concentration_ppm_mean=mean(concentration_ppm), stError_ppm=sd(concentration_ppm)/sqrt(3))
 colnames(allData)[4] <- "concentration_ppm"
 
-write.csv(allData, file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20201007_wrightii.csv", row.names=FALSE)
+write.csv(allData, file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv", row.names=FALSE)

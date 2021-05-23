@@ -1,5 +1,5 @@
 # Injection names should be standardized to match the following format:
-# Variety Abbreviation - Replicate Number - Plant Organ
+# Species Abbreviation - Replicate Number - Plant Organ
 # e.g. BL-1-R = baicalensis - 1st replicate - Root
 
 library(ggplot2)
