@@ -1,6 +1,6 @@
 library(tidyverse)
 
-rawData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/raw_data/20190813_fresh.csv")
+rawData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/raw_data/20190813_fresh.csv")
 
 # Define functions for interpreting injection names
 abbrevNames <- data.frame(
@@ -84,4 +84,4 @@ allData <- allData %>%
   summarise(concentration_ppm_mean=mean(concentration_ppm), stError_ppm=sd(concentration_ppm)/sqrt(3))
 colnames(allData)[4] <- "concentration_ppm"
 
-write.csv(allData, file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv", row.names=FALSE)
+write.csv(allData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv", row.names=FALSE)

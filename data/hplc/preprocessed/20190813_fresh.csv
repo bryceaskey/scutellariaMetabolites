@@ -56,7 +56,7 @@
 "arenicola","leaves","chrysinG",0,0
 "arenicola","leaves","hispidulin",20.196329375826,5.12500416216002
 "arenicola","leaves","hispidulinG",1.97320421816403,0.993924443831174
-"arenicola","leaves","isoscutellarin",0.08398424114223,0.0420277237387422
+"arenicola","leaves","isoscutellarin",0,0
 "arenicola","leaves","oroxylinA",0,0
 "arenicola","leaves","oroxyloside",0,0
 "arenicola","leaves","scutellarein",0.354566118411924,0.144690036932803
@@ -72,7 +72,7 @@
 "arenicola","roots","chrysinG",0,0
 "arenicola","roots","hispidulin",0,0
 "arenicola","roots","hispidulinG",0,0
-"arenicola","roots","isoscutellarin",7.09740415835572,1.47228529869144
+"arenicola","roots","isoscutellarin",0,0
 "arenicola","roots","oroxylinA",0,0
 "arenicola","roots","oroxyloside",0.380488733920522,0.138841104222603
 "arenicola","roots","scutellarein",0,0
@@ -88,7 +88,7 @@
 "arenicola","stems","chrysinG",0,0
 "arenicola","stems","hispidulin",3.8514799970296,0.351123381050501
 "arenicola","stems","hispidulinG",0.279547757774355,0.279547757774355
-"arenicola","stems","isoscutellarin",0.464330895176221,0.24639407362671
+"arenicola","stems","isoscutellarin",0,0
 "arenicola","stems","oroxylinA",0,0
 "arenicola","stems","oroxyloside",0,0
 "arenicola","stems","scutellarein",0.328863562108568,0.236670181577939
@@ -168,7 +168,7 @@
 "barbata","roots","chrysinG",0,0
 "barbata","roots","hispidulin",0,0
 "barbata","roots","hispidulinG",0,0
-"barbata","roots","isoscutellarin",0.347762029811099,0.0633734808233843
+"barbata","roots","isoscutellarin",0,0
 "barbata","roots","oroxylinA",0.107694850899117,0.00795200416852162
 "barbata","roots","oroxyloside",0.792593853739433,0.406033229630765
 "barbata","roots","scutellarein",0,0

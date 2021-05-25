@@ -1,6 +1,6 @@
 library(tidyverse)
 
-rawData <- read.csv(file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/raw_data/20201119_freshSuffrutescens.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/raw_data/20201119_freshSuffrutescens.csv", header=TRUE)
 
 # Define functions for interpreting injection names
 getSampleName <- function(injectionName){
@@ -77,4 +77,4 @@ allData <- allData %>%
   summarise(concentration_ppm_mean=mean(concentration_ppm), stError_ppm=sd(concentration_ppm)/sqrt(3))
 colnames(allData)[4] <- "concentration_ppm"
  
-write.csv(allData, file="C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv", row.names=FALSE)
+write.csv(allData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv", row.names=FALSE)
