@@ -3,15 +3,15 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20201007_wrightii.csv")
-suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201007_wrightii.csv")
+suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
 
 # Combine all data into a single data frame
 allData <- rbind(fresh, wrightii, suffrutescens)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa_071119", "racemosa_MS", "racemosa_SC", "hastifolia", "havenesis"), collapse="|")
+excludeSpecies <- paste(c("racemosa_071119", "racemosa_MS", "racemosa_SC", "hastifolia", "havanensis"), collapse="|")
 excludeOrgans <- paste(c("flowers"), collapse="|")
 excludeMetabolites <- paste(c("acteoside", "isoscutellarin"), collapse="|")
 allData <- allData %>%
@@ -166,11 +166,6 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
   organData$species <- str_wrap(organData$species, width=16)
   organData$species <- factor(organData$species)
   
-  # organData$species <- factor(organData$species, levels=str_wrap(c(
-  #   #"S. havanensis",
-  #   "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii", "S. suffrutescens",
-  #   #"S. arenicola",
-  #   "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"), width=16))
   organData <- organData %>%
     group_by(species) %>%
     mutate(text_x = as.numeric(species) - 0.25)
@@ -240,7 +235,7 @@ legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights=c(1,1,1.3), align="v", axis="l")
 completePlot <- plot_grid(allOrganPlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.2))
 
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/noKR.pdf",
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/noKR.pdf",
       plot=completePlot,
       device=pdf(),
       width=7.25, height=9, units="in")
