@@ -1,6 +1,6 @@
 library(tidyverse)
 
-rawData <- read.csv(file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/raw_data/20200924_freshWrightii.csv", header=TRUE)
+rawData <- read.csv(file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/raw_data/20210119_freshWrightii.csv", header=TRUE)
 
 # Define function to interpret injection names
 getSampleName <- function(injectionName){
@@ -28,9 +28,9 @@ getSampleOrgan <- function(injectionName){
 ppmConversion <- function(peakArea, metaboliteName, rawData=rawData){
   mix1Metabolites <- c("acteoside", "baicalin", "oroxyloside", "wogonoside", "apigenin", "baicalein", "wogonin", "oroxylinA")
   mix2Metabolites <- c("hispidulinG", "apigeninG", "isoscutellarin", "scutellarein", "chrysinG", "hispidulin", "chrysin")
-  mix1Rows <- 5:12
-  mix2Rows <- 14:21
-  scutellarinRows <- 35:42
+  mix1Rows <- 4:11
+  mix2Rows <- 13:20
+  scutellarinRows <- 33:40
   
   if(metaboliteName %in% mix1Metabolites){
     calibrations <- data.frame(ppm=c(0.1, 0.5, 1, 5, 10, 25, 50, 100), area=rawData[[metaboliteName]][mix1Rows])
@@ -48,7 +48,7 @@ ppmConversion <- function(peakArea, metaboliteName, rawData=rawData){
 }
 
 # Create dataframe with preprocessed data
-dataRows <- c(23:31)
+dataRows <- c(22:30)
 allData <- data.frame(
   species=sapply(rawData$injectionName[dataRows], getSampleName),
   replicate=sapply(rawData$injectionName[dataRows], getSampleRep),
@@ -77,4 +77,4 @@ allData <- allData %>%
   summarise(concentration_ppm_mean=mean(concentration_ppm), stError_ppm=sd(concentration_ppm)/sqrt(3))
 colnames(allData)[4] <- "concentration_ppm"
 
-write.csv(allData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201007_wrightii.csv", row.names=FALSE)
+write.csv(allData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv", row.names=FALSE)
