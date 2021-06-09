@@ -3,9 +3,9 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
-wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201007_wrightii.csv")
-suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
+wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
+suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
 
 # Combine all data into a single data frame
 allData <- rbind(fresh, wrightii, suffrutescens)
@@ -155,7 +155,7 @@ OroxylinAPlot <- createIndividualBars(allData, metaboliteColors, "Oroxylin A", a
 OroxylosidePlot <- createIndividualBars(allData, metaboliteColors, "Oroxyloside", axisLabels=TRUE, legend=FALSE)
 
 combinedPlot <- plot_grid(OroxylinAPlot, OroxylosidePlot, nrow=2, ncol=1, rel_heights=c(1,1.35))
-ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/indBarPlots/combinedPlot_noKR.pdf",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/indBarPlots/newWrightii.pdf",
        plot=combinedPlot,
        device=pdf(),
        width=5, height=6, units="in")
