@@ -78,10 +78,10 @@ allData <- data.frame(
 )
 
 # Calculate mean and standard error
-allData <- pivot_longer(allData, cols=c(4:19), names_to="metabolite", values_to="concentration_ppm")
-allData <- allData %>%
-  group_by(species, organ, metabolite) %>%
-  summarise(concentration_ppm_mean=mean(concentration_ppm), stError_ppm=sd(concentration_ppm)/sqrt(3))
-colnames(allData)[4] <- "concentration_ppm"
+# allData <- pivot_longer(allData, cols=c(4:19), names_to="metabolite", values_to="concentration_ppm")
+# allData <- allData %>%
+#   group_by(species, organ, metabolite) %>%
+#   summarise(concentration_ppm_mean=mean(concentration_ppm), stError_ppm=sd(concentration_ppm)/sqrt(3))
+# colnames(allData)[4] <- "concentration_ppm"
 
-write.csv(allData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv", row.names=FALSE)
+#write.csv(allData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv", row.names=FALSE)
