@@ -11,7 +11,7 @@ suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/h
 allData <- rbind(fresh, wrightii, suffrutescens)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa_071119", "racemosa_MS", "racemosa_SC", "hastifolia", "havanensis"), collapse="|")
+excludeSpecies <- paste(c("racemosa_071119", "racemosa_MS", "racemosa_SC", "hastifolia", "havanensis", "arenicola", "suffrutescens"), collapse="|")
 excludeOrgans <- paste(c("flowers"), collapse="|")
 excludeMetabolites <- paste(c("acteoside", "isoscutellarin"), collapse="|")
 allData <- allData %>%
@@ -130,11 +130,11 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
     theme(legend.position="bottom", 
           legend.direction=legendOrientation, 
           legend.text=element_text(size=8), 
-          legend.title=element_text(size=8),
+          legend.title=element_text(size=8, face="bold"),
           legend.key.size=unit(0.5, "cm"),
           legend.box.margin=unit(c(-3.7,0,0,0.1), "cm")) +
     labs(fill="Flavonoid") +
-    scale_fill_manual(name="Metabolite", values=metaboliteColors, labels=paste(seq(1, 14), ". ", names(metaboliteColors), sep=""))
+    scale_fill_manual(name="Metabolite:", values=metaboliteColors, labels=paste(seq(1, 14), ". ", names(metaboliteColors), sep=""))
   legend <- get_legend(x)
   return(legend)
 }
@@ -233,11 +233,11 @@ leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 
 allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights=c(1,1,1.3), align="v", axis="l")
-completePlot <- plot_grid(allOrganPlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.2))
+completePlot <- plot_grid(allOrganPlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.25))
 
 ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/noKR_2.pdf",
       plot=completePlot,
       device=pdf(),
-      width=7.25, height=9, units="in")
+      width=6, height=9, units="in")
 
 #justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))

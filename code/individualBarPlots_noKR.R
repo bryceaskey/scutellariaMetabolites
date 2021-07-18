@@ -3,17 +3,18 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
-suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
+suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
+isoscutellarin <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_isoscutellarin.csv")
 
 # Combine all data into a single data frame
 allData <- rbind(fresh, wrightii, suffrutescens)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa_071119", "racemosa_MS", "racemosa_SC", "hastifolia", "havanensis"), collapse="|")
+excludeSpecies <- paste(c("racemosa_071119", "racemosa_MS", "racemosa_SC", "hastifolia", "havanensis", "arenicola", "suffrutescens"), collapse="|")
 excludeOrgans <- paste(c("flowers"), collapse="|")
-excludeMetabolites <- paste(c("acteoside", "isoscutellarin"), collapse="|")
+excludeMetabolites <- paste(c("acteoside"), collapse="|")
 allData <- allData %>%
   filter(!grepl(excludeSpecies, species)) %>%
   filter(!grepl(excludeOrgans, organ)) %>%
@@ -98,6 +99,7 @@ allData$metabolite[allData$metabolite=="apigeninG"] <- "apigenin 7-G"
 allData$metabolite[allData$metabolite=="chrysinG"] <- "chrysin 7-G"
 allData$metabolite[allData$metabolite=="hispidulinG"] <- "hispiduloside"
 allData$metabolite[allData$metabolite=="oroxylinA"] <- "oroxylin A"
+allData$metabolite[allData$metabolite=="isoscutellarin"] <- "isoscutellarein 8-G"
 allData$metabolite <- factor(allData$metabolite)
 
 # Capitalize first letter of each flavonoid name
@@ -129,12 +131,12 @@ createIndividualBars <- function(allData, metaboliteColors, indMetabolite, axisL
     geom_col(position="dodge") +
     geom_errorbar(mapping=aes(ymin=concentration_microM-stError_microM, ymax=concentration_microM+stError_microM), color="black", width=0.35, size=0.35, position=position_dodge(0.9)) +
     scale_fill_manual(values=c("#47acff", "#62c44d", "#ff8d4f"), name="Organ:", breaks=c("leaves", "stems", "roots"), labels=c("Leaf     ", "Stem     ", "Root")) +
-    labs(y=paste(indMetabolite, "concentration (µmol/g FW)")) +
+    labs(y=paste(indMetabolite, "(µmol/g FW)")) +
     theme_classic() +
     theme(panel.grid.major=element_line(size=0.5), panel.grid.minor=element_line(size=0.25),
           axis.title.x=element_blank(), axis.title.y=element_text(size=8), axis.text.y=element_text(size=8, color="black"),
           axis.text.x=element_text(size=8, face="italic", color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(4, 0, 0, 0)),
-          legend.position="top", legend.title=element_text(size=8), legend.text=element_text(size=8), legend.key.size=unit(0.35, "cm"), legend.box.margin=margin(-5,0,-8,0),
+          legend.position="top", legend.title=element_text(size=8, face="bold"), legend.text=element_text(size=8), legend.key.size=unit(0.35, "cm"), legend.box.margin=margin(-5,0,-8,0),
           axis.ticks=element_line(color="black")
     )
   
@@ -154,8 +156,14 @@ OroxylinAPlot <- createIndividualBars(allData, metaboliteColors, "Oroxylin A", a
 
 OroxylosidePlot <- createIndividualBars(allData, metaboliteColors, "Oroxyloside", axisLabels=TRUE, legend=FALSE)
 
-combinedPlot <- plot_grid(OroxylinAPlot, OroxylosidePlot, nrow=2, ncol=1, rel_heights=c(1,1.35))
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/indBarPlots/newWrightii.pdf",
+combinedPlot <- plot_grid(OroxylinAPlot, OroxylosidePlot, nrow=2, ncol=1, rel_heights=c(1,1.2))
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/indBarPlots/newWrightii.pdf",
        plot=combinedPlot,
        device=pdf(),
-       width=5, height=6, units="in")
+       width=4, height=6, units="in")
+
+isoscutellarinPlot <- createIndividualBars(allData, metaboliteColors, "Isoscutellarein 8-G", axisLabels=TRUE, legend=TRUE)
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/indBarPlots/isoscutellarin.pdf",
+       plot=isoscutellarinPlot,
+       device=pdf(),
+       width=4, height=3, units="in")
