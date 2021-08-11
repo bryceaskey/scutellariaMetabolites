@@ -13,37 +13,36 @@ library(ggsci)
 # Generate heatmap ----
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
-herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200117_frozenKR.csv")
+herbarium1_30 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200214_herbarium1_30.csv")
+herbarium31_78 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200812_herbarium31_78.csv")
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201007_wrightii.csv")
+suffrutescencs <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/herbarium/phylo-tree-clades.csv")
 
-# Specify any species, organs, or metabolites to be removed
-speciesToRemove <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
-organsToRemove <- paste(c("flowers", "roots"), collapse = '|')
-
-# Remove barbata from fresh data - use only KR data
-fresh <- fresh %>%
+# Remove barbata from frozenKR data - use only fresh data
+frozenKR <- frozenKR %>%
   filter(!grepl("barbata", species))
 
 # Processing for fresh samples
 freshData <- rbind(fresh, frozenKR, wrightii)
-
 freshData$species <- factor(freshData$species)
 freshData$organ <- factor(freshData$organ)
 freshData$metabolite <- factor(freshData$metabolite)
 
+# Specify any species, organs, or metabolites to exclude, and remove from data frame
+excludeSpecies <- paste(c("racemosa_071119", "racemosa_MS", "racemosa_SC", "hastifolia", "arenicola", "havanensis"), collapse = '|')
+excludeOrgans <- paste(c("flowers", "roots"), collapse = '|')
+excludeMetabolites <- paste(c("isoscutellarin"), collapse = '|')
 freshData <- freshData %>%
-  filter(!grepl(speciesToRemove, species)) %>%
-  filter(!grepl(organsToRemove, organ)) #%>%
+  filter(!grepl(excludeSpecies, species)) %>%
+  filter(!grepl(excludeOrgans, organ)) %>%
+  filter(!grepl(excludeMetabolites, metabolite))
 
 # Fix naming errors
 freshData$species <- as.character(freshData$species)
-freshData$species[freshData$species=="RNA Seq"] <- "racemosa"
-freshData$species[freshData$species=="havenesis"] <- "havanensis"
-freshData$species[freshData$species=="hastafolia"] <- "hastifolia"
+freshData$species[freshData$species=="racemosa_RNAseq"] <- "racemosa"
 freshData$species[freshData$species=="pekinesis"] <- "pekinensis var. alpina"
 freshData$species[freshData$species=="siphocampuloides"] <- "siphocampyloides"
 freshData$species[freshData$species=="indica"] <- "indica var. coccinea"
@@ -78,12 +77,13 @@ herbariumData$organ <- factor(herbariumData$organ)
 herbariumData$metabolite <- factor(herbariumData$metabolite)
 
 herbariumData <- herbariumData %>%
-  filter(!grepl(speciesToRemove, species)) %>%
-  filter(!grepl(organsToRemove, organ)) #%>%
+  filter(!grepl(excludeSpecies, species)) %>%
+  filter(!grepl(excludeOrgans, organ)) %>%
+  filter(!grepl(excludeMetabolites, metabolite))
 
 # Fix naming errors
 herbariumData$species <- as.character(herbariumData$species)
-herbariumData$species[herbariumData$species=="RNA Seq"] <- "racemosa"
+herbariumData$species[herbariumData$species=="racemosa_RNAseq"] <- "racemosa"
 herbariumData$species[herbariumData$species=="havenesis"] <- "havanensis"
 herbariumData$species[herbariumData$species=="hastafolia"] <- "hastifolia"
 herbariumData$species[herbariumData$species=="pekinesis"] <- "pekinensis var. alpina"
@@ -128,7 +128,7 @@ heatmapData <- rbind(freshData, herbariumData)
 # Define function to convert units of ppm to micromol/L
 ppm2microM <- function(input_ppm, metaboliteName){
   if(!is.na(input_ppm)){
-    if(metaboliteName=="acetoside"){ #PubChem CID: 5281800 
+    if(metaboliteName=="acteoside"){ #PubChem CID: 5281800 
       output_microM <- (input_ppm/624.6)*1000
     }else if(metaboliteName=="apigenin"){ #PubChem CID: 5280443
       output_microM <- (input_ppm/270.24)*1000
@@ -158,6 +158,8 @@ ppm2microM <- function(input_ppm, metaboliteName){
       output_microM <- (input_ppm/284.26)*1000
     }else if(metaboliteName=="wogonoside"){ #PubChem CID: 3084961
       output_microM <- (input_ppm/460.4)*1000
+    }else if(metaboliteName=="isoscutellarin"){
+      output_microM <- (input_ppm/462.4)*1000
     }else{
       print(paste("Error: metabolite name", metaboliteName,  "not recognized"))
       output_microM <- NA
@@ -275,19 +277,16 @@ heatmap <- ggplot(data=heatmapData) +
 
 # Combine heatmap, clade labels, and fresh data labels into 1 figure
 heatmap <- plot_grid(heatmap, cladeLabels, freshLabels, nrow=1, rel_widths=c(1.5, 0.05, 0.05))
+print(heatmap)
 
 # Generate MCA plots ----
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200214_herbarium1_30.csv")[, 2:6]
-herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20200812_herbarium31_78.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/phylo-tree-clades.csv")
-
-# Specify any species, organs, or metabolites to be removed
-speciesToRemove <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastifolia", "hastafolia"), collapse = '|')
-organsToRemove <- paste(c("flowers", "roots"), collapse = '|')
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200117_frozenKR.csv")
+herbarium1_30 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200214_herbarium1_30.csv")
+herbarium31_78 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200812_herbarium31_78.csv")
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201007_wrightii.csv")
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/herbarium/phylo-tree-clades.csv")
 
 # Processing for fresh samples
 freshData <- rbind(fresh, frozenKR, wrightii)
@@ -297,8 +296,9 @@ freshData$organ <- factor(freshData$organ)
 freshData$metabolite <- factor(freshData$metabolite)
 
 freshData <- freshData %>%
-  filter(!grepl(speciesToRemove, species)) %>%
-  filter(!grepl(organsToRemove, organ)) #%>%
+  filter(!grepl(excludeSpecies, species)) %>%
+  filter(!grepl(excludeMetabolites, organ)) %>%
+  filter(!grepl(excludeMetabolites, metabolite))
 
 # Fix naming errors
 freshData$species <- as.character(freshData$species)
@@ -339,12 +339,15 @@ herbariumData$organ <- factor(herbariumData$organ)
 herbariumData$metabolite <- factor(herbariumData$metabolite)
 
 herbariumData <- herbariumData %>%
-  filter(!grepl(speciesToRemove, species)) %>%
-  filter(!grepl(organsToRemove, organ)) #%>%
+  filter(!grepl(excludeSpecies, species)) %>%
+  filter(!grepl(excludeOrgans, organ)) %>%
+  filter(!grepl(excludeMetabolites, metabolite))
+
+print("error here")
 
 # Fix naming errors
 herbariumData$species <- as.character(herbariumData$species)
-herbariumData$species[herbariumData$species=="RNA Seq"] <- "racemosa"
+herbariumData$species[herbariumData$species=="racemosa_RNASeq"] <- "racemosa"
 herbariumData$species[herbariumData$species=="havenesis"] <- "havanensis"
 herbariumData$species[herbariumData$species=="hastafolia"] <- "hastifolia"
 herbariumData$species[herbariumData$species=="pekinesis"] <- "pekinensis var. alpina"
@@ -390,7 +393,7 @@ allData$species <- factor(allData$species)
 # Function to convert units of ppm to micromol/L
 ppm2microM <- function(input_ppm, metaboliteName){
   if(!is.na(input_ppm)){
-    if(metaboliteName=="acetoside"){ #PubChem CID: 5281800 
+    if(metaboliteName=="acteoside"){ #PubChem CID: 5281800 
       output_microM <- (input_ppm/624.6)*1000
     }else if(metaboliteName=="apigenin"){ #PubChem CID: 5280443
       output_microM <- (input_ppm/270.24)*1000
@@ -420,6 +423,8 @@ ppm2microM <- function(input_ppm, metaboliteName){
       output_microM <- (input_ppm/284.26)*1000
     }else if(metaboliteName=="wogonoside"){ #PubChem CID: 3084961
       output_microM <- (input_ppm/460.4)*1000
+    }else if(metaboliteName=="isoscutellarin"){
+      output_microM <- (input_ppm/462.4)*1000
     }else{
       print(paste("Error: metabolite name", metaboliteName,  "not recognized"))
       output_microM <- NA
@@ -569,11 +574,11 @@ totalPlot <- plot_grid(heatmap, pcaVarPlot, ncol=2, nrow=1, rel_widths=c(1,1.1),
 
 
 # Export figure
-#ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/manuscript/Figure_3.pdf",
-#       plot=totalPlot,
-#       device=pdf(),
-#       width=7.25, height=8.5, units="in")
-#dev.off()
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/heatmapPCA/20210724_noIsoscutellarin.pdf",
+      plot=totalPlot,
+      device=pdf(),
+      width=7.25, height=8.5, units="in")
+dev.off()
 
 # Print summary statistics
 print(paste("# of species included:", nrow(heatmapCladeData)))

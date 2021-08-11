@@ -1,11 +1,13 @@
 library(tidyverse)
 
 rawData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/raw_data/20190813_fresh.csv")
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/raw_data/20210119_freshWrightii.csv")[22:30, ]
+rawData <- rbind(rawData, wrightii, make.row.names=FALSE)
 
 # Define functions for interpreting injection names
 abbrevNames <- data.frame(
-  abbrev=c("HV", "AC", "AS", "BT", "TT", "HF", "BL", "LD", "RMSEQ", "R071119", "R_MS", "R_SC"),
-  fullName=c("havanensis", "arenicola", "altissima", "barbata", "tournefortii", "hastifolia", "baicalensis", "leonardii", "racemosa_RNAseq", "racemosa_071119", "racemosa_MS", "racemosa_SC")
+  abbrev=c("HV", "AC", "AS", "BT", "TT", "HF", "BL", "LD", "RMSEQ", "R071119", "R_MS", "R_SC", "WRI"),
+  fullName=c("havanensis", "arenicola", "altissima", "barbata", "tournefortii", "hastifolia", "baicalensis", "leonardii", "racemosa_RNAseq", "racemosa_071119", "racemosa_MS", "racemosa_SC", "wrightii")
 )
 
 getSampleName <- function(injectionName){
@@ -34,7 +36,7 @@ rawDataSubset <- data.frame(injectionName=rawData$injectionName,
                             isoscutellarin=rawData$isoscutellarin)
 
 # Create dataframe with preprocessed data
-dataRows <- c(23:112)
+dataRows <- c(23:112, 125:133)
 allData <- data.frame(
   species=sapply(rawData$injectionName[dataRows], getSampleName),
   replicate=sapply(rawData$injectionName[dataRows], getSampleRep),

@@ -5,39 +5,34 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20190813_fresh.csv")[, 2:6]
-frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20200117_frozenKR.csv")[, 2:6]
-wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201007_wrightii.csv")[, 2:6]
-suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/preprocessed/20201119_suffrutescens.csv")[, 2:6]
-cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200117_frozenKR.csv")
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
+suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/herbarium/phylo-tree-clades.csv")
 
-# Remove barbata from fresh data - use only KR data
-fresh <- fresh %>%
+# Remove barbata from frozenKR data - use only fresh data
+frozenKR <- frozenKR %>%
   filter(!grepl("barbata", species))
 
-# Combine all data into a single data frame and change classifiers (species, organs, metabolites)
-# into factors
+# Combine all data into a single data frame and change classifiers (species, organs, metabolites) into factors
 allData <- rbind(fresh, frozenKR, wrightii, suffrutescens)
 allData$species <- as.factor(allData$species)
 allData$organ <- as.factor(allData$organ)
 allData$metabolite <- as.factor(allData$metabolite)
 
 # Specify any species, organs, or metabolites to exclude, and remove from data frame
-excludeSpecies <- paste(c("racemosa 071119", "racemosa MS", "racemosa SC", "hastafolia", "hastifolia", "arenicola", "havenesis"), collapse = '|')
+excludeSpecies <- paste(c("racemosa_071119", "racemosa_MS", "racemosa_SC", "hastifolia", "arenicola", "havanensis"), collapse = '|')
 excludeOrgans <- paste(c("flowers"), collapse = '|')
-# excludeMetabolites <- paste(c(), collapse = '|')
+excludeMetabolites <- paste(c("isoscutellarin"), collapse = '|')
 allData <- allData %>%
   filter(!grepl(excludeSpecies, species)) %>%
-  filter(!grepl(excludeOrgans, organ)) #>%>
-# filter(!grepl(excludeMetabolites, metabolites))
+  filter(!grepl(excludeOrgans, organ)) %>%
+  filter(!grepl(excludeMetabolites, metabolite))
 
 # Fix naming errors
 allData$species <- as.character(allData$species)
-allData$species[allData$species=="RNA Seq"] <- "racemosa"
-allData$species[allData$species=="havenesis"] <- "havanensis"
-allData$species[allData$species=="hastafolia"] <- "hastifolia"
-allData$species[allData$species=="pekinesis"] <- "pekinensis var. alpina"
-allData$species[allData$species=="indica"] <- "indica var. coccinea"
+allData$species[allData$species=="racemosa_RNAseq"] <- "racemosa"
 allData$species <- as.factor(allData$species)
 
 # Average together any duplicate data points
@@ -60,7 +55,7 @@ allData <- allData %>%
 # Define function to convert units of ppm to micromol/L
 ppm2microM <- function(input_ppm, metaboliteName){
   if(!is.na(input_ppm)){
-    if(metaboliteName=="acetoside"){ #PubChem CID: 5281800 
+    if(metaboliteName=="acteoside"){ #PubChem CID: 5281800 
       output_microM <- (input_ppm/624.6)*1000
     }else if(metaboliteName=="apigenin"){ #PubChem CID: 5280443
       output_microM <- (input_ppm/270.24)*1000
@@ -132,12 +127,6 @@ allData$metabolite <- factor(allData$metabolite, levels=c(
   "Chrysin", "Chrysin 7-G", "Baicalein", "Baicalin", "Oroxylin A", "Oroxyloside", "Wogonin", "Wogonoside",
   "Acteoside")
 ) 
-# Set order of metabolites to appear in heatmaps based on heirarchical clustering
-#allData$metabolite <- factor(allData$metabolite, levels=c(
-#  "acetoside", "hispidulinG", "baicalin", "chrysinG", "oroxylinA", "oroxyloside", "hispidulin",
-#  "baicalein", "wogonin", "wogonoside", "scutellarein", "scutellarin", "chrysin", "apigenin",
-#  "apigeninG"
-#))
 
 # Create new column w/ factor nums - for bar plot section labeling
 allData$metNum <- as.numeric(allData$metabolite) 
@@ -175,10 +164,8 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
     mutate(text_y = sum(concentration_microM) - (cumsum(concentration_microM) - concentration_microM/2))
   
   if(length(levels(droplevels(organData$species))) != length(levels(organData$species))){
-    print("TRUE")
     for(speciesName in levels(organData$species)){
       if(sum(grepl(speciesName, levels(droplevels(organData$species)))) == 0){
-        print("TRUE")
         NA_df <- data.frame(species=speciesName, organ=NA, metabolite=NA, concentration_ppm=0,
                             stError_ppm=NA, concentration_microM=0, stError_microM=NA,
                             metNum=NA, text_x=NA, text_y=NA)
@@ -193,17 +180,13 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
   
   
   organData$species <- factor(organData$species, levels=str_wrap(c(
-    #"S. havanensis",
     "S. insignis", "S. indica var. coccinea", "S. barbata", "S. racemosa", "S. strigillosa", "S. dependens", "S. wrightii", "S. suffrutescens",
-    #"S. arenicola",
     "S. baicalensis", "S. tournefortii", "S. altissima", "S. leonardii", "S. pekinensis var. alpina"), width=16))
     organData <- organData %>%
       group_by(species) %>%
       mutate(text_x = as.numeric(species) - 0.25)
     
     levels(organData$species) <- str_wrap(levels(organData$species), width=16)
-    
-    if(plantOrgan=="shoots"){plantOrgan <- "stems"}
     
     chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
       geom_bar(position="stack", stat="identity", width=0.45) +
@@ -269,7 +252,7 @@ cladeLabels <- ggplot(data=plotCladeData) +
   #scale_fill_manual(values=c("#62e8ec", "#90dfb0", "#c6ce86", "#f0b682", "#ffa2a2", "#FFFFFF"), drop=FALSE) +
   theme_void() +
   theme(legend.position="none",
-        plot.margin=margin(-160,0.25,0,28.75,"pt"))
+        plot.margin=margin(-160,0.25,0,24,"pt"))
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
 #rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
@@ -279,7 +262,7 @@ rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
 #       width=30, height=25, units="cm")
 
 
-shootPlot <- createStackedBars(allData, metaboliteColors, "shoots")
+shootPlot <- createStackedBars(allData, metaboliteColors, "stems")
 #shootPlotClades <- plot_grid(shootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
 #ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/stemPlot.png",
 #       plot=shootPlotClades,
@@ -300,9 +283,9 @@ allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_hei
 allOrganCladePlot <- plot_grid(allOrganPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1,0.05))
 completePlot <- plot_grid(allOrganCladePlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.2))
 
-#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.pdf",
-#       plot=completePlot,
-#       device=pdf(),
-#       width=7.25, height=9, units="in")
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.pdf",
+      plot=completePlot,
+      device=pdf(),
+      width=7.25, height=9, units="in")
 
 #justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))
