@@ -5,11 +5,11 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
-frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200117_frozenKR.csv")
-wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
-suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
-cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/herbarium/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
+frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20200117_frozenKR.csv")
+wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
+suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
+cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/herbarium/phylo-tree-clades.csv")
 
 # Remove barbata from frozenKR data - use only fresh data
 frozenKR <- frozenKR %>%
@@ -255,37 +255,15 @@ cladeLabels <- ggplot(data=plotCladeData) +
         plot.margin=margin(-160,0.25,0,24,"pt"))
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
-#rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/rootPlot.png",
-#       plot=rootPlotClades,
-#       device=png(),
-#       width=30, height=25, units="cm")
-
-
 shootPlot <- createStackedBars(allData, metaboliteColors, "stems")
-#shootPlotClades <- plot_grid(shootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/stemPlot.png",
-#       plot=shootPlotClades,
-#       device=png(),
-#       width=30, height=25, units="cm")
-
-
 leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
-#leafPlotClades <- plot_grid(leafPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/leafPlot.png",
-#       plot=leafPlotClades,
-#       device=png(),
-#       width=30, height=25, units="cm")
-
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 
 allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights=c(1,1,1.35), align="v", axis="l")
 allOrganCladePlot <- plot_grid(allOrganPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1,0.05))
 completePlot <- plot_grid(allOrganCladePlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.2))
 
-ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.pdf",
+ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.pdf",
       plot=completePlot,
       device=pdf(),
       width=7.25, height=9, units="in")
-
-#justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))
