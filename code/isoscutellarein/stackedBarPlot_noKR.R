@@ -132,9 +132,9 @@ createLegend <- function(allData, metaboliteColors, legendOrientation="horizonta
           legend.text=element_text(size=8), 
           legend.title=element_text(size=8, face="bold"),
           legend.key.size=unit(0.5, "cm"),
-          legend.box.margin=unit(c(-3.7,0,0,0.1), "cm")) +
+          legend.box.margin=unit(c(-2.5,0,0,0.1), "cm")) +
     labs(fill="Flavonoid") +
-    scale_fill_manual(name="Metabolite:", values=metaboliteColors, labels=paste(seq(1, 14), ". ", names(metaboliteColors), sep=""))
+    scale_fill_manual(name="Flavone:", values=metaboliteColors, labels=paste(seq(1, 14), ". ", names(metaboliteColors), sep=""))
   legend <- get_legend(x)
   return(legend)
 }
@@ -208,36 +208,37 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
 }
 
 rootPlot <- createStackedBars(allData, metaboliteColors, "roots")
-#rootPlotClades <- plot_grid(rootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/rootPlot.png",
-#       plot=rootPlotClades,
-#       device=png(),
-#       width=30, height=25, units="cm")
-
-
 shootPlot <- createStackedBars(allData, metaboliteColors, "stems")
-#shootPlotClades <- plot_grid(shootPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/stemPlot.png",
-#       plot=shootPlotClades,
-#       device=png(),
-#       width=30, height=25, units="cm")
-
-
 leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
-#leafPlotClades <- plot_grid(leafPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1.5, 0.05))
-#ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/leafPlot.png",
-#       plot=leafPlotClades,
-#       device=png(),
-#       width=30, height=25, units="cm")
+
 
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 
 allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights=c(1,1,1.3), align="v", axis="l")
-completePlot <- plot_grid(allOrganPlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.25))
+completePlot <- plot_grid(allOrganPlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.3))
 
-ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/noKR_2.pdf",
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/0-isoscutellarin/Figure_2.pdf",
       plot=completePlot,
       device=pdf(),
-      width=6, height=9, units="in")
+      width=5.1, height=9, units="in")
 
-#justData <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights = c(1, 1, 1.1))
+# Generate reader-friendly table of data
+tableConcData <- allData %>% 
+  pivot_wider(id_cols=c("species", "organ"), names_from=c("metabolite"), values_from=c("concentration_microM"))
+
+tableErrorData <- allData %>%
+  pivot_wider(id_cols=c("species", "organ"), names_from=c("metabolite"), values_from=c("stError_microM"))
+
+tableData <- tableConcData
+tableData[ , 3:ncol(tableConcData)] <- NA
+tableData$species <- paste("S.", tableData$species)
+tableData$organ <- as.character(tableData$organ)
+tableData$organ <- sapply(tableData$organ, capString)
+
+for(metabolite in colnames(tableConcData)[3:ncol(tableConcData)]){
+  concData <- format(round(tableConcData[[metabolite]], 2), nsmall = 2)
+  errorData <- format(round(tableErrorData[[metabolite]], 2), nsmall = 2)
+  tableData[[metabolite]] <- paste(concData, "\u00B1", errorData)
+}
+
+write.csv(tableData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/tables/noKR.csv", row.names=FALSE)
