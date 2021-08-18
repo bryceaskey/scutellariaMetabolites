@@ -5,11 +5,11 @@ library(ggrepel)
 library(cowplot)
 
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20200117_frozenKR.csv")
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
-suffrutescens <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/herbarium/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200117_frozenKR.csv")
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
+suffrutescens <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/herbarium/phylo-tree-clades.csv")
 
 # Remove barbata from frozenKR data - use only fresh data
 frozenKR <- frozenKR %>%
@@ -263,7 +263,32 @@ allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_hei
 allOrganCladePlot <- plot_grid(allOrganPlot, cladeLabels, nrow=2, ncol=1, rel_heights=c(1,0.05))
 completePlot <- plot_grid(allOrganCladePlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.2))
 
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.pdf",
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/stackedBarPlots/combinedPlot.pdf",
       plot=completePlot,
       device=pdf(),
       width=7.25, height=9, units="in")
+
+# Generate reader-friendly table of data
+tableConcData <- allData %>% 
+  pivot_wider(id_cols=c("species", "organ"), names_from=c("metabolite"), values_from=c("concentration_microM"))
+
+tableErrorData <- allData %>%
+  pivot_wider(id_cols=c("species", "organ"), names_from=c("metabolite"), values_from=c("stError_microM"))
+
+tableData <- tableConcData
+tableData[ , 3:ncol(tableConcData)] <- NA
+tableData$species <- paste("S.", tableData$species)
+tableData$organ <- as.character(tableData$organ)
+tableData$organ <- sapply(tableData$organ, capString)
+
+for(metabolite in colnames(tableConcData)[3:ncol(tableConcData)]){
+  concData <- format(round(tableConcData[[metabolite]], 2), nsmall = 2)
+  errorData <- format(round(tableErrorData[[metabolite]], 2), nsmall = 2)
+  tableData[[metabolite]] <- paste(concData, "\u00B1", errorData)
+}
+
+tableData <- tableData[c("species", "organ", levels(allData$metabolite))]
+tableData$species <- factor(tableData$species, levels=paste("S.", levels(allData$species)))
+tableData$organ <- factor(tableData$organ, levels=c("Leaves", "Stems", "Roots"))
+tableData <- with(tableData, tableData[order(species, organ),])
+write.csv(tableData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/tables/withKR.csv", row.names=FALSE)

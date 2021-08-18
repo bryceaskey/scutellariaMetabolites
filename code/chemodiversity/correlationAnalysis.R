@@ -10,15 +10,15 @@ library(robustbase)
 library(ggrepel)
 library(ggsci)
 
-# Generate heatmap ----
+# Merge and prepare data ----
 # Load data from .csv files
-fresh <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
-frozenKR <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20200117_frozenKR.csv")
-herbarium1_30 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20200214_herbarium1_30.csv")
-herbarium31_78 <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20200812_herbarium31_78.csv")
-wrightii <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
-suffrutescencs <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
-cladeData <- read.csv("C:/Users/Bryce/Documents/scutellariaMetabolites/data/herbarium/phylo-tree-clades.csv")
+fresh <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20190813_fresh.csv")
+frozenKR <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200117_frozenKR.csv")
+herbarium1_30 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200214_herbarium1_30.csv")
+herbarium31_78 <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20200812_herbarium31_78.csv")
+wrightii <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20210119_wrightii.csv")
+suffrutescencs <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/preprocessed/20201119_suffrutescens.csv")
+cladeData <- read.csv("C:/Users/Bryce/Research/scutellariaMetabolites/data/herbarium/phylo-tree-clades.csv")
 
 # Remove barbata from frozenKR data - use only fresh data
 frozenKR <- frozenKR %>%
@@ -75,6 +75,10 @@ herbariumData$species <- factor(herbariumData$species)
 herbariumData$organ <- factor(herbariumData$organ)
 herbariumData$metabolite <- factor(herbariumData$metabolite)
 
+# Specify any species, organs, or metabolites to exclude, and remove from data frame
+excludeSpecies <- paste(c("racemosa_071119", "racemosa_MS", "racemosa_SC", "hastifolia"), collapse = '|')
+excludeOrgans <- paste(c("flowers", "roots"), collapse = '|')
+excludeMetabolites <- paste(c("isoscutellarin"), collapse = '|')
 herbariumData <- herbariumData %>%
   filter(!grepl(excludeSpecies, species)) %>%
   filter(!grepl(excludeOrgans, organ)) %>%
@@ -194,6 +198,7 @@ flavonoidOrder <- c("apigenin", "apigenin 7-G", "scutellarein", "scutellarin", "
                     "chrysin", "chrysin 7-G", "baicalein", "baicalin", "oroxylin A", "oroxyloside", "wogonin", "wogonoside", "acteoside")
 allData$metabolite <- factor(allData$metabolite, levels=flavonoidOrder)
 
+# Generate heatmap ----
 # Assign metabolites to groups to generated faceted heatmap
 heatmapData <- allData
 heatmapData$metabolite_group <- NA
@@ -285,10 +290,6 @@ speciesData <- speciesData %>%
   column_to_rownames(var="species")
 
 # Capitalize first letter of flavonoid names
-capString <- function(string) {
-  c <- strsplit(string, " ")[[1]]
-  paste(toupper(substring(c, 1,1)), substring(c, 2), sep="", collapse=" ")
-}
 colnames(speciesData) <- sapply(colnames(speciesData), capString)
 
 # Add column to indicate clade which the species belongs to
@@ -370,8 +371,10 @@ varPlot <- ggplot(data=pca_vars, mapping=aes(x=Dim.1, y=Dim.2, label=variable, f
   geom_hline(mapping=aes(yintercept=0), color="darkgray", linetype="dashed") +
   geom_vline(mapping=aes(xintercept=0), color="darkgray", linetype="dashed") +
   geom_point(size=2.5, shape=21, color="black") +
-  geom_text_repel(data=subset(pca_vars, Dim.1<0), color="black", nudge_x=-1, direction="y", point.padding=0.6, box.padding=0.15, min.segment.length=0.1, size=6/.pt) +
-  geom_text_repel(data=subset(pca_vars, Dim.1>0), color="black", nudge_x=1, direction="y", point.padding=0.6, box.padding=0.15, min.segment.length=0.1, size=6/.pt) +
+  geom_text_repel(data=subset(pca_vars, Dim.1<0 & Dim.2>0), color="black", nudge_x=-1, nudge_y=0.5, direction="y", point.padding=0.5, box.padding=0.15, min.segment.length=0.25, size=6/.pt, max.overlaps=Inf) +
+  geom_text_repel(data=subset(pca_vars, Dim.1<0 & Dim.2<0), color="black", nudge_x=-1, nudge_y=-0.5, direction="y", point.padding=0.5, box.padding=0.15, min.segment.length=0.25, size=6/.pt, max.overlaps=Inf) +
+  geom_text_repel(data=subset(pca_vars, Dim.1>0 & Dim.2>0), color="black", nudge_x=1, nudge_y=0.5, direction="y", point.padding=0.5, box.padding=0.15, min.segment.length=0.25, size=6/.pt, max.overlaps=Inf) +
+  geom_text_repel(data=subset(pca_vars, Dim.1>0 & Dim.2<0), color="black", nudge_x=1, nudge_y=-0.5, direction="y", point.padding=0.5, box.padding=0.15, min.segment.length=0.25, size=6/.pt, max.overlaps=Inf) +
   scale_fill_npg(name="")+
   coord_fixed(ratio=1) +
   coord_cartesian(xlim=c(-2.5, 2.5), ylim=c(-2.5, 2.5)) +
@@ -397,15 +400,14 @@ pcaVarPlot <- plot_grid(pcaPlot, varPlot, ncol=1, nrow=2, rel_heights=c(1,1.3), 
 # Merge plots and export as pdf ----
 totalPlot <- plot_grid(heatmap, pcaVarPlot, ncol=2, nrow=1, rel_widths=c(1,1.1), labels=c("A"))
 
-
 # Export figure
-ggsave(filename="C:/Users/Bryce/Documents/scutellariaMetabolites/figures/heatmapPCA/20210724_noIsoscutellarin.pdf",
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/heatmapPCA/20210816.pdf",
       plot=totalPlot,
       device=pdf(),
       width=7.25, height=8.5, units="in")
 dev.off()
 
-# Print summary statistics
+# Print summary statistics ----
 print(paste("# of species included:", nrow(heatmapCladeData)))
 print(paste("# of species assigned to a clade:", sum(!is.na(heatmapCladeData$cladeList))))
 flavonoidAbundance <- data.frame(flavonoid=character(), totalCount=numeric(), totalPct=numeric(), avgConc=numeric(),
@@ -435,3 +437,21 @@ deoxyflavones <- deoxyflavones %>%
   group_by(species) %>%
   summarise(totalDeoxyflavoneContent=sum(concentration_microM))
 print(paste("Species with no deoxyflavones detected:", sum(deoxyflavones$totalDeoxyflavoneContent==0)))
+
+hydroxyflavones <- heatmapData[heatmapData$metabolite %in% c("Apigenin", "Apigenin 7-G", "Scutellarein", "Scutellarin", "Hispidulin", "Hispiduloside"), ]
+hydroxyflavones <- hydroxyflavones %>%
+  group_by(species) %>%
+  summarise(totalHydroxyflavoneContent=sum(concentration_microM))
+print(paste("Species with no hydroxyflavones detected:", sum(hydroxyflavones$totalHydroxyflavoneContent==0)))
+
+# Generate reader-friendly table of data ----
+tableData <- allData %>% 
+  pivot_wider(id_cols=c("species"), names_from=c("metabolite"), values_from=c("concentration_microM"))
+tableData$species <- paste("S.", tableData$species)
+colnames(tableData)[1:ncol(tableData)] <- sapply(colnames(tableData)[1:ncol(tableData)], capString)
+
+for(metabolite in colnames(tableData)[2:ncol(tableData)]){
+  tableData[[metabolite]] <- format(round(tableData[[metabolite]], 3), nsmall = 3)
+}
+
+write.csv(tableData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/tables/herbarium.csv", row.names=FALSE)
