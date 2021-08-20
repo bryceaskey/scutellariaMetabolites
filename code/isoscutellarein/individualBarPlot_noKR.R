@@ -156,8 +156,8 @@ OroxylinAPlot <- createIndividualBars(allData, metaboliteColors, "Oroxylin A", a
 
 OroxylosidePlot <- createIndividualBars(allData, metaboliteColors, "Oroxyloside", axisLabels=TRUE, legend=FALSE)
 
-combinedPlot <- plot_grid(OroxylinAPlot, OroxylosidePlot, nrow=2, ncol=1, rel_heights=c(1,1.2))
-ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/indBarPlots/newWrightii.pdf",
+combinedPlot <- plot_grid(OroxylinAPlot, OroxylosidePlot, nrow=2, ncol=1, rel_heights=c(1,1.2), labels=c("a", "b"))
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/0-isoscutellarein/Figure_3.pdf",
        plot=combinedPlot,
        device=pdf(),
        width=4, height=6, units="in")

@@ -214,10 +214,10 @@ leafPlot <- createStackedBars(allData, metaboliteColors, "leaves")
 
 legend <- createLegend(allData, metaboliteColors, legendOrientation="vertical")
 
-allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights=c(1,1,1.3), align="v", axis="l")
+allOrganPlot <- plot_grid(leafPlot, shootPlot, rootPlot, nrow=3, ncol=1, rel_heights=c(1,1,1.3), align="v", axis="l", labels=c("a", "b", "c"), label_size=10)
 completePlot <- plot_grid(allOrganPlot, legend, nrow=1, ncol=2, rel_widths=c(1,0.3))
 
-ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/0-isoscutellarin/Figure_2.pdf",
+ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/0-isoscutellarein/Figure_2.pdf",
       plot=completePlot,
       device=pdf(),
       width=5.1, height=9, units="in")
