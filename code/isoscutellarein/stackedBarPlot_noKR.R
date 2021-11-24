@@ -21,6 +21,7 @@ allData <- allData %>%
 
 # Fix naming errors
 allData$species[allData$species=="racemosa_RNAseq"] <- "racemosa"
+allData$species[allData$species=="leonardii"] <- "parvula"
 
 # Change classifiers (species, organs, metabolites) into factors
 allData$species <- factor(allData$species)
@@ -108,11 +109,11 @@ capString <- function(string) {
 allData$metabolite <- as.character(allData$metabolite)
 allData$metabolite <- sapply(allData$metabolite, capString)
 
-# Set order of metabolites to appear in heatmaps based on pathway
+# Set order of metabolites to appear in plots based on pathway
 allData$metabolite <- factor(allData$metabolite, levels=c(
   "Apigenin", "Apigenin 7-G", "Scutellarein", "Scutellarin", "Hispidulin", "Hispiduloside",
   "Chrysin", "Chrysin 7-G", "Baicalein", "Baicalin", "Oroxylin A", "Oroxyloside", "Wogonin", "Wogonoside")
-) 
+)
 
 # Create new column w/ factor nums - for bar plot section labeling
 allData$metNum <- as.numeric(allData$metabolite) 
@@ -164,30 +165,30 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
   
   organData$species <- paste("S.", organData$species)
   organData$species <- str_wrap(organData$species, width=16)
-  organData$species <- factor(organData$species)
+  organData$species <- factor(organData$species, levels=c("S. baicalensis", "S. altissima", "S. barbata", "S. parvula", "S. racemosa", "S. tournefortii", "S. wrightii"))
   
   organData <- organData %>%
     group_by(species) %>%
-    mutate(text_x = as.numeric(species) - 0.25)
+    mutate(text_x = as.numeric(species) - 0.2)
   
   levels(organData$species) <- str_wrap(levels(organData$species), width=16)
   
   chart <- ggplot(data=organData, mapping=aes(x=species, y=concentration_microM, fill=metabolite)) +
-    geom_bar(position="stack", stat="identity", width=0.45) +
+    geom_bar(position="stack", stat="identity", width=0.4) +
     #ylim(0, 400) +
     labs(x="Species",
-         y=paste("Concentration in ", plantOrgan, " (µmol/g FW)",  sep="")) +
+         y=paste("Concentration in ", plantOrgan, " [µmol/g FW]",  sep="")) +
     scale_fill_manual(values=metaboliteColors) +
     theme(axis.text.x=element_text(face="italic")) +
-    geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), nudge_x=-0.25, direction="y", size=6/.pt,
-                    segment.size=0.2, box.padding=0.15, segment.alpha=0.6, min.segment.length=0.25) +
+    geom_text_repel(mapping=aes(label=metNum, x=text_x, y=text_y), nudge_x=-0.3, direction="y", size=6/.pt,
+                    segment.size=0.2, box.padding=0.15, segment.alpha=0.6, min.segment.length=0.1) +
     if(plantOrgan=="roots"){
       theme(legend.position="none",
             axis.title.x=element_blank(),
             axis.text.x=element_text(size=8, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(4, 0, 0, 0)),
             axis.text.y=element_text(color="#000000", size=8), axis.title.y=element_text(color="#000000", size=8),
             panel.background=element_rect(fill="#ffe0cf"),
-            plot.margin=margin(0, 0, 0, 0, unit="cm"))
+            plot.margin=margin(0, 0, 0, 0.1, unit="cm"))
     }else if(plantOrgan=="stems"){
       theme(legend.position="none", 
             axis.title.x=element_blank(),
@@ -195,7 +196,7 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
             #axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
             axis.text.y=element_text(color="#000000", size=8), axis.title.y=element_text(color="#000000", size=8),
             panel.background=element_rect(fill="#d5ffcc"),
-            plot.margin=margin(0, 0, 0.15, 0, unit="cm"))
+            plot.margin=margin(0, 0, 0.15, 0.1, unit="cm"))
     }else{
       theme(legend.position="none",
             axis.title.x=element_blank(),
@@ -203,7 +204,7 @@ createStackedBars <- function(allData, metaboliteColors, plantOrgan){
             #axis.text.x=element_text(size=18, color="#000000", angle=90, hjust=1, vjust=0.5, margin=margin(25, 0, 0, 0)),
             axis.text.y=element_text(color="#000000", size=8), axis.title.y=element_text(color="#000000", size=8),
             panel.background = element_rect(fill="#cce8ff"),
-            plot.margin=margin(0, 0, 0.15, 0, unit="cm"))
+            plot.margin=margin(0, 0, 0.15, 0.1, unit="cm"))
     }
 }
 
@@ -220,7 +221,7 @@ completePlot <- plot_grid(allOrganPlot, legend, nrow=1, ncol=2, rel_widths=c(1,0
 ggsave(filename="C:/Users/Bryce/Research/scutellariaMetabolites/figures/0-isoscutellarein/Figure_2.pdf",
       plot=completePlot,
       device=pdf(),
-      width=5.1, height=9, units="in")
+      width=5.5, height=9, units="in")
 
 # Generate reader-friendly table of data
 tableConcData <- allData %>% 
@@ -228,6 +229,23 @@ tableConcData <- allData %>%
 
 tableErrorData <- allData %>%
   pivot_wider(id_cols=c("species", "organ"), names_from=c("metabolite"), values_from=c("stError_microM"))
+
+tablePvalData <- tableConcData
+tablePvalData[ , 3:ncol(tablePvalData)] <- ""
+for(row in 1:nrow(tablePvalData)){
+  if(tablePvalData$species[row] != "baicalensis"){
+    for(col in 3:ncol(tablePvalData)){
+      baiSE <- tableErrorData[tableErrorData$species == "baicalensis" & tableErrorData$organ == tablePvalData$organ[row], col]
+      baiConc <- tableConcData[tableConcData$species == "baicalensis" & tableConcData$organ == tablePvalData$organ[row], col]
+      SEsum <- sqrt(tableErrorData[row, col]^2 + baiSE^2) #https://www.graphpad.com/support/faq/the-standard-error-of-the-difference-between-two-means/
+      z <- as.numeric(abs(tableConcData[row, col] - baiConc)/SEsum)
+      pval <- exp(-0.717*z - 0.416*z^2) #https://www.bmj.com/content/343/bmj.d2304
+      if(pval < 0.05 & !is.nan(pval)){
+        tablePvalData[row, col] <- "*"
+      }
+    }
+  }
+}
 
 tableData <- tableConcData
 tableData[ , 3:ncol(tableConcData)] <- NA
@@ -238,7 +256,15 @@ tableData$organ <- sapply(tableData$organ, capString)
 for(metabolite in colnames(tableConcData)[3:ncol(tableConcData)]){
   concData <- format(round(tableConcData[[metabolite]], 2), nsmall = 2)
   errorData <- format(round(tableErrorData[[metabolite]], 2), nsmall = 2)
-  tableData[[metabolite]] <- paste(concData, "\u00B1", errorData)
+  pvalData <- tablePvalData[[metabolite]]
+  tableData[[metabolite]] <- paste0(concData, " \u00B1 ", errorData, pvalData)
 }
+
+tableData[tableData == " 0.00 ± 0.00" | tableData == "0.00 ± 0.00"] <- "n.d."
+tableData$species <- factor(tableData$species, levels=unique(tableData$species))
+tableData$organ <- factor(tableData$organ, levels=c("Leaves", "Stems", "Roots"))
+tableData <- with(tableData, tableData[order(species, organ), ])
+tableData <- tableData[ , c("species", "organ", "Apigenin", "Apigenin 7-G", "Scutellarein", "Scutellarin", "Hispidulin", "Hispiduloside",
+                            "Chrysin", "Chrysin 7-G", "Baicalein", "Baicalin", "Oroxylin A", "Oroxyloside", "Wogonin", "Wogonoside")]
 
 write.csv(tableData, file="C:/Users/Bryce/Research/scutellariaMetabolites/data/hplc/tables/noKR.csv", row.names=FALSE)

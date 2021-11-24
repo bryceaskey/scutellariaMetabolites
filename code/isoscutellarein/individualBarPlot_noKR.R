@@ -22,6 +22,7 @@ allData <- allData %>%
 
 # Fix naming errors
 allData$species[allData$species=="racemosa_RNAseq"] <- "racemosa"
+allData$species[allData$species=="leonardii"] <- "parvula"
 
 # Change classifiers (species, organs, metabolites) into factors
 allData$species <- factor(allData$species)
@@ -102,7 +103,26 @@ allData$metabolite[allData$metabolite=="oroxylinA"] <- "oroxylin A"
 allData$metabolite[allData$metabolite=="isoscutellarin"] <- "isoscutellarein 8-G"
 allData$metabolite <- factor(allData$metabolite)
 
-# Capitalize first letter of each flavonoid name
+allData$signif <- NA
+allData$signif_Y <- NA
+for(row in 1:nrow(allData)){
+  if(allData$species[row] != "baicalensis"){
+    baiSE <- allData$stError_microM[allData$species == "baicalensis" & allData$metabolite == allData$metabolite[row] & allData$organ == allData$organ[row]]
+    baiConc <- allData$concentration_microM[allData$species == "baicalensis" & allData$metabolite == allData$metabolite[row] & allData$organ == allData$organ[row]]
+    SEsum <- sqrt(allData$stError_microM[row]^2 + baiSE^2) #https://www.graphpad.com/support/faq/the-standard-error-of-the-difference-between-two-means/
+    z <- as.numeric(abs(allData$concentration_microM[row] - baiConc)/SEsum)
+    pval <- exp(-0.717*z - 0.416*z^2) #https://www.bmj.com/content/343/bmj.d2304
+    if(pval < 0.05 & !is.nan(pval)){
+      allData$signif[row] <- "*"
+      nudge_Y <- max(allData$concentration_microM[allData$metabolite == allData$metabolite[row]])*0.025
+      allData$signif_Y[row] <- allData$concentration_microM[row] + allData$stError_microM[row] + nudge_Y
+    }
+  }
+}
+
+allData$stError_microM[allData$concentration_microM == 0] <- NA
+
+# Capitalize first letter of each flavone name
 capString <- function(string) {
   c <- strsplit(string, " ")[[1]]
   paste(toupper(substring(c, 1,1)), substring(c, 2), sep="", collapse=" ")
@@ -125,13 +145,14 @@ createIndividualBars <- function(allData, metaboliteColors, indMetabolite, axisL
   
   graphData$species <- paste("S.", graphData$species)
   graphData$species <- str_wrap(graphData$species, width=16)
-  graphData$species <- factor(graphData$species)
+  graphData$species <- factor(graphData$species, levels=c("S. baicalensis", "S. altissima", "S. barbata", "S. parvula", "S. racemosa", "S. tournefortii", "S. wrightii"))
   
   indBarPlot <- ggplot(data=graphData, mapping=aes(x=species, y=concentration_microM, fill=organ)) +
     geom_col(position="dodge") +
     geom_errorbar(mapping=aes(ymin=concentration_microM-stError_microM, ymax=concentration_microM+stError_microM), color="black", width=0.35, size=0.35, position=position_dodge(0.9)) +
+    geom_text(mapping=aes(y=signif_Y, label=signif), position=position_dodge(0.9)) +
     scale_fill_manual(values=c("#47acff", "#62c44d", "#ff8d4f"), name="Organ:", breaks=c("leaves", "stems", "roots"), labels=c("Leaf     ", "Stem     ", "Root")) +
-    labs(y=paste(indMetabolite, "(µmol/g FW)")) +
+    labs(y=paste(indMetabolite, "[µmol/g FW]")) +
     theme_classic() +
     theme(panel.grid.major=element_line(size=0.5), panel.grid.minor=element_line(size=0.25),
           axis.title.x=element_blank(), axis.title.y=element_text(size=8), axis.text.y=element_text(size=8, color="black"),
